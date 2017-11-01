@@ -1,0 +1,83 @@
+#
+# Ignore case of matches
+#
+set completion-ignore-case on
+set bell-style visible
+#set editing-mode vi
+control-p: history-search-backward
+control-n: history-search-forward
+#set meta-flag on
+#set convert-meta off
+#set output-meta on
+#
+# Set up/down to search through history if portion of common is typed, otherwise searches through entire history
+#
+"\e[B": history-search-forward
+"\e[A": history-search-backward
+
+#
+# Adds a / behind symlinked directories
+#
+set mark-symlinked-directories on
+
+#
+# C-W Deletes to first /
+#
+control-w: unix-filename-rubout
+#control-w: unix-word-rubout
+
+#
+# Show ambiguous matches
+#
+set show-all-if-ambiguous on
+
+#
+# Allow for tab to cycle forward through matches
+#
+TAB: menu-complete
+
+#
+# Allow for shift-tab to cycle backwards through matchs
+#
+"\e[Z": "\e-1\C-i"
+
+#
+# Word forward/back with option-arrow (mac) or alt-arrow (not-mac)
+#
+"\e[1;5C": forward-word
+"\e[1;5D": backward-word
+
+#
+# Jump to last folder with option-x / alt-x
+#
+"\ex": 'cd !$ \015ls\015'
+
+#
+# Cd to last directory
+#
+"\ez": 'cd -\015'
+
+#
+# Meta-Return
+# Wrap line in $( ) and put cursor at begining
+#
+# aka. find . -name "blah"
+# becomes $(find . -name "blah") with the cursor at the begining
+#
+"\e\C-m": '\C-a "$(\C-e)"\C-a'
+
+#
+# Meta-L
+# Create a for loop around command
+#
+"\el": '\C-a for i in $(\C-e) ; do \C-a \C-m'
+
+#
+# Meta-/
+# Run output from previous command through FZF for selection
+#
+"\e/": '"$(!!|fzf --multi)"\C-a \C-m\C-m'
+
+# Include system wide settings which are ignored
+# by default if one has their own .inputrc
+$include /etc/inputrc
