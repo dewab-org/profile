@@ -12,7 +12,7 @@ while (<FH>) {
 	next if /^\#/;
 	next if /^\s*$/;
 
-	my ($action, $source, $target)=split(" ");
+	my ($action, $source, $target)=split /\s+/;
 
 	$target =~ s/~/$home/;
 	$source = abs_path($source);
