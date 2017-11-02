@@ -1,12 +1,20 @@
 #!/usr/bin/env perl
 use File::Copy qw(copy);
+use File::Basename;
 use Cwd 'abs_path';
 
-open (FH,"manifest.conf") or die "Cannot read manifest file manifest.conf!\n";
+$homedir=$ENV{HOME};
+$sourcedir=dirname(abs_path($0));
 
-$home=$ENV{HOME};
+$manifest="$sourcedir/manifest.conf";
+
+open (FH,$manifest) or die "Cannot read manifest file manifest.conf!\n";
+
 
 printf "* Re-creating files \n";
+print "* Target = $homedir \n";
+print "* Source = $sourcedir \n\n";
+
 while (<FH>) {
 	chomp;
 	next if /^\#/;
@@ -14,8 +22,8 @@ while (<FH>) {
 
 	my ($action, $source, $target)=split /\s+/;
 
-	$target =~ s/~/$home/;
-	$source = abs_path($source);
+	$target =~ s/~/$homedir/;
+	$source = "$sourcedir/$source";
 
 	warn "Cannot read $source" if ! -r $source;
 
