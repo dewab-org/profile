@@ -17,7 +17,6 @@ function _profile_up_web () {
 function _profile_up_git () {
 	GIT="$(which git 2> /dev/null)"
 	
-
 	if [ ! -x "${GIT}" ] ; then
 		echo "X Cannot find git"
 		exit 1
@@ -42,4 +41,21 @@ function profile-up () {
 		echo "* Updating profile using web."
 		_profile_up_web
 	fi
+}
+
+function profile-reset () {
+	GIT="$(which git 2> /dev/null)"
+	
+	if [ ! -x "${GIT}" ] ; then
+		echo "X Cannot find git"
+		exit 1
+	fi
+
+	local URL=$(${GIT} -C ~/.profile.d/ remote get-url origin)
+	echo "> reseting profile using ${URL}"
+	${GIT} -C "${HOME}/.profile.d" reset --hard origin/master
+
+	local URL=$(${GIT} -C ~/.custom/${platform}/ remote get-url origin)
+	echo "> reseting profile using ${URL}"
+	${GIT} -C "${HOME}/.custom/${platform}" reset --hard origin/master
 }
