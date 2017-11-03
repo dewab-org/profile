@@ -82,6 +82,7 @@ alias eject='hdiutil eject'
 
 alias hibernateon="sudo pmset -a hibernatemode 5"
 alias hibernateoff="sudo pmset -a hibernatemode 0"
+alias caff="caffeinate -disut 3600"
 
 alias ftp-on='sudo -s launchctl load -w /System/Library/LaunchDaemons/ftp.plist'
 alias ftp-off='sudo -s launchctl unload -w /System/Library/LaunchDaemons/ftp.plist'
@@ -94,7 +95,8 @@ alias mdns-off='sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple
 
 alias cdf='cd "`osascript ~/.custom/darwin/bin/finder-window-dir`"'
 
-alias maclocation="scselect | egrep '^ \*' | sed 's:.*(\(.*\)):\1:'"
+#alias maclocation="scselect | egrep '^ \*' | sed 's:.*(\(.*\)):\1:'"
+alias maclocation="networksetup -getcurrentlocation"
 
 alias ql="qlmanage -p &>/dev/null" # QuickLook a file
 
