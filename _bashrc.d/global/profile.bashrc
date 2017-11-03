@@ -97,5 +97,15 @@ function profile-changes () {
         fi
 	
 	_profile_changes_git_push "${HOME}/.profile.d" 
-	#_profile_changes_git_push "${HOME}/.custom/${platform}"
+}
+
+function custom-changes () {
+	GIT="$(which git 2> /dev/null)"
+
+        if [ ! -x "${GIT}" ] ; then
+                echo "X Cannot find git"
+                return 1
+        fi
+	
+	_profile_changes_git_push "${HOME}/.custom/${platform}"
 }
