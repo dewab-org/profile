@@ -43,6 +43,21 @@ function profile-up () {
 	fi
 }
 
+function profile-publishable () {
+	GIT="$(which git 2> /dev/null)"
+	
+	if [ ! -x "${GIT}" ] ; then
+		echo "X Cannot find git"
+		return 1
+	fi
+
+	${GIT} -C "${HOME}/.profile.d" remote set-url --push origin git@aws-1.bifrost.cc:/var/lib/git/profile.git
+	${GIT} -C "${HOME}/.profile.d" remote -v
+
+	${GIT} -C "${HOME}/.custom/${platform}/" remote set-url --push origin git@aws-1.bifrost.cc:/var/lib/git/custom.${platform}.git
+	${GIT} -C "${HOME}/.custom/${platform}/" remote -v
+}
+
 function profile-reset () {
 	GIT="$(which git 2> /dev/null)"
 	
