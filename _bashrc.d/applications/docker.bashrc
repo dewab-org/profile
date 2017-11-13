@@ -1,4 +1,6 @@
 #
+DOCKER="$(which docker 2> /dev/null)"
+[ ! -x "${DOCKER}" ] && return
 
 function docker-update () {
 	# Update all latest images
@@ -10,4 +12,8 @@ function docker-update () {
 	# Remove any dangling volumes
 	#docker volume ls -qf dangling=true | xargs -rn1 docker volume rm
 	docker volume prune -f
+}
+
+function drips(){
+    docker ps -q | xargs -n 1 docker inspect --format '{{ .NetworkSettings.IPAddress }} {{ .Name }}' | sed 's/ \// /'
 }
