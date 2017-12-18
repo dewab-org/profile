@@ -8,4 +8,11 @@ function recask () {
 	brew cask uninstall --force "$1" && brew cask install --force "$1"
 }
 
-alias brewup="brew update ; brew upgrade ; brew-cask.sh upgrade ; brew cleanup ; brew cask cleanup"
+#alias brewup="brew update ; brew upgrade ; brew-cask.sh upgrade ; brew cleanup ; brew cask cleanup"
+
+function brew-up () {
+	brew update
+	brew upgrade
+	brew cu -a --cleanup -q
+	brew cleanup
+}
