@@ -10,6 +10,12 @@ then
 	return
 fi
 
+# Check if running inside of a tmux session, and if so skip iterm checking as it doesn't like tmux start scripts
+if [ -n "${TMUX}" ]
+then
+	return
+fi
+
 # Using isiterm2.sh to determine whether the connected terminal is iTerm or not
 if [ -x "${ISITERM}" ] &&  [ -x "${ITERM_INTEGRATION}" ]
 then
