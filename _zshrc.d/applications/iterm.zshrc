@@ -2,7 +2,7 @@
 
 ISITERM="${HOME}/.bashrc.d/scripts/isiterm2.sh"
 ITERM_INTEGRATION="${HOME}/.bashrc.d/scripts/iterm_integration.sh"
-IS_WINDOWS="$(uname -r | awk -F- '{print $NF}' | tr [A-Z] [a-z])"
+IS_WINDOWS="$(uname -r | awk -F- '{print $NF}' | tr \[A-Z\] \[a-z\])"
 
 # Check if using Linux on Windows, and if so skip iterm checking as it locks the terminal for some reason
 if [ "${IS_WINDOWS}" = "microsoft" ]

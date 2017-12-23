@@ -43,24 +43,26 @@ export FIGNORE="" # files and directories to ignore with tab-completion
 #
 # Configure Shell Options
 #
-shopt -s histappend
-shopt -s cmdhist
-shopt -s cdspell
-shopt -s checkwinsize
+# Doesn't appear that these apply to ZSH
+#shopt -s histappend
+#shopt -s cmdhist
+#shopt -s cdspell
+#shopt -s checkwinsize
 
 #
 # expand !^ !* !$ !:2 !$:h !$:t when you hit space 
 #
-bind space:magic-space
+# Doesn't appear that these apply to ZSH
+#bind space:magic-space
 
 #
 # Deermine egrep location and options based on platform type
 #
 __EGREP=$(which egrep | grep -v alias)
 case "$platform" in
-	sunos)		export __EGREP=$__EGREP" -s"
+	sunos)		export __EGREP_OPTS=" -s"
 	;;
-	*)		export __EGREP=$__EGREP" -q"
+	*)		export __EGREP_OPTS=" -q"
 	;;
 esac
 
@@ -82,26 +84,32 @@ function pathmunge () {
 	#
 	# Add a path to PATH
 	#
-        if ! echo $PATH | ${__EGREP} "(^|:)$1($|:)" ; then
+        case ":${PATH}:" in
+          *:"$1":*)
+            ;;
+          *)
            if [ "$2" = "after" ] ; then
               PATH=$PATH:$1
            else
               PATH=$1:$PATH
            fi
-        fi
+        esac
 }
 
 function manpathmunge () {
 	#
 	# Add a path to MANPATH
 	#
-        if ! echo $MANPATH | ${__EGREP} "(^|:)$1($|:)" ; then
+        case ":${PATH}:" in
+          *:"$1":*)
+            ;;
+          *)
            if [ "$2" = "after" ] ; then
               MANPATH=$MANPATH:$1
            else
               MANPATH=$1:$MANPATH
            fi
-        fi
+        esac
 }
 
 function unpathmunge ()  {
