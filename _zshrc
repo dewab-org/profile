@@ -27,9 +27,6 @@ if [[ "$-" != *i* ]]; then
     return
 fi
 
-# Enable compinit command completion
-autoload -U compinit && compinit
-
 #
 # Configure Variables
 #
@@ -53,6 +50,17 @@ setopt complete_aliases
 setopt extended_history             # save timestamp of command and duration
 setopt hist_ignore_dups             # Do not write events to history that are duplicates of previous events
 setopt hist_reduce_blanks           # trim blanks
+
+#
+# Completion
+#
+
+# Enable compinit command completion
+autoload -U compinit && compinit
+
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:descriptions' format %d
+zstyle ':completion:*:descriptions' format %B%d%b
 
 
 #

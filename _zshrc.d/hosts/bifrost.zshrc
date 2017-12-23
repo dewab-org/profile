@@ -19,7 +19,7 @@ function bans {
 		sudo ipset list $i | tail -n +8 | wc -l
 	done
 }
-export -f bans
+
 alias ban="sudo ipset add banned "
 
 function firewalld-ban() {
@@ -83,7 +83,6 @@ nsup Examples:
 
 nsupdate -y DHCP_UPDATER:pRP5FapFoJ95JEL06sv4PQ==
 }
-export -f nsup
 
 # BitTorrent
 #alias bt='launchmany-curses --minport 16881 --maxport 16889'
