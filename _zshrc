@@ -32,9 +32,9 @@ fi
 #
 export CDPATH=.:~:/
 export PROMPT_COMMAND='history -a ; echo -ne "\[\033]0;\]${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/~}\[\007\]"'
-export HISTCONTROL=ignoredups:ignorespace
-export HISTTIMEFORMAT="%F %H:%M  "
-export HISTIGNORE="&:l:ls:ll:[bf]g:clear:exit:history:history *:history|*:cd:cd -:df"
+export HISTFILE="~/.zsh_history"
+export HISTSIZE=1000
+export HISTORY_IGNORE="(ls|ll|bg|fg|clear|exit|history|history|cd|df)"
 export CLICOLOR=true
 #export GREP_OPTIONS='--color=auto'
 export LESS="-X"
