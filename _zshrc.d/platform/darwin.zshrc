@@ -27,8 +27,8 @@ fi
 #
 # Mac Specific Environmental Variables
 #
+cdpath=($cdpath $HOME/Documents/Work/Sigma/Customers)
 export GDFONTPATH=/Library/Fonts
-export CDPATH="$CDPATH:$HOME/Documents/Work/Sigma/Customers:"
 export FIGNORE="$FIGNORE:Application Scripts:Global Foundries:"
 unset COMMAND_MODE
 

@@ -27,44 +27,39 @@ if [[ "$-" != *i* ]]; then
     return
 fi
 
+# Enable compinit command completion
+autoload -U compinit && compinit
+
 #
 # Configure Variables
 #
-export CDPATH=.:~:/
+cdpath=(. ~ / $HOME/Documents)
 export PROMPT_COMMAND='history -a ; echo -ne "\[\033]0;\]${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/~}\[\007\]"'
-export HISTFILE="~/.zsh_history"
+export HISTFILE=$HOME/.zsh_history
 export HISTSIZE=1000
+export SAVEHIST=1000
 export HISTORY_IGNORE="(ls|ll|bg|fg|clear|exit|history|history|cd|df)"
 export CLICOLOR=true
-#export GREP_OPTIONS='--color=auto'
 export LESS="-X"
 export FIGNORE="" # files and directories to ignore with tab-completion
 
 #
 # Configure Shell Options
 #
-# Doesn't appear that these apply to ZSH
-#shopt -s histappend
-#shopt -s cmdhist
-#shopt -s cdspell
-#shopt -s checkwinsize
+setopt auto_cd                      # if command is a path, cd into it
+setopt correct                      # try to correct spelling of commands
+setopt append_history               # append
+setopt complete_aliases
+setopt extended_history             # save timestamp of command and duration
+setopt hist_ignore_dups             # Do not write events to history that are duplicates of previous events
+setopt hist_reduce_blanks           # trim blanks
+
 
 #
 # expand !^ !* !$ !:2 !$:h !$:t when you hit space 
 #
 # Doesn't appear that these apply to ZSH
 #bind space:magic-space
-
-#
-# Deermine egrep location and options based on platform type
-#
-__EGREP=$(which egrep | grep -v alias)
-case "$platform" in
-	sunos)		export __EGREP_OPTS=" -s"
-	;;
-	*)		export __EGREP_OPTS=" -q"
-	;;
-esac
 
 #
 # Functions
@@ -138,20 +133,6 @@ function socksvars {
 	export SOCKS5_SERVER="localhost:1080"
 	export socks5_server="localhost:1080"
 	alias curl="curl -K ~/.curlrc.proxy"
-}
-
-function _set_lab_geometry {
-        case "$hostname" in
-                snotra)		_LAB_GEOMETRY="1500x100";
-                ;;
-                aesir)		_LAB_GEOMETRY="1500x100";
-                ;;
-                Sunna)		_LAB_GEOMETRY="1300x800";
-                ;;
-                ragnarok)	_LAB_GEOMETRY="1200x700";
-		;;
-		*)		_LAB_GEOMETRY="1200x600";
-        esac
 }
 
 function fp () { 
@@ -249,7 +230,7 @@ cd_func () {
 return 0
 }
 
-alias cd=cd_func
+#alias cd=cd_func
 
 if [[ $BASH_VERSION > "2.05a" ]]; then
   # ctrl+w shows the menu
