@@ -1,0 +1,350 @@
+# Daniel's .zshrc
+# 
+# Directories:
+# ~/.zshrc.d
+# ~/.zshrc.d/global/*.zshrc			scripts for all hosts
+# ~/.zshrc.d/hosts/<shortname>.zshrc		scripts for specific hostname (ex: bifrost, sunna, ragnarok)
+# ~/.zshrc.d/platform/<platform>.zshrc	scripts for specific OS (ex: darwin, linux, sunos)
+# ~/.zshrc.d/applications/<app>.zshrc		scripts for specific App (ex: veritas)
+# ~/.zshrc.d/completions/<commands>.zshrc	scripts for customer bash completions
+# ~/.zshrc.d/scripts/<script>.sh		scripts for use in support of profile scripts (ex: isiterm2.sh)
+#
+
+#
+# Set some varibles for use in this script
+#
+hostname=$(uname -n | awk -F. '{print $1}' | tr "[A-Z]" "[a-z]")
+platform=$(uname -s | tr "[A-Z]" "[a-z]")
+
+#
+# For non-ineractive shells, only set the path and exit
+#
+if [[ "$-" != *i* ]]; then
+    for dir in /usr/bin /usr/sbin /usr/*/bin/ /opt/*/bin/ /sw/bin ~/bin ~/.custom/$platform/bin /brew/bin; do
+    	export PATH="$PATH:$dir"
+    done
+    unset dir
+    return
+fi
+
+#
+# Configure Variables
+#
+export CDPATH=.:~:/
+export PROMPT_COMMAND='history -a ; echo -ne "\[\033]0;\]${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/~}\[\007\]"'
+export HISTCONTROL=ignoredups:ignorespace
+export HISTTIMEFORMAT="%F %H:%M  "
+export HISTIGNORE="&:l:ls:ll:[bf]g:clear:exit:history:history *:history|*:cd:cd -:df"
+export CLICOLOR=true
+#export GREP_OPTIONS='--color=auto'
+export LESS="-X"
+export FIGNORE="" # files and directories to ignore with tab-completion
+
+#
+# Configure Shell Options
+#
+shopt -s histappend
+shopt -s cmdhist
+shopt -s cdspell
+shopt -s checkwinsize
+
+#
+# expand !^ !* !$ !:2 !$:h !$:t when you hit space 
+#
+bind space:magic-space
+
+#
+# Deermine egrep location and options based on platform type
+#
+__EGREP=$(which egrep | grep -v alias)
+case "$platform" in
+	sunos)		export __EGREP=$__EGREP" -s"
+	;;
+	*)		export __EGREP=$__EGREP" -q"
+	;;
+esac
+
+#
+# Functions
+#
+function nix-host () {
+	#
+	# Remove host key from .ssh/known_hosts
+	#
+	if [ $# -eq 0 ] ; then
+		echo "Usage: nix-host hostname"
+		return 1
+	fi
+	echo perl -ni -e \'print unless /^$1/\' ~/.ssh/known_hosts | sh
+}
+
+function pathmunge () {
+	#
+	# Add a path to PATH
+	#
+        if ! echo $PATH | ${__EGREP} "(^|:)$1($|:)" ; then
+           if [ "$2" = "after" ] ; then
+              PATH=$PATH:$1
+           else
+              PATH=$1:$PATH
+           fi
+        fi
+}
+
+function manpathmunge () {
+	#
+	# Add a path to MANPATH
+	#
+        if ! echo $MANPATH | ${__EGREP} "(^|:)$1($|:)" ; then
+           if [ "$2" = "after" ] ; then
+              MANPATH=$MANPATH:$1
+           else
+              MANPATH=$1:$MANPATH
+           fi
+        fi
+}
+
+function unpathmunge ()  {
+	#
+	# Remove a path from PATH
+	#
+	PATH=`echo -n "$PATH" | awk  'BEGIN { RS=":"; ORS=":" } $0 != "'$1'" '`
+	export PATH=${PATH/%:/}
+}
+
+function showpath () {
+	#
+	# Show path entries one per line
+	echo ${PATH} | tr ":" "\n"
+}
+
+function grepp () {
+        #
+        # Paragraph Grep
+        #
+        [ $# -eq 1 ] && perl -00ne "print if /$1/i" || perl -00ne "print if /$1/i" < "$2";
+}
+
+
+function socksvars {
+	export SOCKS5_SERVER="localhost:1080"
+	export socks5_server="localhost:1080"
+	alias curl="curl -K ~/.curlrc.proxy"
+}
+
+function _set_lab_geometry {
+        case "$hostname" in
+                snotra)		_LAB_GEOMETRY="1500x100";
+                ;;
+                aesir)		_LAB_GEOMETRY="1500x100";
+                ;;
+                Sunna)		_LAB_GEOMETRY="1300x800";
+                ;;
+                ragnarok)	_LAB_GEOMETRY="1200x700";
+		;;
+		*)		_LAB_GEOMETRY="1200x600";
+        esac
+}
+
+function fp () { 
+	#find and list processes matching a case-insensitive partial-match string
+        case "$platform" in
+                darwin)
+                ps Ao pid,comm|awk '{match($0,/[^\/]+$/); print substr($0,RSTART,RLENGTH)": "$1}'|grep -i $1|grep -v grep
+                ;;
+                linux)
+                ps ao pid,comm|awk '{match($0,/[^\/]+$/); print substr($0,RSTART,RLENGTH)": "$1}'|grep -i $1|grep -v grep
+                ;;
+                solaris)
+                ps -ao pid,comm|awk '{match($0,/[^\/]+$/); print substr($0,RSTART,RLENGTH)": "$1}'|grep -i $1|grep -v grep
+                ;;
+                *)
+                echo "fp Not implemented for this platform, yet!" ; exit 1
+                ;;
+        esac
+}
+
+function fk () { 
+	# build menu to kill process
+	QUIT=$(which quit)
+	IFS=$'\n'
+	PS3='Kill which process? '
+	select OPT in "Cancel" $(fp $1); do
+		if [[ $OPT =~ [0-9]$ ]]; then
+			cmd=$(ps -p ${OPT##* } -o command|tail -n 1)
+			if [[ "$cmd" =~ "Contents/MacOS" ]] && [[ -x ${QUIT} ]]; then
+				echo "Quitting ${OPT%%:*}"
+				cmd=$(echo "$cmd"| sed -E 's/.*\/(.*)\.app\/.*/\1/')
+				${QUIT} -n "$cmd"
+			else
+				echo "killing ${OPT%%:*}"
+				kill ${OPT##* }
+			fi
+		fi
+		break
+	done
+	unset I
+}
+
+cd_func () {
+	# allows one to do:
+	# cd --   (list previous directories)
+	# cd -2   (switch to directory #2 from list)
+	# cd -	  (switch to previous working dir)
+	local x2 the_new_dir adir index
+	local -i cnt
+
+	if [[ $1 ==  "--" ]]; then
+		dirs -v
+		return 0
+	fi
+
+	the_new_dir=$1
+	[[ -z $1 ]] && the_new_dir=$HOME
+
+	if [[ ${the_new_dir:0:1} == '-' ]]; then
+		#
+		# Extract dir N from dirs
+		index=${the_new_dir:1}
+		[[ -z $index ]] && index=1
+		adir=$(dirs +$index)
+		[[ -z $adir ]] && return 1
+		the_new_dir=$adir
+	fi
+
+	#
+	# '~' has to be substituted by ${HOME}
+	[[ ${the_new_dir:0:1} == '~' ]] && the_new_dir="${HOME}${the_new_dir:1}"
+
+	#
+	# Now change to the new dir and add to the top of the stack
+	pushd "${the_new_dir}" > /dev/null
+	[[ $? -ne 0 ]] && return 1
+	the_new_dir=$(pwd)
+
+	#
+	# Trim down everything beyond 11th entry
+	popd -n +11 2>/dev/null 1>/dev/null
+
+	#
+	# Remove any other occurence of this dir, skipping the top of the stack
+	for ((cnt=1; cnt <= 10; cnt++)); do
+	x2=$(dirs +${cnt} 2>/dev/null)
+	[[ $? -ne 0 ]] && return 0
+	[[ ${x2:0:1} == '~' ]] && x2="${HOME}${x2:1}"
+	if [[ "${x2}" == "${the_new_dir}" ]]; then
+		popd -n +$cnt 2>/dev/null 1>/dev/null
+		cnt=cnt-1
+	fi
+	done
+
+return 0
+}
+
+alias cd=cd_func
+
+if [[ $BASH_VERSION > "2.05a" ]]; then
+  # ctrl+w shows the menu
+  bind -x "\"\C-w\":cd_func -- ;"
+fi
+
+#
+# Set My Paths
+#
+
+pathmunge /sbin after
+pathmunge /usr/sbin after
+pathmunge $HOME/bin after
+pathmunge $HOME/.custom/$platform/bin after
+pathmunge $HOME/.custom/$platform/sbin after
+pathmunge /usr/X11R6/bin after
+pathmunge /usr/local/bin after
+pathmunge /usr/local/sbin after
+pathmunge /opt/local/bin after
+pathmunge /opt/local/sbin after
+
+manpathmunge /usr/man
+manpathmunge $HOME/man after
+manpathmunge $HOME/.custom/$platform/man after
+manpathmunge $HOME/.custom/$platform/share/man after
+manpathmunge /usr/share/man after
+manpathmunge /usr/local/man after
+manpathmunge /usr/local/share/man after
+manpathmunge /usr/X11R6/man after
+manpathmunge /opt/local/man after
+
+#
+# Aliases
+#
+
+alias ls='ls -F'
+alias ll='ls -alh'
+alias l.='ls -d .*' 
+alias cpan="sudo perl -MCPAN -e shell"
+alias nslookup='/usr/bin/nslookup -sil'
+alias grpe='grep'
+alias rb='source ~/.zshrc ; bind -f ~/.inputrc'
+#alias ipgrep="grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'"
+alias ipgrep="grep -Eo '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)'"
+alias mailgrep="grep -Eo '\b[a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+\b'"
+alias sortcount="sort | uniq -c | sort -n"
+alias sudo='sudo ' # If the last character of the alias value is a blank, then the next command word following the alias is also checked for alias expansion.
+#alias whatismyip='curl http://aws-1.bifrost.cc/whatismyip.php ; echo '
+alias whatismyip='dig +short myip.opendns.com @resolver1.opendns.com'
+
+
+#
+# Run all application global zshrc scripts from $HOME/.zshrc.d/global/ (ex: prompt, colors, etc.)
+#
+
+for globalscript in $HOME/.zshrc.d/global/*.zshrc ; do
+  source $globalscript
+done
+unset globalscript
+
+#
+# Run platform specific zshrc scripts from $HOME/.zshrc.d/platform/ (ex: darwin, sunos, linux)
+#
+
+if [ -r "$HOME/.zshrc.d/platform/$platform.zshrc" ] ; then
+	source $HOME/.zshrc.d/platform/$platform.zshrc
+fi
+
+#
+# Run host specific zshrc scripts from $HOME/.zshrc.d/hosts/ (ex: bifrost, sunna, ragnarok)
+#
+
+if [ -r "$HOME/.zshrc.d/hosts/$hostname.zshrc" ] ; then
+	source $HOME/.zshrc.d/hosts/$hostname.zshrc
+fi
+
+#
+# Run all application specific zshrc scripts from $HOME/.zshrc.d/applications/ (ex: veritas)
+#
+
+for application in $HOME/.zshrc.d/applications/*.zshrc ; do
+	source $application
+done
+unset application
+
+#
+# Run all custom bash completion scripts from $HOME/.zshrc.d/completions/
+#
+
+for completion in $HOME/.zshrc.d/completions/*.zshrc ; do
+	source $completion
+done
+unset completion
+
+#
+# Set the EDITOR variable
+#
+export EDITOR=$(which vim)
+if [ ! -x "$EDITOR" ] ; then
+	export EDITOR=$(which vi)
+fi
+
+#
+# Create socket directory for SSH ControlPath
+#
+test -d ~/.ssh/cm_socket || ( mkdir ~/.ssh/cm_socket ; chmod 0700 ~/.ssh/cm_socket )
