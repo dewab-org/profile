@@ -31,10 +31,11 @@ fi
 # Configure Variables
 #
 cdpath=(. ~ / $HOME/Documents)
+fpath=( $fpath $HOME/.zshrc.d/completions)
 export PROMPT_COMMAND='history -a ; echo -ne "\[\033]0;\]${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/~}\[\007\]"'
 export HISTFILE=$HOME/.zsh_history
 export HISTSIZE=1000
-export SAVEHIST=1000
+export SAVEHIST=$HISTSIZE
 export HISTORY_IGNORE="(ls|ll|bg|fg|clear|exit|history|history|cd|df)"
 export CLICOLOR=true
 export LESS="-X"
@@ -58,9 +59,16 @@ setopt hist_reduce_blanks           # trim blanks
 # Enable compinit command completion
 autoload -U compinit && compinit
 
+# Enable bash completion support
+autoload -U +X bashcompinit && bashcompinit
+
+# Separate tab completions into groups
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*:descriptions' format %d
 zstyle ':completion:*:descriptions' format %B%d%b
+
+# Add simple clors to kill tab completion
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
 
 
 #
@@ -142,108 +150,6 @@ function socksvars {
 	export socks5_server="localhost:1080"
 	alias curl="curl -K ~/.curlrc.proxy"
 }
-
-function fp () { 
-	#find and list processes matching a case-insensitive partial-match string
-        case "$platform" in
-                darwin)
-                ps Ao pid,comm|awk '{match($0,/[^\/]+$/); print substr($0,RSTART,RLENGTH)": "$1}'|grep -i $1|grep -v grep
-                ;;
-                linux)
-                ps ao pid,comm|awk '{match($0,/[^\/]+$/); print substr($0,RSTART,RLENGTH)": "$1}'|grep -i $1|grep -v grep
-                ;;
-                solaris)
-                ps -ao pid,comm|awk '{match($0,/[^\/]+$/); print substr($0,RSTART,RLENGTH)": "$1}'|grep -i $1|grep -v grep
-                ;;
-                *)
-                echo "fp Not implemented for this platform, yet!" ; exit 1
-                ;;
-        esac
-}
-
-function fk () { 
-	# build menu to kill process
-	QUIT=$(which quit)
-	IFS=$'\n'
-	PS3='Kill which process? '
-	select OPT in "Cancel" $(fp $1); do
-		if [[ $OPT =~ [0-9]$ ]]; then
-			cmd=$(ps -p ${OPT##* } -o command|tail -n 1)
-			if [[ "$cmd" =~ "Contents/MacOS" ]] && [[ -x ${QUIT} ]]; then
-				echo "Quitting ${OPT%%:*}"
-				cmd=$(echo "$cmd"| sed -E 's/.*\/(.*)\.app\/.*/\1/')
-				${QUIT} -n "$cmd"
-			else
-				echo "killing ${OPT%%:*}"
-				kill ${OPT##* }
-			fi
-		fi
-		break
-	done
-	unset I
-}
-
-cd_func () {
-	# allows one to do:
-	# cd --   (list previous directories)
-	# cd -2   (switch to directory #2 from list)
-	# cd -	  (switch to previous working dir)
-	local x2 the_new_dir adir index
-	local -i cnt
-
-	if [[ $1 ==  "--" ]]; then
-		dirs -v
-		return 0
-	fi
-
-	the_new_dir=$1
-	[[ -z $1 ]] && the_new_dir=$HOME
-
-	if [[ ${the_new_dir:0:1} == '-' ]]; then
-		#
-		# Extract dir N from dirs
-		index=${the_new_dir:1}
-		[[ -z $index ]] && index=1
-		adir=$(dirs +$index)
-		[[ -z $adir ]] && return 1
-		the_new_dir=$adir
-	fi
-
-	#
-	# '~' has to be substituted by ${HOME}
-	[[ ${the_new_dir:0:1} == '~' ]] && the_new_dir="${HOME}${the_new_dir:1}"
-
-	#
-	# Now change to the new dir and add to the top of the stack
-	pushd "${the_new_dir}" > /dev/null
-	[[ $? -ne 0 ]] && return 1
-	the_new_dir=$(pwd)
-
-	#
-	# Trim down everything beyond 11th entry
-	popd -n +11 2>/dev/null 1>/dev/null
-
-	#
-	# Remove any other occurence of this dir, skipping the top of the stack
-	for ((cnt=1; cnt <= 10; cnt++)); do
-	x2=$(dirs +${cnt} 2>/dev/null)
-	[[ $? -ne 0 ]] && return 0
-	[[ ${x2:0:1} == '~' ]] && x2="${HOME}${x2:1}"
-	if [[ "${x2}" == "${the_new_dir}" ]]; then
-		popd -n +$cnt 2>/dev/null 1>/dev/null
-		cnt=cnt-1
-	fi
-	done
-
-return 0
-}
-
-#alias cd=cd_func
-
-if [[ $BASH_VERSION > "2.05a" ]]; then
-  # ctrl+w shows the menu
-  bind -x "\"\C-w\":cd_func -- ;"
-fi
 
 #
 # Set My Paths
@@ -328,10 +234,10 @@ unset application
 # Run all custom bash completion scripts from $HOME/.zshrc.d/completions/
 #
 
-for completion in $HOME/.zshrc.d/completions/*.zshrc ; do
-	source $completion
-done
-unset completion
+#for completion in $HOME/.zshrc.d/completions/*.zshrc ; do
+#	source $completion
+#done
+#unset completion
 
 #
 # Set the EDITOR variable
