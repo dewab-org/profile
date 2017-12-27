@@ -70,6 +70,8 @@ zstyle ':completion:*:descriptions' format %B%d%b
 # Add simple clors to kill tab completion
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
 
+# Have completion ignore case
+zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 
 #
 # expand !^ !* !$ !:2 !$:h !$:t when you hit space 
