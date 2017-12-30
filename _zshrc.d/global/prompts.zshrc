@@ -18,19 +18,21 @@ _normal_prompt () {
 
 }
 
-_color_prompt () {
+_right_prompt_err_code_prompt () {
 	# set an error string for the prompt, if applicable
 	local LAST_EXIT_CODE=$?
 	if [[ $LAST_EXIT_CODE -eq 0 ]]
-	then 
-		ERRPROMPT=" "
-	else
-	    
-		ERRPROMPT="->($LAST_EXIT_CODE) "
-	fi
+        then
+                ERRPROMPT=" "
+        else
 
-	# history -a
+                ERRPROMPT="%F{blue}-%F{red}%K{white} $LAST_EXIT_CODE %k%F{blue}-%f%k"
+        fi
 
+	echo "${ERRPROMPT}"
+}
+
+_color_prompt () {
 	case "$hostname" in
 		snotra)         HOSTCOLOR="%F{purple}" ;;
 		uller)		    HOSTCOLOR="%F{blue}" ;;
@@ -42,7 +44,7 @@ _color_prompt () {
 	case "$USER" in
 		Daniel)		USERCOLOR="%f%k%b" ;;
 		heimdall)	USERCOLOR="%f%k%b" ;;
-		root)		USERCOLOR="%F{red}%B{white}" ; ROOTPROMPT="%F{red}[%F{green}ROOT%F{red}]%f%k%b" ;;
+		root)		USERCOLOR="%F{red}%K{white}" ; ROOTPROMPT="%F{red}[%F{green}ROOT%F{red}]%f%k%b" ;;
 		*)          USERCOLOR="%F{green}" ;;
 	esac
 
@@ -53,6 +55,7 @@ _color_prompt () {
 	fi
 
 	export PROMPT="${SSHPROMPT}${ROOTPROMPT}%F{red}[%f%k%b%!%F{red}]%F{red}[${USERCOLOR}%n%f%k%b@${HOSTCOLOR}%m %f%k%b%~%F{red}]$ERRPROMPT%f%k%b\$ "
+	export RPROMPT='$(_right_prompt_err_code_prompt)'
 	export SUDO_PS1=${PS1}
 }
 
