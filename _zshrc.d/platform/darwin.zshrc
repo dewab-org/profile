@@ -126,14 +126,23 @@ function pman () {
 	man -t $1 | open -f -a Preview
 }
 
+function location () {
+    # Determine mac network location
+    local location=$(networksetup -getcurrentlocation)
+    
+    echo "$location:l" # :l converts output to all lowercase
+}
+
 function ips () {
 	# List IP addresses for each active interface
 	local interface
-	local interfaces=$(networksetup -listallhardwareports | awk '/^Device: /{print $2}')
+	local interfaces=($(networksetup -listallhardwareports | awk '/^Device: /{print $2}'))
 
 	for interface in $interfaces
 	do
 		local ip=$(ipconfig getifaddr $interface)
-		[ "$ip" != "" ] && printf "%11s: %s\n" "$interface" "$ip"
+		[ -n "$ip" ] && printf "%11s: %s\n" "$interface" "$ip"
 	done
+	
+	return 0 # needed so that failure of last getifaddr doesn't fail entire function
 }
