@@ -5,15 +5,11 @@
 setopt PROMPT_SUBST
 
 _normal_prompt () {
-        #
         # Non-Colorized Prompt
-        #
-	# history -a
-
-        PROMPT="[%!][%n@%m %~${WINDOW:+ ($WINDOW)}]\$ "
-        SUDO_PS1="[%!][%n@%m %~${WINDOW:+ ($WINDOW)}]# "
+        PROMPT="[%!][%n@%m %~${WINDOW:+ ($WINDOW)}]$# "
+        SUDO_PS1=${PROMPT}
         if [ -n "$SSH_CONNECTION" ] ; then
-                PS1="[SSH]"$PS1
+                PROMPT="[SSH]"$PROMPT
         fi
 
 }
@@ -56,7 +52,7 @@ _color_prompt () {
 
 	export PROMPT="${SSHPROMPT}${ROOTPROMPT}%F{red}[%f%k%b%!%F{red}]%F{red}[${USERCOLOR}%n%f%k%b@${HOSTCOLOR}%m %f%k%b%~%F{red}]%f%k%b%# "
 	export RPROMPT='$(_right_prompt_err_code_prompt)'
-	export SUDO_PS1=${PS1}
+	export SUDO_PS1=${PROMPT}
 }
 
 #
