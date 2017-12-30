@@ -54,7 +54,7 @@ _color_prompt () {
 		SSHPROMPT=''
 	fi
 
-	export PROMPT="${SSHPROMPT}${ROOTPROMPT}%F{red}[%f%k%b%!%F{red}]%F{red}[${USERCOLOR}%n%f%k%b@${HOSTCOLOR}%m %f%k%b%~%F{red}]$ERRPROMPT%f%k%b\$ "
+	export PROMPT="${SSHPROMPT}${ROOTPROMPT}%F{red}[%f%k%b%!%F{red}]%F{red}[${USERCOLOR}%n%f%k%b@${HOSTCOLOR}%m %f%k%b%~%F{red}]%f%k%b%# "
 	export RPROMPT='$(_right_prompt_err_code_prompt)'
 	export SUDO_PS1=${PS1}
 }
