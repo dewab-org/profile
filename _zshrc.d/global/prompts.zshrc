@@ -6,12 +6,11 @@ setopt PROMPT_SUBST
 
 _normal_prompt () {
         # Non-Colorized Prompt
-        PROMPT="[%!][%n@%m %~${WINDOW:+ ($WINDOW)}]$# "
+        PROMPT="[%!][%n@%m %~${WINDOW:+ ($WINDOW)}]%# "
         SUDO_PS1=${PROMPT}
         if [ -n "$SSH_CONNECTION" ] ; then
                 PROMPT="[SSH]"$PROMPT
         fi
-
 }
 
 _right_prompt_err_code_prompt () {
@@ -21,8 +20,7 @@ _right_prompt_err_code_prompt () {
         then
             ERRPROMPT=" "
         else
-
-            ERRPROMPT="$fg_no_bold[blue]-$fg_no_bold[red]$bg_no_bold[white] $LAST_EXIT_CODE %k$fg_no_bold[blue]-%f%k"
+            ERRPROMPT="%{$fg_no_bold[blue]%}-%{$fg_no_bold[red]%}%{$bg_no_bold[white]%} $LAST_EXIT_CODE %{$reset_color%}%{$fg_no_bold[blue]%}-%{$reset_color%}"
         fi
 
 	echo "${ERRPROMPT}"
@@ -30,27 +28,27 @@ _right_prompt_err_code_prompt () {
 
 _color_prompt () {
 	case "$hostname" in
-		snotra)         HOSTCOLOR="$fg_no_bold[purple]" ;;
-		uller)		    HOSTCOLOR="$fg_no_bold[blue]" ;;
-		uller-wifi)	    HOSTCOLOR="$fg_no_bold[blue]" ;;
-		bifrost)        HOSTCOLOR="$fg_no_bold[cyan]" ;;
-		*)              HOSTCOLOR="$reset_color" ;;
+		snotra)         HOSTCOLOR="%{$fg_no_bold[purple]%}" ;;
+		uller)		    HOSTCOLOR="%{$fg_no_bold[blue]%}" ;;
+		uller-wifi)	    HOSTCOLOR="%{$fg_no_bold[blue]%}" ;;
+		bifrost)        HOSTCOLOR="%{$fg_no_bold[cyan]%}" ;;
+		*)              HOSTCOLOR="%{$reset_color%}" ;;
 	esac
 
 	case "$USER" in
-		Daniel)		USERCOLOR="$reset_color" ;;
-		heimdall)	USERCOLOR="$reset_color" ;;
-		root)		USERCOLOR="$fg_no_bold[red]$bg_no_bold[white]" ; ROOTPROMPT="$fg_no_bold[red][$fg_no_bold[green]ROOT$fg_no_bold[red]]$reset_color" ;;
-		*)          USERCOLOR="$fg_no_bold[green]" ;;
+		Daniel)		USERCOLOR="%{$reset_color%}" ;;
+		heimdall)	USERCOLOR="%{$reset_color%}" ;;
+		root)		USERCOLOR="%{$fg_no_bold[red]%}%{$bg_no_bold[white]%}" ; ROOTPROMPT="%{$fg_no_bold[red]%}[%{$fg_no_bold[green]%}ROOT%{$fg_no_bold[red]%}]%{$reset_color%}" ;;
+		*)          USERCOLOR="%{$fg_no_bold[green]%}" ;;
 	esac
 
 	if [ -n "$SSH_CONNECTION" ] ; then
-		SSHPROMPT="$fg_no_bold[red][$fg_no_bold[blue]SSH$fg_no_bold[red]]$reset_color"	
+		SSHPROMPT="%{$fg_no_bold[red]%}[%{$fg_no_bold[blue]%}SSH%{$fg_no_bold[red]%}]%{$reset_color%}"	
 	else
 		SSHPROMPT=''
 	fi
 
-	export PROMPT="${SSHPROMPT}${ROOTPROMPT}$fg_no_bold[red][$reset_color%!$fg_no_bold[red]]$fg_no_bold[red][${USERCOLOR}%n$reset_color@${HOSTCOLOR}%m $reset_color%~$fg_no_bold[red]]$reset_color%# "
+	export PROMPT="${SSHPROMPT}${ROOTPROMPT}%{$fg_no_bold[red]%}[%{$reset_color%}%!%{$fg_no_bold[red]%}]%{$fg_no_bold[red]%}[${USERCOLOR}%n%{$reset_color%}@${HOSTCOLOR}%m %{$reset_color%}%~%{$fg_no_bold[red]%}]%{$reset_color%}%# "
 	export RPROMPT='$(_right_prompt_err_code_prompt)'
 	export SUDO_PS1=${PROMPT}
 }
