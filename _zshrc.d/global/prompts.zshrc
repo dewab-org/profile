@@ -19,10 +19,10 @@ _right_prompt_err_code_prompt () {
 	local LAST_EXIT_CODE=$?
 	if [[ $LAST_EXIT_CODE -eq 0 ]]
         then
-                ERRPROMPT=" "
+            ERRPROMPT=" "
         else
 
-                ERRPROMPT="%F{blue}-%F{red}%K{white} $LAST_EXIT_CODE %k%F{blue}-%f%k"
+            ERRPROMPT="$fg_no_bold[blue]-$fg_no_bold[red]$bg_no_bold[white] $LAST_EXIT_CODE %k$fg_no_bold[blue]-%f%k"
         fi
 
 	echo "${ERRPROMPT}"
@@ -30,27 +30,27 @@ _right_prompt_err_code_prompt () {
 
 _color_prompt () {
 	case "$hostname" in
-		snotra)         HOSTCOLOR="%F{purple}" ;;
-		uller)		    HOSTCOLOR="%F{blue}" ;;
-		uller-wifi)	    HOSTCOLOR="%F{blue}" ;;
-		bifrost)        HOSTCOLOR="%F{cyan}" ;;
-		*)              HOSTCOLOR="%f%k%b" ;;
+		snotra)         HOSTCOLOR="$fg_no_bold[purple]" ;;
+		uller)		    HOSTCOLOR="$fg_no_bold[blue]" ;;
+		uller-wifi)	    HOSTCOLOR="$fg_no_bold[blue]" ;;
+		bifrost)        HOSTCOLOR="$fg_no_bold[cyan]" ;;
+		*)              HOSTCOLOR="$reset_color" ;;
 	esac
 
 	case "$USER" in
-		Daniel)		USERCOLOR="%f%k%b" ;;
-		heimdall)	USERCOLOR="%f%k%b" ;;
-		root)		USERCOLOR="%F{red}%K{white}" ; ROOTPROMPT="%F{red}[%F{green}ROOT%F{red}]%f%k%b" ;;
-		*)          USERCOLOR="%F{green}" ;;
+		Daniel)		USERCOLOR="$reset_color" ;;
+		heimdall)	USERCOLOR="$reset_color" ;;
+		root)		USERCOLOR="$fg_no_bold[red]$bg_no_bold[white]" ; ROOTPROMPT="$fg_no_bold[red][$fg_no_bold[green]ROOT$fg_no_bold[red]]$reset_color" ;;
+		*)          USERCOLOR="$fg_no_bold[green]" ;;
 	esac
 
 	if [ -n "$SSH_CONNECTION" ] ; then
-		SSHPROMPT="%F{red}[%F{blue}SSH%F{red}]%f%k%b"	
+		SSHPROMPT="$fg_no_bold[red][$fg_no_bold[blue]SSH$fg_no_bold[red]]$reset_color"	
 	else
 		SSHPROMPT=''
 	fi
 
-	export PROMPT="${SSHPROMPT}${ROOTPROMPT}%F{red}[%f%k%b%!%F{red}]%F{red}[${USERCOLOR}%n%f%k%b@${HOSTCOLOR}%m %f%k%b%~%F{red}]%f%k%b%# "
+	export PROMPT="${SSHPROMPT}${ROOTPROMPT}$fg_no_bold[red][$reset_color%!$fg_no_bold[red]]$fg_no_bold[red][${USERCOLOR}%n$reset_color@${HOSTCOLOR}%m $reset_color%~$fg_no_bold[red]]$reset_color%# "
 	export RPROMPT='$(_right_prompt_err_code_prompt)'
 	export SUDO_PS1=${PROMPT}
 }

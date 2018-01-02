@@ -30,13 +30,18 @@ fi
 #
 # Configure Variables
 #
+
+# Paths
 cdpath=(. ~ / $HOME/Documents)
 fpath=( $fpath $HOME/.zshrc.d/completions)
-export PROMPT_COMMAND='history -a ; echo -ne "\[\033]0;\]${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/~}\[\007\]"'
+
+# History Paramters
 export HISTFILE=$HOME/.zsh_history
 export HISTSIZE=1000
 export SAVEHIST=$HISTSIZE
 export HISTORY_IGNORE="(ls|ll|bg|fg|clear|exit|history|history|cd|df)"
+
+# Others
 export CLICOLOR=true
 export LESS="-X"
 export FIGNORE="" # files and directories to ignore with tab-completion
@@ -51,6 +56,11 @@ setopt complete_aliases             # make the alias a distinct command for comp
 setopt extended_history             # save timestamp of command and duration
 setopt hist_ignore_dups             # Do not write events to history that are duplicates of previous events
 setopt hist_reduce_blanks           # trim blanks
+
+#
+# Enable ZSH colors
+#
+autoload -U colors && colors
 
 #
 # Completion
