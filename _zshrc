@@ -33,7 +33,7 @@ fi
 
 # Paths
 cdpath=(. ~ / $HOME/Documents)
-fpath=( $fpath $HOME/.zshrc.d/completions /brew/completions/zsh)
+fpath=( $fpath $HOME/.zshrc.d/completions )
 
 # History Paramters
 export HISTFILE=$HOME/.zsh_history
@@ -71,6 +71,10 @@ autoload -U compinit && compinit
 
 # Enable bash completion support
 autoload -U +X bashcompinit && bashcompinit
+
+# Enable completion list menu
+zstyle ':completion:*' menu select
+zmodload zsh/complist
 
 # Separate tab completions into groups
 zstyle ':completion:*' group-name ''
