@@ -33,7 +33,7 @@ fi
 
 # Paths
 cdpath=(. ~ / $HOME/Documents)
-fpath=( $fpath $HOME/.zshrc.d/completions)
+fpath=( $fpath $HOME/.zshrc.d/completions /brew/completions/zsh)
 
 # History Paramters
 export HISTFILE=$HOME/.zsh_history
