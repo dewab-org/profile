@@ -264,6 +264,11 @@ if [ ! -x "$EDITOR" ] ; then
 fi
 
 #
+# Switch back to Emacs mode (changing editor switches to VI-mode for some stupid reason)
+#
+bindkey -e
+
+#
 # Create socket directory for SSH ControlPath
 #
 test -d ~/.ssh/cm_socket || ( mkdir ~/.ssh/cm_socket ; chmod 0700 ~/.ssh/cm_socket )
