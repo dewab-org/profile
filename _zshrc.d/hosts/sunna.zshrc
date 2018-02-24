@@ -2,8 +2,9 @@
 # Snotra specific bashrc script
 #
 
-alias piup='pssh -h ~/hosts/pis.hosts -t0 -i "sudo apt-get update ; sudo apt-get upgrade -y"'
-alias awsup='pssh -h ~/hosts/aws.hosts -t0 -i "sudo yum update -y"'
+alias pi-up='pssh -h ~/.hosts/pis.hosts -t0 -i "sudo apt-get update ; sudo apt-get upgrade -y"'
+alias aws-up='pssh -h ~/.hosts/aws.hosts -t0 -i "sudo yum update -y"'
+alias aws-status='pssh -h ~/.hosts/aws.hosts -it0 -p1 sudo bin/service_status.sh'
 
 cdpath=($cdpath /net/bifrost/data/work)
 
