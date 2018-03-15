@@ -90,6 +90,9 @@ function _profile_changes_git_push () {
 		return 1
 	fi
 
+	# Remove Mac crap first
+	find ${GITREPO} -type f -name ".DS_Store" -delete
+
 	local URL=$(${GIT} -C ${GITREPO} remote get-url --push origin)
         echo "> Sending changes to ${URL}"
 
