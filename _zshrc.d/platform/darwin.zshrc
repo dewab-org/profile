@@ -32,8 +32,6 @@ export GDFONTPATH=/Library/Fonts
 export FIGNORE="$FIGNORE:Application Scripts:Global Foundries:"
 unset COMMAND_MODE
 
-release=`uname -r | awk -F. '{print $1}'`
-
 #
 # Bash Completeion
 #
@@ -51,29 +49,15 @@ fi
 #
 alias finkup='fink selfupdate ; fink update-all'
 
-case "$release" in
-	#
-	#  Apple being inconsistent.  Go figure.
-	#
-	13) 	alias flushcache="sudo killall -HUP mDNSResponder" # 10.7 & 10.8 & 10.9
-	;;
-	14)	
-		if [ -x /usr/sbin/discoveryutil ] ; then
-			alias flushcache="sudo discoveryutil mdnsflushcache" # 10.10.0 - 10.10.3
-		else
-			alias flushcache="sudo killall -HUP mDNSResponder" # 10.10.4 - ??
-		fi
-	;;
-	15)
-		alias flushcache="sudo dscacheutil -flushcache;sudo killall -HUP mDNSResponder" # 10.11.0 (El Capitan)
-	;;
-	16)
-		alias flushcache="sudo dscacheutil -flushcache;sudo killall -HUP mDNSResponder" # 10.11.0 (El Capitan)
-	;;
-	*)	alias flushcache="dscacheutil -flushcache" # 10.6 and earlier
-	;;
-esac
-unset release
+#
+# Flush DNS Cache
+#
+
+if [ -x /usr/sbin/discoveryutil ] ; then
+	alias flushcache="sudo discoveryutil mdnsflushcache" # 10.10.0 - 10.10.3
+else
+	alias flushcache="sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder" # 10.10.4 - ??
+fi
 
 alias am='open -a "Activity Monitor"'
 alias top="top -u" # Mac Top
