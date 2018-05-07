@@ -67,6 +67,9 @@ set statusline+=%=
 set statusline+=\ \ Loc:\ [%02c][%04l/%04L]
 set statusline+=\ [%P]
 
+" Two Spaces replace tab key when editin YAML files
+autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+
 " Returns true if paste mode is enabled
 function! HasPaste()
     if &paste
