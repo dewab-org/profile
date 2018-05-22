@@ -33,23 +33,6 @@ export FIGNORE="$FIGNORE:Application Scripts:Global Foundries:"
 unset COMMAND_MODE
 
 #
-# Bash Completeion
-#
-
-if [ -r "/sw/etc/bash_completion" ] ; then
-        source /sw/etc/bash_completion
-fi
-
-if [ -r "/brew/etc/profile.d/bash_completion.sh" ] ; then
-	source /brew/etc/profile.d/bash_completion.sh
-fi
-
-#
-# Aliases
-#
-alias finkup='fink selfupdate ; fink update-all'
-
-#
 # Flush DNS Cache
 #
 
@@ -58,6 +41,18 @@ if [ -x /usr/sbin/discoveryutil ] ; then
 else
 	alias flushcache="sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder" # 10.10.4 - ??
 fi
+
+#
+# Enable ZSH Autosuggestions
+#
+
+if [ -f  /brew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] ; then
+	source /brew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+fi
+
+#
+# General Aliases
+#
 
 alias am='open -a "Activity Monitor"'
 alias top="top -u" # Mac Top
@@ -83,17 +78,6 @@ alias cdf='cd "`osascript ~/.custom/darwin/bin/finder-window-dir`"'
 alias maclocation="networksetup -getcurrentlocation"
 
 alias ql="qlmanage -p &>/dev/null" # QuickLook a file
-
-##alias is-on='sudo -s launchctl load -w /System/Library/LaunchDaemons/com.apple.InternetSharing.plist'
-##alias is-off='sudo -s launchctl unload -w /System/Library/LaunchDaemons/com.apple.InternetSharing.plist'
-
-#
-# Mac Specific Paths
-#
-pathmunge /sw/bin after
-pathmunge /sw/sbin after
-
-manpathmunge /sw/share/man after
 
 #
 # Functions
