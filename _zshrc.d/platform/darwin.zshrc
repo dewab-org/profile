@@ -51,6 +51,13 @@ if [ -f  /brew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] ; then
 fi
 
 #
+# Enable ZSH Syntx Highlighting
+#
+if [ -f /brew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] ; then
+	source /brew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
+
+#
 # General Aliases
 #
 
