@@ -56,6 +56,7 @@ setopt complete_aliases             # make the alias a distinct command for comp
 setopt extended_history             # save timestamp of command and duration
 setopt hist_ignore_dups             # Do not write events to history that are duplicates of previous events
 setopt hist_reduce_blanks           # trim blanks
+setopt nomatch                      # match BASH glob behavior.  Pass wildcard to command if unmatched (as in scp blah:* .)
 
 #
 # Enable ZSH colors
