@@ -1,5 +1,8 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =3
+let g:netrw_dirhist_cnt =6
 let g:netrw_dirhist_1='/Users/Daniel/.zshrc.d'
 let g:netrw_dirhist_2='/Users/daniel/.tmuxinator'
 let g:netrw_dirhist_3='/Users/Daniel/.profile.d/_vim/plugin'
+let g:netrw_dirhist_4='/Users/daniel/work/ansible/roles/dns_entries/tasks'
+let g:netrw_dirhist_5='/Users/daniel/work/ansible/roles/ipa_host_entry'
+let g:netrw_dirhist_6='/Users/daniel/work/ansible/roles/create_rhel_vm_from_template'

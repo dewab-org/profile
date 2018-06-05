@@ -23,14 +23,15 @@ function _profile_up_git () {
 	fi
 
 	# Git profile
-	local URL=$(${GIT} -C ~/.profile.d/ remote get-url origin)
+	local URL=$( ( cd ~/.profile.d/ ; ${GIT} remote get-url origin ))
 	echo "> updating profile using ${URL}"
 	${GIT} -C "${HOME}/.profile.d/" pull
+	( cd "${HOME}/.profile.d/" ; ${GIT} pull )
 
 	# Git binaries
-	local URL=$(${GIT} -C ~/.custom/${platform}/ remote get-url origin)
+	local URL=$( ( cd ~/.custom/${platform}/ ; ${GIT} remote get-url origin))
 	echo "> updating profile using ${URL}"
-	${GIT} -C "${HOME}/.custom/${platform}/" pull
+	( cd "${HOME}/.custom/${platform}/" ; ${GIT} pull )
 }
 
 function profile-up () {
