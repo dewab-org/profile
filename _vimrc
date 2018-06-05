@@ -77,3 +77,5 @@ function! HasPaste()
     en
     return ''
 endfunction
+
+au BufNewFile,BufRead *.zshrc set filetype=zsh
