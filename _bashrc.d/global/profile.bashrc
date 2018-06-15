@@ -23,14 +23,16 @@ function _profile_up_git () {
 	fi
 
 	# Git profile
-	local URL=$(${GIT} -C ~/.profile.d/ remote get-url origin)
-	echo "> updating profile using ${URL}"
-	${GIT} -C "${HOME}/.profile.d/" pull
+	#local URL=$( ( cd ~/.profile.d/ ; ${GIT} remote get-url origin ))
+	#echo "> updating profile using ${URL}"
+	echo "> updating ~/profile.d"
+	( cd "${HOME}/.profile.d/" ; ${GIT} pull )
 
 	# Git binaries
-	local URL=$(${GIT} -C ~/.custom/${platform}/ remote get-url origin)
-	echo "> updating profile using ${URL}"
-	${GIT} -C "${HOME}/.custom/${platform}/" pull
+	#local URL=$( ( cd ~/.custom/${platform}/ ; ${GIT} remote get-url origin))
+	#echo "> updating profile using ${URL}"
+	echo "> updating ~/.custom/${platform}"
+	( cd "${HOME}/.custom/${platform}/" ; ${GIT} pull )
 }
 
 function profile-up () {
@@ -89,6 +91,9 @@ function _profile_changes_git_push () {
 		echo ""
 		return 1
 	fi
+
+	# Remove Mac crap first
+	find ${GITREPO} -type f -name ".DS_Store" -delete
 
 	local URL=$(${GIT} -C ${GITREPO} remote get-url --push origin)
         echo "> Sending changes to ${URL}"
