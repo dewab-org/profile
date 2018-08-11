@@ -1,0 +1,20 @@
+#
+# .zshenv is set for all sessions, login and non-interactive
+#
+
+#
+# Set some varibles for use in this script
+#
+hostname=${HOST%%.*} # replaces everything including and after the first . with nothing.
+platform=$(uname -s | tr "[A-Z]" "[a-z]")
+
+#
+# For non-ineractive shells, only set the path and exit
+#
+if [[ ! -o interactive ]]; then
+    for dir in /usr/bin /usr/sbin /usr/*/bin/ /sw/bin ~/bin ~/.custom/$platform/bin /brew/bin; do
+        export PATH="$PATH:$dir"
+    done
+    unset dir
+    return
+fi
