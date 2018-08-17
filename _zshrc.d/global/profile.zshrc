@@ -102,7 +102,7 @@ function _profile_changes_git_push () {
         git -C "${GITREPO}" add .
 
         # Commits changes after launching an interactive VI(M) session
-        git -C "${GITREPO}" commit
+        git -C "${GITREPO}" commit --no-verify
 
         # Push the changes to the git repo
         git -C "${GITREPO}" push origin master	
