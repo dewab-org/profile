@@ -1,0 +1,15 @@
+[user]
+	name = Daniel Whicker
+	email = daniel.whicker@sigmasolinc.com
+[core]
+	editor = vi
+	excludesfile = /Users/daniel/.gitignore
+	autocrlf = input
+[color]
+	branch = auto
+	diff = auto
+	interactive = auto
+	status = auto
+[credential]
+	helper = osxkeychain
+
