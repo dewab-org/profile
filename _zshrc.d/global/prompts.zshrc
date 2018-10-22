@@ -76,6 +76,11 @@ alias normal_prompt='export PROMPT_COMMAND=_normal_prompt'
 #
 export PROMPT_COMMAND=_color_prompt
 
+_prompt_command () {
+	eval "${PROMPT_COMMAND}"
+}
+
 # Allow ZSH to "emulate" bash PROMPT_COMMAND variable
 #precmd() { vcs_info ; eval "$PROMPT_COMMAND" }
-precmd() { eval "$PROMPT_COMMAND" }
+#precmd_functions+=(vcs_info)
+precmd_functions+=(_prompt_command)
