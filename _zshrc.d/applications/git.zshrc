@@ -80,3 +80,7 @@ function git-new-repo () {
   git -C "${REPOSITORY}" commit --no-verify -m "Initial state"
   git -C "${REPOSITORY}" push -u origin master
 }
+
+function git-log () {
+  git log --pretty=format:"%h %ad | %s%d [%an]" --graph --date=short
+}
