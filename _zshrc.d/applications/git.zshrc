@@ -80,3 +80,29 @@ function git-new-repo () {
   git -C "${REPOSITORY}" commit --no-verify -m "Initial state"
   git -C "${REPOSITORY}" push -u origin master
 }
+
+function git-new-repo-pivot () {
+  if [ ! $# -eq 1 ] ; then
+    echo "Usage: git-new-repo [reponame]"
+    return 1
+  fi
+
+  REPOSITORY="$1"
+
+  if [ -d "${REPOSITORY}" ] ; then
+    echo "Local copy already exists!"
+    return 1
+  fi
+
+  # Create local repostitory
+  git init "${REPOSITORY}"
+
+  # Create README file
+  echo "# This is the README file." >> ${REPOSITORY}/README
+  git -C "${REPOSITORY}" add .
+  git -C "${REPOSITORY}" commit --no-verify -m "Initial state"
+  #git -C "${REPOSITORY}" push -u origin master
+
+  # Create GitLab Repo
+  git -C "${REPOSITORY}" push --set-upstream git@gitlab.com:sigma-automation/${REPOSITORY}.git master
+}
