@@ -10,40 +10,20 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 
-" The following are examples of different formats supported.
-" Keep Plugin commands between vundle#begin/end.
-" plugin on GitHub repo
-Plugin 'tpope/vim-fugitive'
-" plugin from http://vim-scripts.org/vim/scripts.html
-" Plugin 'L9'
-" Git plugin not hosted on GitHub
-Plugin 'git://git.wincent.com/command-t.git'
-" git repos on your local machine (i.e. when working on your own plugin)
-"Plugin 'file:///home/gmarik/path/to/plugin'
-" The sparkup vim script is in a subdirectory of this repo called vim.
-" Pass the path to set the runtimepath properly.
-Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
-" Install L9 and avoid a Naming conflict if you've already installed a
-" different version somewhere else.
-" Plugin 'ascenator/L9', {'name': 'newL9'}
-"
-
 " All of your Plugins must be added before the following line
 "
 " airline plugin 2019-02-26
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 
-"Plugin 'powerline/powerline'
-
 " Enable ALE linting engine
 Plugin 'w0rp/ale'
 
-" Color Scheme
-Plugin 'Royal-Colorschemes'
+Plugin 'ColorSchemeMenuMaker'
 
 call vundle#end()            " required
 filetype plugin indent on    " required
+
 " To ignore plugin indent changes, instead use:
 "filetype plugin on
 "
@@ -72,19 +52,15 @@ set wildmode=list:longest,full
 set showmode
 set showcmd
 
-set background=dark
-"colorscheme railcasts
-"colorscheme molokai
-
 " added 2015-09-16
 " Set to auto read when a file is changed from the outside
 set autoread
 
 "Always show current position
-set ruler
+"set ruler
 
 " Highlight search results
-set hlsearch
+"set hlsearch
 
 " search as characters are entered
 set incsearch
@@ -108,23 +84,6 @@ set foldnestmax=10      "deepest fold is 10 levels
 set nofoldenable        "dont fold by default
 set foldlevel=1         "this is just what i use
 
-""""""""""""""""""""""""""""""
-" => Status line
-""""""""""""""""""""""""""""""
-" Always show the status line
-"set laststatus=2
-
-" Format the status line
-"set statusline=\ \ Filename:\ [%.20F]
-"set statusline+=\ \ %{HasPaste()}
-"set statusline+=\ \ Flags:\ [%hm%r%w]
-"set statusline+=\ \ Type:\ %y
-"set statusline+=\ \ Encoding:\ [%{strlen(&fenc)?&fenc:'none'}] "file encoding
-"set statusline+=\ \ Format:\ [%{&fileformat}]              " file format
-"set statusline+=%=
-"set statusline+=\ \ Loc:\ [%02c][%04l/%04L]
-"set statusline+=\ [%P]
-
 " Two Spaces replace tab key when editin YAML files
 autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 
@@ -138,6 +97,9 @@ endfunction
 
 " Set Airline Theme
 let g:airline_theme='cool'
+
+" Set color scheme
+"colorscheme molokai
 
 au BufNewFile,BufRead *.zshrc set filetype=zsh
 
