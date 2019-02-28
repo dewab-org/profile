@@ -1,6 +1,6 @@
 function _profile_up_web () {
-	CURL="$(which curl 2> /dev/null)"
-	WGET="$(which wget 2> /dev/null)"
+	local CURL="$(command -v curl)"
+	local WGET="$(command -v wget)"
 
 	if [ -x "${CURL}" ] ; then
 		GET="${CURL} -L -s"
@@ -15,7 +15,7 @@ function _profile_up_web () {
 }
 
 function _profile_up_git () {
-	GIT="$(which git 2> /dev/null)"
+	local GIT="$(command -v git)"
 	
 	if [ ! -x "${GIT}" ] ; then
 		echo "X Cannot find git"
@@ -46,7 +46,7 @@ function profile-up () {
 }
 
 function profile-publishable () {
-	GIT="$(which git 2> /dev/null)"
+	local GIT="$(command -v git)"
 	
 	if [ ! -x "${GIT}" ] ; then
 		echo "X Cannot find git"
@@ -61,7 +61,7 @@ function profile-publishable () {
 }
 
 function profile-reset () {
-	GIT="$(which git 2> /dev/null)"
+	local GIT="$(command -v git)"
 	
 	if [ ! -x "${GIT}" ] ; then
 		echo "X Cannot find git"
@@ -109,7 +109,7 @@ function _profile_changes_git_push () {
 }
 
 function profile-changes () {
-	GIT="$(which git 2> /dev/null)"
+	local GIT="$(command -v git)"
 
         if [ ! -x "${GIT}" ] ; then
                 echo "X Cannot find git"
@@ -120,7 +120,7 @@ function profile-changes () {
 }
 
 function custom-changes () {
-	GIT="$(which git 2> /dev/null)"
+	local GIT="$(command -v git)"
 
         if [ ! -x "${GIT}" ] ; then
                 echo "X Cannot find git"
