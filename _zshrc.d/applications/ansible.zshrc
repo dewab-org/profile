@@ -1,10 +1,11 @@
-ANSIBLE=$(which ansible 2>/dev/null)
+local ANSIBLE=$(command -v ansible )
+[ ! -x "${ANSIBLE}" ] && return
 
-if [ -x "${ANSIBLE}" ] ; then
-	ANSIBLE_PATH="$(dirname $( head -1 $(which ansible) | sed -e 's/^\#\!//' ))"
-	alias ansible-pip="${ANSIBLE_PATH}/pip3"
-fi
+ANSIBLE_PATH="$(dirname $( head -1 ${ANSIBLE} | sed -e 's/^\#\!//' ))"
+alias ansible-pip="${ANSIBLE_PATH}/pip3"
 
 if [ -x "${ANSIBLE_PATH}/tower-cli" ] ; then
 	alias tower-cli="${ANSIBLE_PATH}/tower-cli"
 fi
+
+unset ANSIBLE

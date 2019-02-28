@@ -1,14 +1,13 @@
-PYGMENTIZE="$(which pygmentize 2> /dev/null)"
+local PYGMENTIZE="$(command -v pygmentize)"
+[ ! -x "${PYGMENTIZE}" ] && return
 
-if [ -x "${PYGMENTIZE}" ] ; then
-        alias ccat="${PYGMENTIZE} -g"
+ alias ccat="${PYGMENTIZE} -g"
 
-	if [ -x "$(which less_py_filter.sh)" ] ; then
-		alias cless='LESSOPEN="|less_py_filter.sh %s" less -R'
-	fi
-
-	export LESSOPEN="| pygmentize %s"
-	export LESS="$LESS -R"
+if [ -x "$(command -v less_py_filter.sh)" ] ; then
+  alias cless='LESSOPEN="|less_py_filter.sh %s" less -R'
 fi
+
+export LESSOPEN="| pygmentize %s"
+export LESS="$LESS -R"
 
 unset PYGMENTIZE

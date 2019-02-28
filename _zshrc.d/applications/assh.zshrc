@@ -1,5 +1,6 @@
-ASSH=$(which assh 2>/dev/null)
+local ASSH=$(command -v assh)
+[ ! -x "${ASSH}" ] && return
 
-if [ -x "${ASSH}" ]  ; then
-	alias ssh="${ASSH} wrapper ssh"
-fi
+alias ssh="${ASSH} wrapper ssh"
+
+unset ASSH

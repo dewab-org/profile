@@ -1,5 +1,5 @@
 #
-DOCKER="$(which docker 2> /dev/null)"
+local DOCKER="$(command -v docker)"
 [ ! -x "${DOCKER}" ] && return
 
 function docker-update () {
@@ -17,3 +17,5 @@ function docker-update () {
 function drips(){
     docker ps -q | xargs -n 1 docker inspect --format '{{ .NetworkSettings.IPAddress }} {{ .Name }}' | sed 's/ \// /'
 }
+
+unset DOCKER

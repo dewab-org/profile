@@ -1,7 +1,8 @@
-TMUXINATOR=$(which tmuxinator 2> /dev/null)
+local TMUXINATOR=$(command -v tmuxinator)
+[ ! -x "${TMUXINATOR}" ] && return
 
 # Have to do this because $fpath doesn't seem to work the way I thought it did
 
-if [ -x "${TMUXINATOR}" ] ; then
-	source ${HOME}/.zshrc.d/completions/_tmuxinator
-fi
+source ${HOME}/.zshrc.d/completions/_tmuxinator
+
+unset TMUXINATOR

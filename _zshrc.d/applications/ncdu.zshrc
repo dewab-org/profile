@@ -1,3 +1,6 @@
-if [ -x "$(which ncdu)" ] ; then
-	alias ncdu='ncdu --color=dark'
-fi
+local NCDU=$(command -v ncdu)
+[ ! -x "${NCDU}" ] && return
+
+alias ncdu='ncdu --color=dark'
+
+unset NCDU
