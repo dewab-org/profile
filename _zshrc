@@ -257,9 +257,9 @@ unset application
 #
 # Set the EDITOR variable
 #
-export EDITOR=$(which vim)
+export EDITOR=$(command -v vim)
 if [ ! -x "$EDITOR" ] ; then
-	export EDITOR=$(which vi)
+	export EDITOR=$(command -v vi)
 fi
 
 #
