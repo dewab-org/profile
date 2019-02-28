@@ -79,7 +79,7 @@ function profile-reset () {
 
 function _profile_changes_git_push () {
 	# I need to add error/sanity checking
-	GITREPO=$1
+	local GITREPO=$1
 	
 	echo "> Checking for swap files in ${GITREPO}"
 	# Check for vi(m) swap files first
@@ -99,13 +99,13 @@ function _profile_changes_git_push () {
         echo "> Sending changes to ${URL}"
 
         # Add any new files
-        git -C "${GITREPO}" add .
+        ${GIT} -C "${GITREPO}" add .
 
         # Commits changes after launching an interactive VI(M) session
-        git -C "${GITREPO}" commit --no-verify
+        ${GIT} -C "${GITREPO}" commit --no-verify
 
         # Push the changes to the git repo
-        git -C "${GITREPO}" push origin master	
+        ${GIT} -C "${GITREPO}" push origin master	
 }
 
 function profile-changes () {
