@@ -1,6 +1,9 @@
 # Only run iTerm integration if the terminal is iTerm
+#
+# https://iterm2.com/shell_integration/bash
+# https://github.com/gnachman/iterm2-website/blob/master/source/utilities/it2check
 
-ISITERM="${HOME}/.bashrc.d/scripts/isiterm2.sh"
+IT2CHECK="${HOME}/.bashrc.d/scripts/it2check"
 ITERM_INTEGRATION="${HOME}/.bashrc.d/scripts/iterm_integration.sh"
 IS_WINDOWS="$(uname -r | awk -F- '{print $NF}' | tr \[A-Z\] \[a-z\])"
 
@@ -17,9 +20,9 @@ then
 fi
 
 # Using isiterm2.sh to determine whether the connected terminal is iTerm or not
-if [ -x "${ISITERM}" ] &&  [ -x "${ITERM_INTEGRATION}" ]
+if [ -x "${IT2CHECK}" ] &&  [ -x "${ITERM_INTEGRATION}" ]
 then
-	${ISITERM} && ITERM=true
+	${IT2CHECK} && ITERM=true
 
 fi
 
