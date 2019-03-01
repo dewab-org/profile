@@ -1,24 +1,29 @@
 [user]
-	name = Daniel Whicker
-	email = daniel.whicker@sigmasolinc.com
+  name = Daniel Whicker
+  email = daniel.whicker@sigmasolinc.com
+
 [core]
-	editor = vi
-	excludesfile = /Users/daniel/.gitignore
-	autocrlf = input
-	pager = 
+  editor = vi
+  excludesfile = /Users/daniel/.gitignore
+  autocrlf = input
+  pager = 
+
 [color]
-	branch = auto
-	diff = auto
-	interactive = auto
-	status = auto
+  branch = auto
+  diff = auto
+  interactive = auto
+  status = auto
+  ui = true
+  pager = true
+
 [credential]
-	helper = osxkeychain
+  helper = osxkeychain
 
 [alias]
-	co = checkout
-	ci = commit
-	st = status
-	br = branch
-	hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
-	type = cat-file -t
-	dump = cat-file -p
+  co = checkout
+  ci = commit
+  st = status
+  br = branch
+  hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+  type = cat-file -t
+  dump = cat-file -p
