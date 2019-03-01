@@ -14,7 +14,7 @@
 # Set some varibles for use in this script
 #
 hostname=${HOST%%.*} # replaces everything including and after the first . with nothing.
-platform=$(uname -s | tr "[A-Z]" "[a-z]")
+platform=$(uname -s | tr '[:upper:]' '[:lower:]')
 
 # For non-ineractive shells, only set the path and exit
 # non-interative information moved to .zshenv
@@ -99,10 +99,10 @@ function nix-host () {
 	fi
 	#echo perl -ni -e \'print unless /^$1/\' ~/.ssh/known_hosts | sh
 	local host
-	for host in $*
+	for host in "$@" 
 	do
 	  echo "Removing ${host}... "
-	  ssh-keygen -R ${host}
+	  ssh-keygen -R "${host}"
 	done
 }
 
@@ -142,14 +142,15 @@ function unpathmunge ()  {
 	#
 	# Remove a path from PATH
 	#
-	PATH=`echo -n "$PATH" | awk  'BEGIN { RS=":"; ORS=":" } $0 != "'$1'" '`
+	PATH=$(echo -n "$PATH" | awk  'BEGIN { RS=":"; ORS=":" } $0 != "'$1'" ')
 	export PATH=${PATH/%:/}
 }
 
 function showpath () {
 	#
 	# Show path entries one per line
-	echo ${PATH} | tr ":" "\n"
+	# 
+	echo "${PATH}" | tr ":" "\n"
 }
 
 function grepp () {
@@ -216,7 +217,7 @@ alias whatismyip='dig +short myip.opendns.com @resolver1.opendns.com'
 #
 
 for globalscript in $HOME/.zshrc.d/global/*.zshrc ; do
-  source $globalscript
+  source "${globalscript}"
 done
 unset globalscript
 
@@ -224,24 +225,24 @@ unset globalscript
 # Run platform specific zshrc scripts from $HOME/.zshrc.d/platform/ (ex: darwin, sunos, linux)
 #
 
-if [ -r "$HOME/.zshrc.d/platform/$platform.zshrc" ] ; then
-	source $HOME/.zshrc.d/platform/$platform.zshrc
+if [ -r "${HOME}/.zshrc.d/platform/${platform}.zshrc" ] ; then
+	source "${HOME}/.zshrc.d/platform/${platform}.zshrc"
 fi
 
 #
 # Run host specific zshrc scripts from $HOME/.zshrc.d/hosts/ (ex: bifrost, sunna, ragnarok)
 #
 
-if [ -r "$HOME/.zshrc.d/hosts/$hostname.zshrc" ] ; then
-	source $HOME/.zshrc.d/hosts/$hostname.zshrc
+if [ -r "${HOME}/.zshrc.d/hosts/${hostname}.zshrc" ] ; then
+	source "${HOME}/.zshrc.d/hosts/${hostname}.zshrc"
 fi
 
 #
 # Run all application specific zshrc scripts from $HOME/.zshrc.d/applications/ (ex: veritas)
 #
 
-for application in $HOME/.zshrc.d/applications/*.zshrc ; do
-	source $application
+for application in ${HOME}/.zshrc.d/applications/*.zshrc ; do
+	source "${application}"
 done
 unset application
 

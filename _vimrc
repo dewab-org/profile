@@ -19,8 +19,6 @@ Plugin 'vim-airline/vim-airline-themes'
 " Enable ALE linting engine
 Plugin 'w0rp/ale'
 
-Plugin 'ColorSchemeMenuMaker'
-
 call vundle#end()            " required
 filetype plugin indent on    " required
 
