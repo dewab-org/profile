@@ -64,7 +64,7 @@ function git-new-repo () {
 
   if [ -d "${REPOSITORY}" ] ; then
     echo "Local copy already exists!"
-    return 1
+    #return 1
   fi
 
   # Create local repostitory
@@ -91,7 +91,7 @@ function git-new-repo-pivot () {
 
   if [ -d "${REPOSITORY}" ] ; then
     echo "Local copy already exists!"
-    return 1
+    #return 1
   fi
 
   # Create local repostitory
