@@ -4,12 +4,12 @@ local ONEPASSWORD=$(command -v op)
 export OP_SESSION_FILE=~/.op_session
 
 function op-signin {
-	export OP_SESSION_dwhicker=$("${ONEPASSWORD}" signin --output=raw)
+	export OP_SESSION_dwhicker="$("${ONEPASSWORD}" signin --output=raw)"
 	echo "${OP_SESSION_dwhicker}" > "${OP_SESSION_FILE}"
 }
 
 function op-eval {
-	export OP_SESSION_dwhicker=$(cat "$OP_SESSION_FILE")}
+	export OP_SESSION_dwhicker="$(cat "$OP_SESSION_FILE")"
 }
 
 # Read file on login
