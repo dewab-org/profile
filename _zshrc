@@ -13,9 +13,8 @@
 #
 # Set some varibles for use in this script
 #
-hostname=${HOST%%.*} # replaces everything including and after the first . with nothing.
-#platform=$(uname -s | tr '[:upper:]' '[:lower:]')
-platform=$(uname -s) ; platform=${platform:l}
+hostname=${${HOST%%.*}:l} # replaces everything including and after the first . with nothing. Then lowercases it.
+platform=${$(uname -s):l} # lowercases platform name
 
 # For non-ineractive shells, only set the path and exit
 # non-interative information moved to .zshenv
