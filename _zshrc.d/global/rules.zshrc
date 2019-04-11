@@ -21,5 +21,5 @@ rulemc ()  {
               return 1
       fi
       # Fill line with ruler character ($2, default "-"), reset cursor, move 2 cols right, print message
-      printf -v _hr "%*s" $(tput cols) && echo -en ${_hr// /${2--}} && printf "\r\033[2C$_Yel$1$_RCol\n"
+      printf -v _hr "%*s" $(tput cols) && print -n ${_hr// /${2--}} && printf "\r\033[2C${fg[yellow]}${1}${reset_color}\n"
 }
