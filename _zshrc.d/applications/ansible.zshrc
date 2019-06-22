@@ -2,7 +2,7 @@ local ANSIBLE=$(command -v ansible )
 [ ! -x "${ANSIBLE}" ] && return
 
 local ANSIBLE_PYTHON=$(head -1 ${ANSIBLE})
-local ANSIBLE_PYTHON_PATH=$(dirname ${${(s: :)ANSIBLE_PYTHON}[1]:s/\#\!/})
+local ANSIBLE_PYTHON_PATH=$(dirname ${${ANSIBLE_PYTHON}:s/\#\!/})
 
 alias ansible-pip="${ANSIBLE_PYTHON_PATH}/pip3"
 
