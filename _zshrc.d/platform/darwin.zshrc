@@ -88,6 +88,7 @@ alias mdns-on='sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.mD
 alias mdns-off='sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist'
 
 alias cdf='cd "`osascript ~/.custom/darwin/bin/finder-window-dir`"'
+alias cpwd='pwd|tr -d "\n"|pbcopy'
 
 #alias maclocation="scselect | egrep '^ \*' | sed 's:.*(\(.*\)):\1:'"
 alias maclocation="networksetup -getcurrentlocation"
