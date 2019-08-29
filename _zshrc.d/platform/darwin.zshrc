@@ -129,3 +129,8 @@ function ips () {
 	
 	return 0 # needed so that failure of last getifaddr doesn't fail entire function
 }
+
+function f() { 
+	# Open current or specified folder in Finder
+	open -a "Finder" "${1-.}"; 
+}
