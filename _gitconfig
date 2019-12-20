@@ -29,3 +29,4 @@
 	type = cat-file -t
 	dump = cat-file -p
 	aa = add .
+	url = remote get-url --all
