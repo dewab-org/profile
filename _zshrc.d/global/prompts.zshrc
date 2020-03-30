@@ -37,7 +37,9 @@ _color_prompt () {
 	case "$hostname" in
 		snotra)         HOSTCOLOR="%{$fg_no_bold[purple]%}" ;;
 		uller)		    HOSTCOLOR="%{$fg_no_bold[blue]%}" ;;
+		freya)		    HOSTCOLOR="%{$fg_no_bold[blue]%}" ;;
 		uller-wifi)	    HOSTCOLOR="%{$fg_no_bold[blue]%}" ;;
+		freya-wifi)	    HOSTCOLOR="%{$fg_no_bold[blue]%}" ;;
 		bifrost)        HOSTCOLOR="%{$fg_no_bold[cyan]%}" ;;
 		*)              HOSTCOLOR="%{$reset_color%}" ;;
 	esac
