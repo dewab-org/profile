@@ -4,6 +4,7 @@
 alias ls='ls --color=auto -F'
 alias l.='ls -d .* --color=auto'
 alias yumup="sudo yum update"
+alias dnfup="sudo dnf update"
 
 # mkfile
 mkfile=$(command -v mkfile)
@@ -13,6 +14,11 @@ if [ ! -x "${mkfile}" ] && [ -x "${xfs_mkfile}" ] ; then
 fi
 
 # Bash Completion
-if [ -x "/etc/bash_completion" ] ; then
-	source /etc/bash_completion
-fi
+#if [ -x "/etc/bash_completion" ] ; then
+#	source /etc/bash_completion
+#fi
+
+# Functions
+function ips() {
+	ip -o addr show scope global up | awk '{printf "%11s: %s\n", $2, $4}'
+}
