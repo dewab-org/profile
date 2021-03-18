@@ -6,7 +6,8 @@ alias pi-up='pssh -h ~/.hosts/pis.hosts -t0 -i "sudo apt-get update ; sudo apt-g
 alias aws-up='pssh -h ~/.hosts/aws.hosts -t0 -i "sudo yum update -y"'
 alias aws-status='pssh -h ~/.hosts/aws.hosts -it0 -p1 sudo bin/service_status.sh'
 
-cdpath=($cdpath /net/bifrost/data/work)
+# Putting automount in cdpath was epically stupid.  Don't do that.  ZSH hangs when mount isn't available.  :-)
+#cdpath=($cdpath /net/bifrost/data/work)
 
 # DNS
 alias nslookup='/usr/bin/nslookup -sil'
