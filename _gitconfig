@@ -17,7 +17,7 @@
 	pager = true
 
 [credential]
-	helper = osxkeychain
+	helper = cache --timeout=3600
 
 [alias]
 	co = checkout

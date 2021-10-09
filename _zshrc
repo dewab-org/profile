@@ -269,6 +269,18 @@ fi
 bindkey -e
 
 #
+# Change ctrl+u to kill to front of line
+#
+bindkey '^U' backward-kill-line
+
+#
+# Cntrl+X E to edit the command line in editor
+#
+autoload edit-command-line
+zle -N edit-command-line
+bindkey '^Xe' edit-command-line
+
+#
 # Create socket directory for SSH ControlPath
 #
 test -d ~/.ssh/cm_socket || ( mkdir ~/.ssh/cm_socket ; chmod 0700 ~/.ssh/cm_socket )
