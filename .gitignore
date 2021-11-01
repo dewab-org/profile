@@ -3,4 +3,4 @@
 *.LSOverride
 Thumbs.db
 *.swp
-dht.dat
+_aria2/dht.dat
