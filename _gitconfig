@@ -17,7 +17,7 @@
 	pager = true
 
 [credential]
-	helper = osxkeychain
+	helper = cache --timeout=3600
 
 [alias]
 	co = checkout
@@ -29,4 +29,21 @@
 	type = cat-file -t
 	dump = cat-file -p
 	aa = add .
-	url = remote get-url --all
+	pa = push --all all
+	pt = push origin --tag
+	url = remote get-url --push --all
+
+[core]
+	pager = delta
+
+[interactive]
+	diffFilter = delta --color-only
+
+[delta]
+	features = side-by-side line-numbers decorations
+	whitespace-error-style = 22 reverse
+
+[delta "decorations"]
+	commit-decoration-style = bold yellow box ul
+	file-style = bold yellow ul
+	file-decoration-style = none
