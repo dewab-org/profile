@@ -8,6 +8,9 @@ local ANSIBLE=$(command -v ansible )
 alias ansible-pip="/usr/local/opt/ansible/libexec/bin/pip"
 alias ansible-up='find ~/.ansible ~/ansible -name ".git" -exec dirname {} \; | xargs -n1 -I % git -C % pull'
 
+# added 2022-01-08 to fix issue with ansible crashing running win_* modules
+alias ansible="OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES ansible"
+
 if [ -x "${ANSIBLE_PATH}/tower-cli" ] ; then
 	alias tower-cli="${ANSIBLE_PATH}/tower-cli"
 fi
