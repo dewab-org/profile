@@ -135,3 +135,11 @@ function f() {
 	# Open current or specified folder in Finder
 	open -a "Finder" "${1-.}"; 
 }
+
+function macmodel() {
+	curl -s https://support-sp.apple.com/sp/product?cc=$(
+  		system_profiler SPHardwareDataType \
+    	| awk '/Serial/ {print $4}' \
+    	| cut -c 9-
+	) | sed 's|.*<configCode>\(.*\)</configCode>.*|\1|'
+}
