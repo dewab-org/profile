@@ -1,4 +1,3 @@
-local PROG=$(command -v direnv)
-[ ! -x "${PROG}" ] && return
+[[ $+commands[direnv] -lt 1 ]] && return
 
-eval "$(${PROG} hook zsh)"
+eval "$(direnv hook zsh)"

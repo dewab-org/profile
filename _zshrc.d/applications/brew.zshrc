@@ -1,8 +1,9 @@
-#
+[[ $+commands[brew] -lt 1 ]] && return
 
 export HOMEBREW_GITHUB_API_TOKEN="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"
 
-fpath=( $fpath /brew/completions/zsh /brew/share/zsh-completions )
+fpath=( $fpath $(brew --prefix)/share/zsh/site-functions )
+
 
 function recask () {
 	brew cask uninstall --force "$1" && brew cask install --force "$1"

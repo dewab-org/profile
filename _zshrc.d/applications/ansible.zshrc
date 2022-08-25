@@ -1,5 +1,4 @@
-local ANSIBLE=$(command -v ansible )
-[ ! -x "${ANSIBLE}" ] && return
+[[ $+commands[ansible] -lt 1 ]] && return
 
 #local ANSIBLE_PYTHON=$(head -1 ${ANSIBLE})
 #local ANSIBLE_PYTHON_PATH=$(dirname ${${ANSIBLE_PYTHON}:s/\#\!/})
@@ -16,5 +15,3 @@ export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 if [ -x "${ANSIBLE_PATH}/tower-cli" ] ; then
 	alias tower-cli="${ANSIBLE_PATH}/tower-cli"
 fi
-
-unset ANSIBLE

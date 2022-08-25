@@ -1,6 +1,3 @@
-local NCDU=$(command -v ncdu)
-[ ! -x "${NCDU}" ] && return
+[[ $+commands[ncdu] -lt 1 ]] && return
 
 alias ncdu='ncdu --color=dark'
-
-unset NCDU

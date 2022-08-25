@@ -1,7 +1,9 @@
-local KUBECTL=$(command -v kubectl )
-[ ! -x "${KUBECTL}" ] && return
+if (( $+commands[kubectl] )) ; then
+    source <(kubectl completion zsh)
+    # source <(kubectl completion zsh | sed 's/kubectl/k/g')
+    alias k=kubectl
+fi
 
-alias k=kubectl
-
-source <(kubectl completion zsh)
-source <(kubectl completion zsh | sed 's/kubectl/k/g')
+if (( $+commands[kompose] )) ; then
+    source <(kompose completion zsh)
+fi

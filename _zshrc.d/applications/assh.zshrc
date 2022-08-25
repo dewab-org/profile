@@ -1,6 +1,6 @@
-local ASSH=$(command -v assh)
-[ ! -x "${ASSH}" ] && return
+[[ $+commands[assh] -lt 1 ]] && return
 
-alias ssh="${ASSH} wrapper ssh"
+alias ssh="assh wrapper ssh"
 
-unset ASSH
+source <(assh completion zsh)
+compdef _assh assh

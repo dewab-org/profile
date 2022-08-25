@@ -1,6 +1,5 @@
-#
-local DOCKER="$(command -v docker)"
-[ ! -x "${DOCKER}" ] && return
+[[ $+commands[docker] -lt 1 ]] && return
+
 
 function docker-update () {
 	# Update all latest images
@@ -17,5 +16,3 @@ function docker-update () {
 function drips(){
     docker ps -q | xargs -n 1 docker inspect --format '{{ .NetworkSettings.IPAddress }} {{ .Name }}' | sed 's/ \// /'
 }
-
-unset DOCKER

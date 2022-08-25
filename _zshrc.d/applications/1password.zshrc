@@ -1,5 +1,4 @@
-local ONEPASSWORD=$(command -v op)
-[ ! -x "${ONEPASSWORD}" ] && return
+[[ $+commands[op] -lt 1 ]] && return
 
 export OP_SESSION_FILE=~/.op_session
 
@@ -14,3 +13,6 @@ function op-eval {
 
 # Read file on login
 [ -f "${OP_SESSION_FILE}" ] && op-eval
+
+source <(op completion zsh)
+compdef _op op
