@@ -4,7 +4,7 @@ function vim-setup {
     if [ -d ~/.vim/bundle/Vundle.vim ] ; then
         # Update Vundle
         print "Ensuring Vundle is latest"
-        git -C ~/.vim/bundle/Vundle.vim pull
+        (cd ~/.vim/bundle/Vundle.vim ; git pull)
     else
         # Download Vundle
         print "Installing Vundle"
