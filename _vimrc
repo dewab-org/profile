@@ -12,6 +12,9 @@ Plugin 'VundleVim/Vundle.vim'
 
 " All of your Plugins must be added before the following line
 "
+"
+Plugin 'tpope/vim-fugitive'
+
 " airline plugin 2019-02-26
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
@@ -95,6 +98,13 @@ endfunction
 
 " Set Airline Theme
 let g:airline_theme='cool'
+
+"Fonts for the Status Line
+let g:airline_powerline_fonts = 1
+
+if !exists('g:airline_symbols')
+    let g:airline_symbols = {}
+endif
 
 " Set color scheme
 "colorscheme molokai
