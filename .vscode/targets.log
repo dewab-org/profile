@@ -10,7 +10,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 make: *** No rule to make target `all'.  Stop.
 
 
-# Make data base, printed on Thu Aug 25 10:39:45 2022
+# Make data base, printed on Thu Sep  1 08:58:00 2022
 
 # Variables
 
@@ -20,7 +20,6 @@ make: *** No rule to make target `all'.  Stop.
 ?F = $(notdir $?)
 # environment
 ELECTRON_NO_ATTACH_CONSOLE = 1
- 
 # automatic
 ?D = $(patsubst %/,%,$(dir $?))
 # environment
@@ -44,11 +43,13 @@ MAKEFILE_LIST :=
 # environment
 __CFBundleIdentifier = com.microsoft.VSCode
 # environment
+INFOPATH = /usr/local/share/info:
+# environment
 LESSOPEN = | pygmentize %s
 # environment
-VSCODE_CWD = /Users/daniel/.profile.d
+VSCODE_CWD = /Users/daniel
 # environment
-PATH = /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/VMware Fusion.app/Contents/Public:/Applications/Little Snitch.app/Contents/Components:/opt/X11/bin:/Library/Apple/usr/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/Applications/Wireshark.app/Contents/MacOS:/Users/daniel/bin:/Users/daniel/.custom/darwin/bin:/Users/daniel/.custom/darwin/sbin:/usr/X11R6/bin:/usr/local/sbin:/opt/local/bin:/opt/local/sbin
+PATH = /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/VMware Fusion.app/Contents/Public:/Applications/Little Snitch.app/Contents/Components:/opt/X11/bin:/Library/Apple/usr/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/Applications/Wireshark.app/Contents/MacOS:/Users/daniel/bin:/Users/daniel/.custom/darwin/bin:/Users/daniel/.custom/darwin/sbin:/usr/X11R6/bin:/usr/local/sbin:/opt/local/bin:/opt/local/sbin
 # environment
 LaunchInstanceID = E1C60366-BAB8-49EC-A755-D9DCCEC8F155
 # environment
@@ -66,7 +67,11 @@ DISPLAY = /private/tmp/com.apple.launchd.i7SzlRX1zg/org.xquartz:0
 # environment
 PWD = /Users/daniel/.profile.d
 # environment
+HOMEBREW_CELLAR = /usr/local/Cellar
+# environment
 ORIGINAL_XDG_CURRENT_DESKTOP = undefined
+# environment
+MANPATH = /usr/local/share/man:/usr/man::/Users/daniel/man:/Users/daniel/.custom/darwin/man:/Users/daniel/.custom/darwin/share/man:/usr/share/man:/usr/local/man:/usr/local/share/man:/usr/X11R6/man:/opt/local/man:
 # environment
 VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
 # environment
@@ -106,7 +111,7 @@ USER = daniel
 # default
 MAKECMDGOALS := all
 # environment
-TERM_SESSION_ID = w4t0p0:02EDA7FC-851B-434C-A15C-DFE2895729EF
+TERM_SESSION_ID = w4t0p0:83014CBE-4DB6-4634-816A-127F663291B2
 # environment
 BORG_REPO = borg:.
 # environment
@@ -130,7 +135,7 @@ MallocNanoZone = 0
 # makefile
 MAKEFLAGS = Rrqp
 # environment
-PROMPT = %{[22;31m%}[%{[00m%}%!%{[22;31m%}]%{[22;31m%}[%{[22;32m%}%n%{[00m%}@%{[00m%}%m %{[00m%}%~%{[22;31m%}]%{[00m%}%{[22;31m%}[%{[00m%}%{[22;37m%}± %{[33m%}●%{[00m%} %{[22;37m%}master%{[00m%}%{[22;31m%}]%{[00m%}%# 
+PROMPT = %{[22;31m%}[%{[00m%}%!%{[22;31m%}]%{[22;31m%}[%{[22;32m%}%n%{[00m%}@%{[00m%}%m %{[00m%}%~%{[22;31m%}]%{[00m%}%# 
 # environment
 MFLAGS = -Rrqp
 # automatic
@@ -138,10 +143,11 @@ MFLAGS = -Rrqp
 # environment
 TERM_PROGRAM_VERSION = 3.4.16
 # environment
- 
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.579329989.579329995.FC0BDAAE-F48E-4A3E-A146-482CA47E2253
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.579329989.579329995.9CB161C6-6CC2-409B-B42B-FDC8E4A762E4
 # environment
 LC_TERMINAL_VERSION = 3.4.16
+# environment
+HOMEBREW_PREFIX = /usr/local
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # environment
@@ -151,7 +157,9 @@ APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
 # automatic
 +F = $(notdir $+)
 # environment
-ITERM_SESSION_ID = w4t0p0:02EDA7FC-851B-434C-A15C-DFE2895729EF
+ITERM_SESSION_ID = w4t0p0:83014CBE-4DB6-4634-816A-127F663291B2
+# environment
+HOMEBREW_REPOSITORY = /usr/local/Homebrew
 # environment
 COLORFGBG = 15;0
 # environment
@@ -169,11 +177,11 @@ PROMPT_COMMAND = _color_prompt
 # automatic
 <F = $(notdir $<)
 # environment
-ITERM_PROFILE = tmux
+ITERM_PROFILE = Default
 # environment
 EDITOR = /usr/local/bin/vim
 # environment
-SUDO_PS1 = %{[22;31m%}[%{[00m%}%!%{[22;31m%}]%{[22;31m%}[%{[22;32m%}%n%{[00m%}@%{[00m%}%m %{[00m%}%~%{[22;31m%}]%{[00m%}%{[22;31m%}[%{[00m%}%{[22;37m%}± %{[33m%}●%{[00m%} %{[22;37m%}master%{[00m%}%{[22;31m%}]%{[00m%}%# 
+SUDO_PS1 = %{[22;31m%}[%{[00m%}%!%{[22;31m%}]%{[22;31m%}[%{[22;32m%}%n%{[00m%}@%{[00m%}%m %{[00m%}%~%{[22;31m%}]%{[00m%}%# 
 # environment
 LC_ALL = C
 # environment
@@ -199,11 +207,11 @@ ORATAB = /etc/oratab
 # environment
 LANG = C
 # environment
-TERM = xterm
+TERM = xterm-256color
 # environment
-VSCODE_PID = 15969
+VSCODE_PID = 2042
 # variable set hash-table stats:
-# Load=93/1024=9%, Rehash=0, Collisions=7/114=6%
+# Load=98/1024=10%, Rehash=0, Collisions=7/119=6%
 
 # Pattern-specific Variable Values
 
@@ -285,6 +293,6 @@ GNUmakefile:
 # strcache size: total = 0 / max = 0 / min = 4096 / avg = 0
 # strcache free: total = 0 / max = 0 / min = 4096 / avg = 0
 
-# Finished Make data base on Thu Aug 25 10:39:45 2022
+# Finished Make data base on Thu Sep  1 08:58:00 2022
 
  

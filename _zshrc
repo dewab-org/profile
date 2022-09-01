@@ -59,6 +59,9 @@ autoload -U colors && colors
 # Completion
 #
 
+# Enable is-at-least plugin for version checking
+autoload -Uz is-at-least
+
 # Enable compinit command completion
 autoload -U compinit && compinit
 
