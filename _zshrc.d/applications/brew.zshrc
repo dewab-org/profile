@@ -1,6 +1,5 @@
 [[ $+commands[brew] -lt 1 ]] && return
 
-
 # Add brew environment variables
 export HOMEBREW_GITHUB_API_TOKEN="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"
 source <(brew shellenv)

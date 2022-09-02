@@ -1,8 +1,0 @@
-# GPG-Agent
-local GPGCONF=$(command -v gpgconf)
-[ ! -x "${GPGCONF}" ] && return
-
-export GPG_TTY=$(/usr/bin/tty)
-${GPGCONF} --launch gpg-agent
-
-unset GPGCONF

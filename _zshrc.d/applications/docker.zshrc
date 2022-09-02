@@ -1,6 +1,5 @@
 [[ $+commands[docker] -lt 1 ]] && return
 
-
 function docker-update () {
 	# Update all latest images
 	docker images | awk '$2=="latest" {print $1}' | xargs -n1 docker pull	

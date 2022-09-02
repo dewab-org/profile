@@ -9,19 +9,19 @@
 /usr/bin/ssh-add -A > /dev/null 2>&1
 
 #
-# Run Fink Environment
-#
-if [ -f "/sw/bin/init.sh" ] ; then
-        source /sw/bin/init.sh
-fi
-
-#
 # Homebrew environment
 #
 if [ -d "/brew" ] ; then
 	pathmunge /brew/bin after
 	pathmunge /brew/sbin after
 	manpathmunge /brew/share/man after
+fi
+
+# For Apple Silicon Installs
+if [ -d "/opt/homebrew" ] ; then
+	pathmunge /opt/homebrew/bin after
+	pathmunge /opt/homebrew/sbin after
+	manpathmunge /opt/homebrew/share/man after
 fi
 
 #
@@ -54,6 +54,10 @@ if [ -f  /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] ; then
 	source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 fi
 
+if [ -f  /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] ; then
+	source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+fi
+
 #
 # Enable ZSH Syntx Highlighting
 #
@@ -63,6 +67,10 @@ fi
 
 if [ -f /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] ; then
 	source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
+
+if [ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] ; then
+	source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi
 
 #
@@ -87,7 +95,6 @@ alias tftp-off='sudo -s launchctl unload -w /System/Library/LaunchDaemons/tftp.p
 alias mdns-on='sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist'
 alias mdns-off='sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist'
 
-alias cdf='cd "`osascript ~/.custom/darwin/bin/finder-window-dir`"'
 alias cpwd='pwd|tr -d "\n"|pbcopy'
 
 #alias maclocation="scselect | egrep '^ \*' | sed 's:.*(\(.*\)):\1:'"
