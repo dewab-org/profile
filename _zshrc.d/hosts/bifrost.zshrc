@@ -68,28 +68,12 @@ ban: [-p] CIDR [CIDR...]
         fi
 }
 
-
-# DNS
-alias nslookup='/usr/bin/nslookup -sil'
-function nsup() {
-echo " 
-nsup Examples:
-  update delete www.example.com cname
-  update add www1.example.com 86400 a 172.16.1.1
-  update add www.example.com 600 cname www1.example.com.
-  update add 1.1.16.172.in-addr.arpa 86400 ptr www1.example.com.
-
-"
-
-nsupdate -y DHCP_UPDATER:pRP5FapFoJ95JEL06sv4PQ==
-}
-
 # BitTorrent
 #alias bt='launchmany-curses --minport 16881 --maxport 16889'
 
-# Irc
-alias efnet='epic heimdall -l ~/.efnet.ircrc'
-alias undernet='epic heimdall -l ~/.undernet.ircrc'
-alias bdotcom='epic Heimdall -l ~/.bdotcom.ircrc irc.bondage.com:6663'
-alias ircfilter='perl -pe '\''s/\e\[[\d;].*?m//g'\'''
-#alias ircmsg='egrep "\[[01][0-9]:[0-5][0-9]\wM\] \[[ 1][0-9]\]"'
+# IRC
+# alias efnet='epic heimdall -l ~/.efnet.ircrc'
+# alias undernet='epic heimdall -l ~/.undernet.ircrc'
+# alias bdotcom='epic Heimdall -l ~/.bdotcom.ircrc irc.bondage.com:6663'
+# alias ircfilter='perl -pe '\''s/\e\[[\d;].*?m//g'\'''
+# alias ircmsg='egrep "\[[01][0-9]:[0-5][0-9]\wM\] \[[ 1][0-9]\]"'
