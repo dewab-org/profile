@@ -1,7 +1,0 @@
-#compdef _mas mas
-
-function _mas () {
-	local line
-
-	_arguments -C "1: :(account help install list outdated reset search signin signout upgrade version)"
-}

@@ -1,4 +1,4 @@
-[[ $+commands[docker] -lt 1 ]] && return
+is-executable docker || return
 
 function docker-update () {
 	# Update all latest images

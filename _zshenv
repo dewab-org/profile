@@ -12,7 +12,8 @@ platform=$(uname -s | tr "[A-Z]" "[a-z]")
 # For non-ineractive shells, only set the path and exit
 #
 if [[ ! -o interactive ]]; then
-    for dir in /usr/bin /usr/sbin /usr/*/bin/ /sw/bin ~/bin ~/.custom/$platform/bin /brew/bin; do
+    for dir in /usr/bin /usr/sbin /usr/*/bin/ ~/bin ~/.custom/$platform/bin /brew/bin; do
+        [ -d "${dir}"] || return
         export PATH="$PATH:$dir"
     done
     unset dir

@@ -1,4 +1,5 @@
-[[ $+commands[ansible] -lt 1 ]] && return
+is-executable ansible || return
+
 
 #local ANSIBLE_PYTHON=$(head -1 ${ANSIBLE})
 #local ANSIBLE_PYTHON_PATH=$(dirname ${${ANSIBLE_PYTHON}:s/\#\!/})

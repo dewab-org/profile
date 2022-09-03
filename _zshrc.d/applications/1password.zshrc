@@ -1,4 +1,4 @@
-[[ $+commands[op] -lt 1 ]] && return
+is-executable op || return
 
 export OP_SESSION_FILE=~/.op_session
 

@@ -1,4 +1,4 @@
-[[ $+commands[assh] -lt 1 ]] && return
+is-executable assh || return
 
 alias ssh="assh wrapper ssh --"
 

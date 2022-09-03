@@ -1,4 +1,4 @@
-[[ $+commands[pygmentize] -lt 1 ]] && return
+is-executable pygmentize || return
 
  alias ccat="pygmentize -g"
 

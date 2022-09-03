@@ -1,4 +1,4 @@
-[[ $+commands[nsupdate] -lt 1 ]] && return
+is-executable nsupdate || return
 
 function nsup() {
 	echo "

@@ -1,5 +1,5 @@
-[[ $+commands[tmux] -lt 1 ]] && return
-[[ $+commands[tmuxinator] -gt 0 ]] && alias mux=tmuxinator
+is-executable tmux || return
+is-executable tmuxinator && alias mux=tmuxinator
 
 # Brett Terpstra 2014
 # <http://brettterpstra.com>

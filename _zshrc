@@ -6,7 +6,6 @@
 # ~/.zshrc.d/hosts/<shortname>.zshrc		scripts for specific hostname (ex: bifrost, sunna, ragnarok)
 # ~/.zshrc.d/platform/<platform>.zshrc	scripts for specific OS (ex: darwin, linux, sunos)
 # ~/.zshrc.d/applications/<app>.zshrc		scripts for specific App (ex: veritas)
-# ~/.zshrc.d/completions/<commands>.zshrc	scripts for customer bash completions
 # ~/.zshrc.d/scripts/<script>.sh		scripts for use in support of profile scripts (ex: isiterm2.sh)
 #
 
@@ -92,6 +91,27 @@ zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 
 #
 # Functions
 #
+function is-executable () {
+	[[ $+commands[$1] -gt 0 ]] || return 1
+}
+
+function is-supported () {
+	# see if a command supports a command line option
+	if [ $# -eq 1 ]; then
+		if eval "$1" > /dev/null 2>&1; then
+			return 0
+		else
+			return 1
+		fi
+	else
+		if eval "$1" > /dev/null 2>&1; then
+			echo -n "$2"
+		else
+			echo -n "$3"
+		fi
+	fi
+}
+
 function nix-host () {
 	#
 	# Remove host key from .ssh/known_hosts
@@ -110,41 +130,34 @@ function nix-host () {
 }
 
 function pathmunge () {
-	#
-	# Add a path to PATH
-	#
-        case ":${PATH}:" in
-          *:"$1":*)
-            ;;
-          *)
-           if [ "$2" = "after" ] ; then
-              PATH=$PATH:$1
-           else
-              PATH=$1:$PATH
-           fi
-        esac
+	[ -d "$1" ] || return # Only do something if the path exists
+	case ":${PATH}:" in
+		*:"$1":*)
+		;;
+		*)
+		if [ "$2" = "after" ] ; then
+			PATH="$PATH:$1"
+		else
+			PATH="$1:$PATH"
+		fi
+	esac
 }
 
 function manpathmunge () {
-	#
-	# Add a path to MANPATH
-	#
-        case ":${PATH}:" in
-          *:"$1":*)
-            ;;
-          *)
-           if [ "$2" = "after" ] ; then
-              MANPATH=$MANPATH:$1
-           else
-              MANPATH=$1:$MANPATH
-           fi
-        esac
+	[ -d "$1" ] || return # Only do something if the path exists
+	case ":${PATH}:" in
+		*:"$1":*)
+		;;
+		*)
+		if [ "$2" = "after" ] ; then
+			MANPATH="$MANPATH:$1"
+		else
+			MANPATH="$1:$MANPATH"
+		fi
+	esac
 }
 
 function unpathmunge ()  {
-	#
-	# Remove a path from PATH
-	#
 	PATH=$(echo -n "$PATH" | awk  'BEGIN { RS=":"; ORS=":" } $0 != "'$1'" ')
 	export PATH=${PATH/%:/}
 }
@@ -162,7 +175,6 @@ function grepp () {
         #
         [ $# -eq 1 ] && perl -00ne "print if /$1/i" || perl -00ne "print if /$1/i" < "$2";
 }
-
 
 #
 # Set My Paths
@@ -212,7 +224,7 @@ alias whatismyip='dig +short myip.opendns.com @resolver1.opendns.com'
 # Run all application global zshrc scripts from $HOME/.zshrc.d/global/ (ex: prompt, colors, etc.)
 #
 
-for globalscript in $HOME/.zshrc.d/global/*.zshrc ; do
+for globalscript in ${HOME}/.zshrc.d/global/*.zshrc ; do
   source "${globalscript}"
 done
 unset globalscript
@@ -243,15 +255,6 @@ done
 unset application
 
 #
-# Run all custom bash completion scripts from $HOME/.zshrc.d/completions/
-#
-
-#for completion in $HOME/.zshrc.d/completions/*.zshrc ; do
-#	source $completion
-#done
-#unset completion
-
-#
 # Set the EDITOR variable
 #
 export EDITOR=$(command -v vim)
@@ -279,4 +282,4 @@ bindkey '^Xe' edit-command-line
 #
 # Create socket directory for SSH ControlPath
 #
-test -d ~/.ssh/cm_socket || ( mkdir ~/.ssh/cm_socket ; chmod 0700 ~/.ssh/cm_socket )
+[ -d ~/.ssh/cm_socket ] || ( mkdir ~/.ssh/cm_socket ; chmod 0700 ~/.ssh/cm_socket )

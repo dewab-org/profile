@@ -1,4 +1,4 @@
-[[ $+commands[vim] -lt 1 ]] && return
+is-executable vim || return
 
 function vim-setup {
     if [ -d ~/.vim/bundle/Vundle.vim ] ; then

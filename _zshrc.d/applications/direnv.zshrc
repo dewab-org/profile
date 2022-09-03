@@ -1,3 +1,3 @@
-[[ $+commands[direnv] -lt 1 ]] && return
+is-executable direnv || return
 
 eval "$(direnv hook zsh)"
