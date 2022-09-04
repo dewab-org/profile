@@ -6,3 +6,5 @@ Thumbs.db
 _aria2/dht.dat
 *.log
 .vscode
+.zcompdump
+zcompdump
