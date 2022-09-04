@@ -1,27 +1,30 @@
 [submodule "vundle"]
-        path = _vim/bundle/Vundle.vim
+        path = vim/bundle/Vundle.vim
         url = https://github.com/VundleVim/Vundle.vim.git
 
 [submodule "linepower"]
-        path = _vim/bundle/linepower.vim
+        path = vim/bundle/linepower.vim
         url = https://github.com/vim-scripts/linepower.vim.git
 
 [submodule "powerline"]
-        path = _vim/bundle/powerline
+        path = vim/bundle/powerline
         url = https://github.com/Lokaltog/powerline.git
 
 [submodule "ale"]
-        path = _vim/bundle/ale
+        path = vim/bundle/ale
         url = https://github.com/w0rp/ale.git
 
 [submodule "vim-airline"]
-        path = _vim/bundle/vim-airline
+        path = vim/bundle/vim-airline
         url = https://github.com/vim-airline/vim-airline.git
 
 [submodule "vim-airline-themes"]
-        path = _vim/bundle/vim-airline-themes
+        path = vim/bundle/vim-airline-themes
         url = https://github.com/vim-airline/vim-airline-themes.git
 
 [submodule "tpope/vim-fugitive"]
-        path = _vim/bundle/vim-fugitive
+        path = vim/bundle/vim-fugitive
         url = https://github.com/tpope/vim-fugitive.git
+[submodule "vim/bundle/Vundle.vim"]
+	path = vim/bundle/Vundle.vim
+	url = https://github.com/VundleVim/Vundle.vim.git
