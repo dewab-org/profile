@@ -21,13 +21,18 @@ platform=${$(uname -s):l} # lowercases platform name
 #
 # Configure Variables
 #
+export XDG_CONFIG_HOME=${HOME}/.config
+export XDG_CACHE_HOME=${HOME}/.cache
+export XDG_DATA_HOME=${HOME}/.local/share
+export XDG_STATE_HOME=${HOME}/.local/state
 
 # Paths
 cdpath=(. ~ / $HOME/Documents)
 fpath=( $fpath $HOME/.zshrc.d/completions )
 
 # History Paramters
-export HISTFILE=$HOME/.zsh_history
+# export HISTFILE=$HOME/.zsh_history
+export HISTFILE="${XDG_STATE_HOME}/zsh/history"
 export HISTSIZE=1000
 export SAVEHIST=$HISTSIZE
 export HISTORY_IGNORE="(ls|ll|bg|fg|clear|exit|history|history|cd|df)"
@@ -43,7 +48,7 @@ export FIGNORE="" # files and directories to ignore with tab-completion
 setopt auto_cd                      # if command is a path, cd into it
 setopt correct                      # try to correct spelling of commands
 setopt append_history               # append
-# setopt complete_aliases             # make the alias a distinct command for completion purposes
+setopt complete_aliases             # make the alias a distinct command for completion purposes
 setopt extended_history             # save timestamp of command and duration
 setopt hist_ignore_dups             # Do not write events to history that are duplicates of previous events
 setopt hist_reduce_blanks           # trim blanks
@@ -57,6 +62,8 @@ autoload -U colors && colors
 #
 # Completion
 #
+[ -d "${XDG_CACHE_HOME}/zsh/zcompcache" ] || mkdir -p "${XDG_CACHE_HOME}/zsh/zcompcache"
+zstyle ':completion:*' cache-path "${XDG_CACHE_HOME}/zsh/zcompcache"
 
 # Enable is-at-least plugin for version checking
 autoload -Uz is-at-least
@@ -81,6 +88,18 @@ zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-
 
 # Have completion ignore case
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+
+# Highlight the current autocomplete option
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+
+# Better SSH/Rsync/SCP Autocomplete
+zstyle ':completion:*:(scp|rsync):*' tag-order ' hosts:-ipaddr:ip\ address hosts:-host:host files'
+zstyle ':completion:*:(ssh|scp|rsync):*:hosts-host' ignored-patterns '*(.|:)*' loopback ip6-loopback localhost ip6-localhost broadcasthost
+zstyle ':completion:*:(ssh|scp|rsync):*:hosts-ipaddr' ignored-patterns '^(<->.<->.<->.<->|(|::)([[:xdigit:].]##:(#c,2))##(|%*))' '127.0.0.<->' '255.255.255.255' '::1' 'fe80::*'
+
+# Allow for autocomplete to be case insensitive
+zstyle ':completion:*' matcher-list '' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' '+l:|?=** r:|?=**'
+
 
 #
 # expand !^ !* !$ !:2 !$:h !$:t when you hit space 

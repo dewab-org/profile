@@ -13,7 +13,7 @@ platform=$(uname -s | tr "[A-Z]" "[a-z]")
 #
 if [[ ! -o interactive ]]; then
     for dir in /usr/bin /usr/sbin /usr/*/bin/ ~/bin ~/.custom/$platform/bin /brew/bin; do
-        [ -d "${dir}"] || return
+        [ -d "${dir}" ] || return
         export PATH="$PATH:$dir"
     done
     unset dir

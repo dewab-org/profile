@@ -1,5 +1,8 @@
 is-executable docker || return
 
+# Move configuration files to .config
+export DOCKER_CONFIG="${XDG_CONFIG_HOME}/docker"
+
 function docker-update () {
 	# Update all latest images
 	docker images | awk '$2=="latest" {print $1}' | xargs -n1 docker pull	
