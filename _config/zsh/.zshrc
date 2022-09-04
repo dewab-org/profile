@@ -18,19 +18,6 @@ platform=${$(uname -s):l} # lowercases platform name
 # For non-ineractive shells, only set the path and exit
 # non-interative information moved to .zshenv
 
-#
-# Configure Variables
-#
-export XDG_CONFIG_HOME=${HOME}/.config
-export XDG_CACHE_HOME=${HOME}/.cache
-export XDG_DATA_HOME=${HOME}/.local/share
-export XDG_STATE_HOME=${HOME}/.local/state
-
-for XDG_PATH in $XDG_CONFIG_HOME $XDG_CACHE_HOME $XDG_DATA_HOME $XDG_STATE_HOME
-do
-	[ -d "${XDG_PATH}" ] || mkdir -p "${XDG_PATH}"
-done
-
 # Paths
 cdpath=(. ~ / $HOME/Documents)
 fpath=( $fpath $HOME/.zshrc.d/completions )
@@ -70,6 +57,7 @@ autoload -U colors && colors
 [ -d "${XDG_CACHE_HOME}/zsh/zcompcache" ] || mkdir -p "${XDG_CACHE_HOME}/zsh/zcompcache"
 zstyle ':completion:*' cache-path "${XDG_CACHE_HOME}/zsh/zcompcache"
 
+
 # Enable is-at-least plugin for version checking
 autoload -Uz is-at-least
 
@@ -78,6 +66,9 @@ autoload -U compinit && compinit
 
 # Enable bash completion support
 autoload -U +X bashcompinit && bashcompinit
+
+# Initialize in XDG dir
+compinit -d "${XDG_CACHE_HOME}/zsh/zcompdump-${ZSH_VERSION}"
 
 # Enable completion list menu
 zstyle ':completion:*' menu select
@@ -248,7 +239,7 @@ alias whatismyip='dig +short myip.opendns.com @resolver1.opendns.com'
 # Run all application global zshrc scripts from $HOME/.zshrc.d/global/ (ex: prompt, colors, etc.)
 #
 
-for globalscript in ${HOME}/.zshrc.d/global/*.zshrc ; do
+for globalscript in ${ZDOTDIR}/zshrc.d/global/*.zshrc ; do
   source "${globalscript}"
 done
 unset globalscript
@@ -257,23 +248,23 @@ unset globalscript
 # Run platform specific zshrc scripts from $HOME/.zshrc.d/platform/ (ex: darwin, sunos, linux)
 #
 
-if [ -r "${HOME}/.zshrc.d/platform/${platform}.zshrc" ] ; then
-	source "${HOME}/.zshrc.d/platform/${platform}.zshrc"
+if [ -r "${ZDOTDIR}/zshrc.d/platform/${platform}.zshrc" ] ; then
+	source "${ZDOTDIR}/zshrc.d/platform/${platform}.zshrc"
 fi
 
 #
 # Run host specific zshrc scripts from $HOME/.zshrc.d/hosts/ (ex: bifrost, sunna, ragnarok)
 #
 
-if [ -r "${HOME}/.zshrc.d/hosts/${hostname}.zshrc" ] ; then
-	source "${HOME}/.zshrc.d/hosts/${hostname}.zshrc"
+if [ -r "${ZDOTDIR}/zshrc.d/hosts/${hostname}.zshrc" ] ; then
+	source "${ZDOTDIR}/zshrc.d/hosts/${hostname}.zshrc"
 fi
 
 #
 # Run all application specific zshrc scripts from $HOME/.zshrc.d/applications/ (ex: veritas)
 #
 
-for application in ${HOME}/.zshrc.d/applications/*.zshrc ; do
+for application in ${ZDOTDIR}/zshrc.d/applications/*.zshrc ; do
 	source "${application}"
 done
 unset application

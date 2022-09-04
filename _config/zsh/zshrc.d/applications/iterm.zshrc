@@ -4,8 +4,8 @@
 # https://iterm2.com/shell_integration/zsh
 # https://github.com/gnachman/iterm2-website/blob/master/source/utilities/it2check
 
-IT2CHECK="${HOME}/.zshrc.d/scripts/it2check"
-ITERM_INTEGRATION="${HOME}/.zshrc.d/scripts/iterm_integration.sh"
+IT2CHECK="${ZDOTDIR}/zshrc.d/scripts/it2check"
+ITERM_INTEGRATION="${ZDOTDIR}/zshrc.d/scripts/iterm_integration.sh"
 IS_WINDOWS="$(uname -r | awk -F- '{print $NF}' | tr \[A-Z\] \[a-z\])"
 
 # Check if using Linux on Windows, and if so skip iterm checking as it locks the terminal for some reason
