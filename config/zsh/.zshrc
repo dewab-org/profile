@@ -24,6 +24,7 @@ fpath=( $fpath $HOME/.zshrc.d/completions )
 
 # History Paramters
 # export HISTFILE=$HOME/.zsh_history
+[ -d "${XDG_STATE_HOME}/zsh" ] || mkdir -p "${XDG_STATE_HOME}/zsh"
 export HISTFILE="${XDG_STATE_HOME}/zsh/history"
 export HISTSIZE=1000
 export SAVEHIST=$HISTSIZE
@@ -56,7 +57,6 @@ autoload -U colors && colors
 #
 [ -d "${XDG_CACHE_HOME}/zsh/zcompcache" ] || mkdir -p "${XDG_CACHE_HOME}/zsh/zcompcache"
 zstyle ':completion:*' cache-path "${XDG_CACHE_HOME}/zsh/zcompcache"
-
 
 # Enable is-at-least plugin for version checking
 autoload -Uz is-at-least
