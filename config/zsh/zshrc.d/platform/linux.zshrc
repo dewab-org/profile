@@ -13,11 +13,6 @@ if [ ! -x "${mkfile}" ] && [ -x "${xfs_mkfile}" ] ; then
 	alias mkfile="${xfs_mkfile}"
 fi
 
-# Bash Completion
-#if [ -x "/etc/bash_completion" ] ; then
-#	source /etc/bash_completion
-#fi
-
 # Functions
 function ips() {
 	ip -o addr show scope global up | awk '{printf "%11s: %s\n", $2, $4}'

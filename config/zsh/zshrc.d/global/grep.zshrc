@@ -1,11 +1,9 @@
-# Tell grep to highlight matches
-
+# Determine if grep supports color
 if is-supported "grep --color a <<< a"; then
   GREP_OPTIONS+=" --color=auto"
 fi
 
-# Avoid VCS folders
-
+# Avoid grepping into certain folders
 if is-supported "echo | grep --exclude-dir=.cvs ''"; then
   for PATTERN in .cvs .git .hg .svn
   do

@@ -23,12 +23,14 @@ action() {
 
 success() {
 	print -n ${MOVE_TO_COL}
-	print "[$fg[green]  OK  $reset_color]"
+	print "[$fg_no_bold[green] \xE2\x9C\x94 $reset_color]" # Checkmark
+	# print "[$fg[green]  OK  $reset_color]"
 	return 0
 }
 
 failure() {
 	print -n ${MOVE_TO_COL}
-	print "[$fg[red]FAILED$reset_color]"
+	print "[$fg_no_bold[red] \xE2\x9D\x8C $reset_color]" # X
+	# print "[$fg[red]FAILED$reset_color]"
 	return 0
 }
