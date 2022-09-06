@@ -29,7 +29,7 @@ function select-oracle-database {
 
 	ORACLE_BASE=$( ${ORACLE_HOME}/bin/orabase )
 	export ORACLE_BASE
-	pathmunge ${ORACLE_HOME}/bin
+	append_path PATH ${ORACLE_HOME}/bin
 	display-oracle-env
 }
 
@@ -48,7 +48,7 @@ ORACLE_SID=$(egrep -v "^($|#)" ${ORATAB} | cut -f1 -d: | head -1)
 ORACLE_HOME=$(egrep -v "^($|#)" ${ORATAB} | cut -f2 -d: | head -1)
 export ORACLE_SID ORACLE_HOME
 
-pathmunge "${ORACLE_HOME}/bin"
+append_path PATH "${ORACLE_HOME}/bin"
 
 ORACLE_BASE="$(${ORACLE_HOME}/bin/orabase)"
 export ORACLE_BASE

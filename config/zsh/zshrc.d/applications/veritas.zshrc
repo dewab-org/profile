@@ -7,18 +7,18 @@
 # NetBackup
 #
 if [ -d "/usr/openv" ] ; then 
-	pathmunge /usr/openv/netbackup/bin after
-	pathmunge /usr/openv/netbackup/bin/admincmd after
-	pathmunge /usr/openv/netbackup/bin/support after
-	pathmunge /usr/openv/volmgr/bin after
-	manpathmunge /usr/openv/netbackup/bin/goodies/man
+	append_path PATH /usr/openv/netbackup/bin
+	append_path PATH /usr/openv/netbackup/bin/admincmd
+	append_path PATH /usr/openv/netbackup/bin/support
+	append_path PATH /usr/openv/volmgr/bin
+	append_path MANPATH /usr/openv/netbackup/bin/goodies
 fi
 
 #
 # Storage Foundation
 #
 if [ -d "/opt/VRTS" ] ; then
-	pathmunge /opt/VRTS/bin after
-	pathmunge /opt/VRTSvcs/bin after
-	manpathmunge /opt/VRTS/man after
+	append_path PATH /opt/VRTS/bin
+	append_path PATH /opt/VRTSvcs/bin
+	append_path MANPATH /opt/VRTS/man
 fi

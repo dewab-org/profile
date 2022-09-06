@@ -1,3 +1,6 @@
+# Fig pre block. Keep at the top of this file.
+[[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && . "$HOME/.fig/shell/zshrc.pre.zsh"
+
 # Daniel's .zshrc
 # 
 # Directories:
@@ -18,9 +21,12 @@ platform=${$(uname -s):l} # lowercases platform name
 # For non-ineractive shells, only set the path and exit
 # non-interative information moved to .zshenv
 
+# Prevent duplicate entries in path
+declare -U path
+
 # Paths
-cdpath=(. ~ / $HOME/Documents)
-fpath=( $fpath $HOME/.zshrc.d/completions )
+cdpath=( . ~ / ${HOME}/Documents )
+fpath+=( "${HOME}/.zshrc.d/completions" )
 
 # History Paramters
 # export HISTFILE=$HOME/.zsh_history
@@ -144,44 +150,49 @@ function nix-host () {
 	done
 }
 
-function pathmunge () {
-	[ -d "$1" ] || return # Only do something if the path exists
-	case ":${PATH}:" in
-		*:"$1":*)
-		;;
-		*)
-		if [ "$2" = "after" ] ; then
-			PATH="$PATH:$1"
-		else
-			PATH="$1:$PATH"
-		fi
-	esac
+function prepend_path() {
+	# Exit if directory doesn't exit
+	[[ ! -d "$2" ]] && return
+
+	local p
+	remove_from_path "$1" "$2"
+	eval "p=\$$1"
+	eval export $1=\""$2:$p"\"
 }
 
-function manpathmunge () {
-	[ -d "$1" ] || return # Only do something if the path exists
-	case ":${PATH}:" in
-		*:"$1":*)
-		;;
-		*)
-		if [ "$2" = "after" ] ; then
-			MANPATH="$MANPATH:$1"
-		else
-			MANPATH="$1:$MANPATH"
-		fi
-	esac
+function append_path() {
+	# Exit if directory doesn't exit
+	[[ ! -d "$2" ]] && return
+
+	local p
+	remove_from_path "$1" "$2"
+	eval "p=\$$1"
+	eval export $1=\""$p:$2"\"
 }
 
-function unpathmunge ()  {
-	PATH=$(echo -n "$PATH" | awk  'BEGIN { RS=":"; ORS=":" } $0 != "'$1'" ')
-	export PATH=${PATH/%:/}
+function remove_from_path() {
+	local a
+	local p
+	local s
+	local r
+	eval "p=\$$1"  # get value of specified path
+		a=( ${(s/:/)p} )  # turn it into an array
+	
+	# return if $2 isn't in path
+	if [[ ${a[(i)${2}]} -gt ${#a} ]] && return
+	
+	# rebuild path from elements not matching $2
+	for s in $a; do
+		if [[ ! $s == $2 ]]; then
+			[[ -z "$r" ]] && r="$s" || r="$r:$s"
+		fi
+	done
+	eval $1=\""$r"\"
 }
 
 function showpath () {
-	#
 	# Show path entries one per line
-	# 
-	echo "${PATH}" | tr ":" "\n"
+	eval echo "\$${1:-PATH}" | tr ":" "\n"
 }
 
 function grepp () {
@@ -195,26 +206,26 @@ function grepp () {
 # Set My Paths
 #
 
-pathmunge /sbin after
-pathmunge /usr/sbin after
-pathmunge $HOME/bin after
-pathmunge $HOME/.custom/$platform/bin after
-pathmunge $HOME/.custom/$platform/sbin after
-pathmunge /usr/X11R6/bin after
-pathmunge /usr/local/bin after
-pathmunge /usr/local/sbin after
-pathmunge /opt/local/bin after
-pathmunge /opt/local/sbin after
+append_path PATH /sbin
+append_path PATH /usr/sbin
+append_path PATH ${HOME}/bin
+append_path PATH ${HOME}/.custom/${platform}/bin
+append_path PATH ${HOME}/.custom/${platform}/sbin
+append_path PATH /usr/X11R6/bin
+append_path PATH /usr/local/bin
+append_path PATH /usr/local/sbin
+append_path PATH /opt/local/bin
+append_path PATH /opt/local/sbin
 
-manpathmunge /usr/man
-manpathmunge $HOME/man after
-manpathmunge $HOME/.custom/$platform/man after
-manpathmunge $HOME/.custom/$platform/share/man after
-manpathmunge /usr/share/man after
-manpathmunge /usr/local/man after
-manpathmunge /usr/local/share/man after
-manpathmunge /usr/X11R6/man after
-manpathmunge /opt/local/man after
+append_path MANPATH /usr/man
+append_path MANPATH ${HOME}/man
+append_path MANPATH ${HOME}/.custom/${platform}/man
+append_path MANPATH ${HOME}/.custom/${platform}/share/man
+append_path MANPATH /usr/share/man
+append_path MANPATH /usr/local/man
+append_path MANPATH /usr/local/share/man
+append_path MANPATH /usr/X11R6/man
+append_path MANPATH /opt/local/man
 
 #
 # Aliases
@@ -222,7 +233,8 @@ manpathmunge /opt/local/man after
 
 alias ls='ls -F'
 alias ll='ls -alh'
-alias l.='ls -d .*' 
+alias l.='ls -d .*'
+alias la='ls -a'
 alias cpan="sudo perl -MCPAN -e shell"
 alias nslookup='/usr/bin/nslookup -sil'
 alias grpe='grep'
@@ -298,3 +310,6 @@ bindkey '^Xe' edit-command-line
 # Create socket directory for SSH ControlPath
 #
 [ -d ~/.ssh/cm_socket ] || ( mkdir ~/.ssh/cm_socket ; chmod 0700 ~/.ssh/cm_socket )
+
+# Fig post block. Keep at the bottom of this file.
+[[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && . "$HOME/.fig/shell/zshrc.post.zsh"

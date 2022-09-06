@@ -5,19 +5,19 @@
 #
 # Solaris Specific Paths
 #
-pathmunge /usr/openv/netbackup/bin after
-pathmunge /usr/openv/netbackup/bin/admincmd after
+append_path PATH /usr/openv/netbackup/bin
+append_path PATH /usr/openv/netbackup/bin/admincmd
 
-pathmunge /opt/VRTS/bin after
-manpathmunge /opt/VRTS/man after
+append_path PATH /opt/VRTS/bin
+append_path MANPATH /opt/VRTS/man
 
-pathmunge /usr/sfw/bin after
-pathmunge /usr/sfw/sbin after
-manpathmunge /usr/sfw/man after
+append_path PATH /usr/sfw/bin
+append_path PATH /usr/sfw/sbin
+append_path MANPATH /usr/sfw/man
 
-pathmunge /opt/csw/bin after
-pathmunge /opt/csw/sbin after
-manpathmunge /opt/csw/man after
+append_path PATH /opt/csw/bin
+append_path PATH /opt/csw/sbin
+append_path MANPATH /opt/csw/man
 
 #
 # Fish iTerm Integrate Shell Dependence on hostname -f flag

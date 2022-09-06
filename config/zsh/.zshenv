@@ -14,6 +14,11 @@ platform=$(uname -s | tr "[A-Z]" "[a-z]")
 export ZDOTDIR=${HOME}/.config/zsh
 
 #
+# Reset to default path if getconf is present
+#
+[[ $+commands[getconf] -gt 0 ]] && export PATH="$(getconf PATH)"
+
+#
 # Configure XDG Variables
 #
 export XDG_CONFIG_HOME=${HOME}/.config
@@ -21,7 +26,7 @@ export XDG_CACHE_HOME=${HOME}/.cache
 export XDG_DATA_HOME=${HOME}/.local/share
 export XDG_STATE_HOME=${HOME}/.local/state
 
-# Create XDG dirs if they'd exist
+# Create XDG dirs if they don't exist
 for XDG_PATH in $XDG_CONFIG_HOME $XDG_CACHE_HOME $XDG_DATA_HOME $XDG_STATE_HOME
 do
 	[ -d "${XDG_PATH}" ] || mkdir -p "${XDG_PATH}"

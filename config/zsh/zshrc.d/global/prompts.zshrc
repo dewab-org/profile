@@ -35,7 +35,7 @@ _right_prompt_err_code_prompt () {
 
 _color_prompt () {
 	case "$hostname" in
-		snotra)         HOSTCOLOR="%{$fg_no_bold[purple]%}" ;;
+		sunna)         	HOSTCOLOR="%{$fg_no_bold[purple]%}" ;;
 		uller)		    HOSTCOLOR="%{$fg_no_bold[blue]%}" ;;
 		freya)		    HOSTCOLOR="%{$fg_no_bold[blue]%}" ;;
 		uller-wifi)	    HOSTCOLOR="%{$fg_no_bold[blue]%}" ;;
@@ -60,12 +60,17 @@ _color_prompt () {
 
 	#export PROMPT="${SSHPROMPT}${ROOTPROMPT}%{$fg_no_bold[red]%}[%{$reset_color%}%!%{$fg_no_bold[red]%}]%{$fg_no_bold[red]%}[${USERCOLOR}%n%{$reset_color%}@${HOSTCOLOR}%m %{$reset_color%}%~%{$fg_no_bold[red]%}]%{$reset_color%}${vcs_info_msg_0_}%# "
 	export PROMPT="${SSHPROMPT}${ROOTPROMPT}%{$fg_no_bold[red]%}[%{$reset_color%}%!%{$fg_no_bold[red]%}]%{$fg_no_bold[red]%}[${USERCOLOR}%n%{$reset_color%}@${HOSTCOLOR}%m %{$reset_color%}%~%{$fg_no_bold[red]%}]%{$reset_color%}$(git_info)%# "
-	export RPROMPT='$(_right_prompt_err_code_prompt)'
+	# export RPROMPT='$(_right_prompt_err_code_prompt)'
+	# RPROMPT='%(?.%F{green}✔%f.%F{red}❌%F{white}%?%f)'
+	RPROMPT='%(?..%F{red}❌%F{white}%?%f)'
 	export SUDO_PS1=${PROMPT}
 }
 
 # Git prompt options
 zstyle ':vcs_info:git*' formats "%{$fg_no_bold[red]%}[%{$fg[grey]%}(%s)%{$reset_color%}(%r)%{$fg[grey]%}(%{$fg[blue]%}%b)%{$reset_color%}%m%u%c%{$reset_color%}%{$fg_no_bold[red]%}]%{$reset_color%}"
+
+# Set correction prompt
+SPROMPT="zsh: correct '%F{red}%R%f' to '%F{green}%r%f' [nyae]?"
 
 #
 # Aliases to switch between prompts

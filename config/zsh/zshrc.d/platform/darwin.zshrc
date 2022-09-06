@@ -12,22 +12,22 @@
 # Homebrew environment
 #
 if [ -d "/brew" ] ; then
-	pathmunge /brew/bin after
-	pathmunge /brew/sbin after
-	manpathmunge /brew/share/man after
+	append_path PATH /brew/bin
+	append_path PATH /brew/sbin
+	append_path MANPATH /brew/share/man
 fi
 
 # For Apple Silicon Installs
 if [ -d "/opt/homebrew" ] ; then
-	pathmunge /opt/homebrew/bin after
-	pathmunge /opt/homebrew/sbin after
-	manpathmunge /opt/homebrew/share/man after
+	append_path PATH /opt/homebrew/sbin
+	append_path PATH /opt/homebrew/bin
+	append_path MANPATH /opt/homebrew/share/man
 fi
 
 #
 # Mac Specific Environmental Variables
 #
-cdpath=($cdpath $HOME/Documents/Work/Sigma/Customers)
+cdpath+=('${HOME}/Documents/Work/Sigma/Customers')
 export GDFONTPATH=/Library/Fonts
 export FIGNORE="$FIGNORE:Application Scripts:Global Foundries:"
 unset COMMAND_MODE
