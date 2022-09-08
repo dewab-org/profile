@@ -32,7 +32,7 @@
 	aa = add .
 	pa = push --all all
 	pt = push origin --tag
-	url = remote get-url --push --all
+	url = remote get-url --push --all origin
 
 [core]
 	pager = delta
