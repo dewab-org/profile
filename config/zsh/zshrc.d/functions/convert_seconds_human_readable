@@ -1,0 +1,11 @@
+convert_seconds_human_readable () {
+	local ELAPSED=$1
+	local HOURS=0
+	local MINUTES=0
+	local SECONDS=0
+	((HOURS=${ELAPSED}%(60*60*24)/(60*60)))
+	((MINUTES=${ELAPSED}%(60*60*24)/(60)))
+	((SECONDS=${ELAPSED}%60))
+
+	printf "%02dh %02dm %02ds" $HOURS $MINUTES $SECONDS
+}

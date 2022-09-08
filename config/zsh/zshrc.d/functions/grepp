@@ -1,0 +1,6 @@
+function grepp () {
+        #
+        # Paragraph Grep
+        #
+        [ $# -eq 1 ] && perl -00ne "print if /$1/i" || perl -00ne "print if /$1/i" < "$2";
+}

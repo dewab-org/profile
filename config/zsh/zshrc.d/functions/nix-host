@@ -1,0 +1,16 @@
+function nix-host () {
+	#
+	# Remove host key from .ssh/known_hosts
+	#
+	if [ $# -eq 0 ] ; then
+		echo "Usage: nix-host [hosts]"
+		return 1
+	fi
+	#echo perl -ni -e \'print unless /^$1/\' ~/.ssh/known_hosts | sh
+	local host
+	for host in "$@" 
+	do
+	  echo "Removing ${host}... "
+	  ssh-keygen -R "${host}"
+	done
+}

@@ -1,0 +1,44 @@
+function prepend_path() {
+	# Exit if directory doesn't exit
+	[[ ! -d "$2" ]] && return
+
+	local p
+	remove_from_path "$1" "$2"
+	eval "p=\$$1"
+	eval export $1=\""$2:$p"\"
+}
+
+function append_path() {
+	# Exit if directory doesn't exit
+	[[ ! -d "$2" ]] && return
+
+	local p
+	remove_from_path "$1" "$2"
+	eval "p=\$$1"
+	eval export $1=\""$p:$2"\"
+}
+
+function remove_from_path() {
+	local a
+	local p
+	local s
+	local r
+	eval "p=\$$1"  # get value of specified path
+		a=( ${(s/:/)p} )  # turn it into an array
+	
+	# return if $2 isn't in path
+	if [[ ${a[(i)${2}]} -gt ${#a} ]] && return
+	
+	# rebuild path from elements not matching $2
+	for s in $a; do
+		if [[ ! $s == $2 ]]; then
+			[[ -z "$r" ]] && r="$s" || r="$r:$s"
+		fi
+	done
+	eval $1=\""$r"\"
+}
+
+function showpath () {
+	# Show path entries one per line
+	eval echo "\$${1:-PATH}" | tr ":" "\n"
+}

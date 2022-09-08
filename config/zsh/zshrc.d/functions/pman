@@ -1,0 +1,11 @@
+function pman () {
+	#
+	# Open a Unix man page in Preview.app
+	#
+	if [ $# -ne 1 ]
+	then
+		echo "pman <command>"
+		return 1
+	fi
+	man -t $1 | open -f -a Preview
+}

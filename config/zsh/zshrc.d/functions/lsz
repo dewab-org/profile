@@ -1,0 +1,29 @@
+# ls archives (inspired by `extract`)
+lsz() {
+	if [ $# -ne 1 ]
+	then
+		echo "lsz filename.[tar,tgz,tar.gz,zip,rar,etc]"
+		return 1
+	fi
+	if [ -f "$1" ] ; then
+		case $1 in
+			*.tar.bz2|*.tar.gz|*.tar|*.tbz2|*.tgz) 
+				tar tvf "$1"
+				;;
+			*.zip|*.cbz) 
+				unzip -l "$1"
+				;;
+			*.rar|*.cbr) 
+				unrar l "$1"
+				;;
+			*.7z)	
+				7z l "$1"
+				;;
+			*)     
+				echo "'$1' unrecognized." 
+				;;
+		esac
+	else
+		echo "'$1' is not a valid file"
+	fi
+}

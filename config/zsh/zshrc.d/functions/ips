@@ -1,0 +1,13 @@
+function ips () {
+	# List IP addresses for each active interface
+	local interface
+	local interfaces=($(networksetup -listallhardwareports | awk '/^Device: /{print $2}'))
+
+	for interface in $interfaces
+	do
+		local ip=$(ipconfig getifaddr $interface)
+		[ -n "$ip" ] && printf "%11s: %s\n" "$interface" "$ip"
+	done
+	
+	return 0 # needed so that failure of last getifaddr doesn't fail entire function
+}
