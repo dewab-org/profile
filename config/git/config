@@ -26,11 +26,12 @@
 	st = status
 	sb = status -sb
 	br = branch
-	hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+	hist = log --pretty=format:\"%C(magenta)%h%Creset | %C(red)%ad%Creset | %C(green)%an%Creset | %s%d\" --graph --date=short
+	lg = !git log --pretty=format:\"%C(magenta)%h%Creset -%C(red)%d%Creset %s %C(dim green)(%cr) [%an]\" --abbrev-commit -30
 	type = cat-file -t
 	dump = cat-file -p
 	aa = add .
-	pa = push --all all
+	p = push
 	pt = push origin --tag
 	url = remote get-url --push --all origin
 
