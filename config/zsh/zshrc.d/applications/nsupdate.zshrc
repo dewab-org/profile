@@ -10,5 +10,5 @@ function nsup() {
 
 	"
 
-	nsupdate -y DHCP_UPDATER:pRP5FapFoJ95JEL06sv4PQ==
+	nsupdate -k ~/.dnskeys/local.key
 }

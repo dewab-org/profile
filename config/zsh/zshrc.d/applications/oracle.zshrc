@@ -1,7 +1,6 @@
-#
+[ -f "/etc/oratab" ] || return
 
 export ORATAB="/etc/oratab"
-if [ -f "${ORATAB}" ] ; then
 
 function select-oracle-database {
 	DATABASES=$( egrep -v "^($|#)" ${ORATAB} | cut -f1 -d: | sort )
@@ -54,5 +53,3 @@ ORACLE_BASE="$(${ORACLE_HOME}/bin/orabase)"
 export ORACLE_BASE
 
 display-oracle-env
-
-fi

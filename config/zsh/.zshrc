@@ -1,3 +1,6 @@
+# Turn on prompt performance checking if enabled
+[ -z "$ZPROF" ] || zmodload zsh/zprof
+
 # Fig pre block. Keep at the top of this file.
 [[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && . "$HOME/.fig/shell/zshrc.pre.zsh"
 
@@ -21,20 +24,29 @@ platform=${$(uname -s):l} # lowercases platform name
 # For non-ineractive shells, only set the path and exit
 # non-interative information moved to .zshenv
 
+# Set ZSH Cache Directories
+ZSH_CACHE_DIR="${XDG_CACHE_HOME}/zsh"
+[ -d "${ZSH_CACHE_DIR}/completions" ] || mkdir -m 0700 -p "${ZSH_CACHE_DIR}/completions"
+[ -d "${XDG_CACHE_HOME}/zsh" ] || mkdir -m 0700 -p "${XDG_CACHE_HOME}/zsh"
+
+# Set ZSH Comp Dump
+ZSH_COMPDUMP="${XDG_CACHE_HOME}/zsh/zcompdump-${ZSH_VERSION}-${hostname}"
+
 # Prevent duplicate entries in path
 declare -U path
 
 # Paths
 cdpath=( . ~ / ${HOME}/Documents )
-fpath+=( "${HOME}/.zshrc.d/completions" )
+fpath+=( "${ZDOTDIR}/zshrc.d/functions" )
+(( ${fpath[(Ie)"$ZSH_CACHE_DIR/completions"]} )) || fpath+=("$ZSH_CACHE_DIR/completions" )
 
 # History Paramters
 # export HISTFILE=$HOME/.zsh_history
-[ -d "${XDG_STATE_HOME}/zsh" ] || mkdir -p "${XDG_STATE_HOME}/zsh"
+[ -d "${XDG_STATE_HOME}/zsh" ] || mkdir -m 0700 -p "${XDG_STATE_HOME}/zsh"
 export HISTFILE="${XDG_STATE_HOME}/zsh/history"
 export HISTSIZE=1000
 export SAVEHIST=$HISTSIZE
-export HISTORY_IGNORE="(ls|ll|bg|fg|clear|exit|history|history|cd|df)"
+export HISTORY_IGNORE="(ls|ll|l.|bg|fg|clear|exit|history|cd|df)"
 
 # Others
 export CLICOLOR=true
@@ -68,13 +80,28 @@ zstyle ':completion:*' cache-path "${XDG_CACHE_HOME}/zsh/zcompcache"
 autoload -Uz is-at-least
 
 # Enable compinit command completion
-autoload -U compinit && compinit
+# autoload -U compinit # && compinit
+autoload -Uz compinit # && compinit -C -d "${XDG_CACHE_HOME}/zsh/zcompdump-${ZSH_VERSION}"
+# Only rebuild comp database once per day
+if [ $(date +'%j') != $(stat -f '%Sm' -t '%j' ${ZSH_COMPDUMP}) ]; then
+	compinit -d "${ZSH_COMPDUMP}"
+else
+	compinit -C -d "${ZSH_COMPDUMP}"
+fi
 
 # Enable bash completion support
 autoload -U +X bashcompinit && bashcompinit
 
-# Initialize in XDG dir
-compinit -d "${XDG_CACHE_HOME}/zsh/zcompdump-${ZSH_VERSION}"
+# Enable my functions
+# autoload -Uz action && action
+autoload -Uz paths && paths
+autoload -Uz nix-host
+autoload -Uz grepp
+autoload -Uz is && is
+autoload -Uz convert_seconds
+autoload -Uz convert_seconds_human_readable
+autoload -Uz rules && rules
+autoload -Uz lsz
 
 # Enable completion list menu
 zstyle ':completion:*' menu select
@@ -102,105 +129,11 @@ zstyle ':completion:*:(ssh|scp|rsync):*:hosts-ipaddr' ignored-patterns '^(<->.<-
 # Allow for autocomplete to be case insensitive
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' '+l:|?=** r:|?=**'
 
-
 #
 # expand !^ !* !$ !:2 !$:h !$:t when you hit space 
 #
 # Doesn't appear that these apply to ZSH
 #bind space:magic-space
-
-#
-# Functions
-#
-function is-executable () {
-	[[ $+commands[$1] -gt 0 ]] || return 1
-}
-
-function is-supported () {
-	# see if a command supports a command line option
-	if [ $# -eq 1 ]; then
-		if eval "$1" > /dev/null 2>&1; then
-			return 0
-		else
-			return 1
-		fi
-	else
-		if eval "$1" > /dev/null 2>&1; then
-			echo -n "$2"
-		else
-			echo -n "$3"
-		fi
-	fi
-}
-
-function nix-host () {
-	#
-	# Remove host key from .ssh/known_hosts
-	#
-	if [ $# -eq 0 ] ; then
-		echo "Usage: nix-host [hosts]"
-		return 1
-	fi
-	#echo perl -ni -e \'print unless /^$1/\' ~/.ssh/known_hosts | sh
-	local host
-	for host in "$@" 
-	do
-	  echo "Removing ${host}... "
-	  ssh-keygen -R "${host}"
-	done
-}
-
-function prepend_path() {
-	# Exit if directory doesn't exit
-	[[ ! -d "$2" ]] && return
-
-	local p
-	remove_from_path "$1" "$2"
-	eval "p=\$$1"
-	eval export $1=\""$2:$p"\"
-}
-
-function append_path() {
-	# Exit if directory doesn't exit
-	[[ ! -d "$2" ]] && return
-
-	local p
-	remove_from_path "$1" "$2"
-	eval "p=\$$1"
-	eval export $1=\""$p:$2"\"
-}
-
-function remove_from_path() {
-	local a
-	local p
-	local s
-	local r
-	eval "p=\$$1"  # get value of specified path
-		a=( ${(s/:/)p} )  # turn it into an array
-	
-	# return if $2 isn't in path
-	if [[ ${a[(i)${2}]} -gt ${#a} ]] && return
-	
-	# rebuild path from elements not matching $2
-	for s in $a; do
-		if [[ ! $s == $2 ]]; then
-			[[ -z "$r" ]] && r="$s" || r="$r:$s"
-		fi
-	done
-	eval $1=\""$r"\"
-}
-
-function showpath () {
-	# Show path entries one per line
-	eval echo "\$${1:-PATH}" | tr ":" "\n"
-}
-
-function grepp () {
-        #
-        # Paragraph Grep
-        #
-        [ $# -eq 1 ] && perl -00ne "print if /$1/i" || perl -00ne "print if /$1/i" < "$2";
-}
 
 #
 # Set My Paths
@@ -226,6 +159,12 @@ append_path MANPATH /usr/local/man
 append_path MANPATH /usr/local/share/man
 append_path MANPATH /usr/X11R6/man
 append_path MANPATH /opt/local/man
+
+#
+# Miscallaneous Vars
+#
+
+export BORG_REPO="borg:."
 
 #
 # Aliases
@@ -284,10 +223,7 @@ unset application
 #
 # Set the EDITOR variable
 #
-export EDITOR=$(command -v vim)
-if [ ! -x "$EDITOR" ] ; then
-	export EDITOR=$(command -v vi)
-fi
+is-executable vim && export EDITOR=$(command -v vim)
 
 #
 # Switch back to Emacs mode (changing editor switches to VI-mode for some stupid reason)
@@ -309,7 +245,9 @@ bindkey '^Xe' edit-command-line
 #
 # Create socket directory for SSH ControlPath
 #
-[ -d ~/.ssh/cm_socket ] || ( mkdir ~/.ssh/cm_socket ; chmod 0700 ~/.ssh/cm_socket )
+[ -d ~/.ssh/cm_socket ] || mkdir -m 0700 ~/.ssh/cm_socket
 
 # Fig post block. Keep at the bottom of this file.
 [[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && . "$HOME/.fig/shell/zshrc.post.zsh"
+
+[ -z "$ZPROF" ] || zprof

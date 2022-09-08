@@ -1,11 +1,6 @@
 is-executable tea || return
-#[[ $+commands[docker] -lt 1 ]] && return
 
-#alias tea='docker run --rm -v tea:/app -v $PWD:/repo:ro -w /repo tgerczei/tea --'
-
-#compdef _cli_zsh_autocomnplete tea
-
-_cli_zsh_autocomplete() {
+_tea() {
 
   local -a opts
   local cur
@@ -25,4 +20,4 @@ _cli_zsh_autocomplete() {
   return
 }
 
-compdef _cli_zsh_autocomplete tea
+compdef _tea tea

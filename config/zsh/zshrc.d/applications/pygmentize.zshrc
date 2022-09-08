@@ -1,10 +1,8 @@
 is-executable pygmentize || return
 
- alias ccat="pygmentize -g"
+alias ccat="pygmentize -g"
 
-if [ -x "$(command -v less_py_filter.sh)" ] ; then
-  alias cless='LESSOPEN="|less_py_filter.sh %s" less -R'
-fi
+is-executable less_py_filter.sh &&  alias cless='LESSOPEN="|less_py_filter.sh %s" less -R'
 
 export LESSOPEN="| pygmentize %s"
-export LESS="$LESS -R"
+LESS+=" -R"

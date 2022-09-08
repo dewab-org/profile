@@ -1,28 +1,6 @@
 #
-# Custom bashrc.d script for MacOSX (Darwin) Environment
+# Custom zshrc.d script for MacOSX (Darwin) Environment
 #
-
-#
-# Add SSH Keys from OS-X Keychain
-# (Had to add this after upgrding to macOS Sierra, for some reason
-#
-/usr/bin/ssh-add -A > /dev/null 2>&1
-
-#
-# Homebrew environment
-#
-if [ -d "/brew" ] ; then
-	append_path PATH /brew/bin
-	append_path PATH /brew/sbin
-	append_path MANPATH /brew/share/man
-fi
-
-# For Apple Silicon Installs
-if [ -d "/opt/homebrew" ] ; then
-	append_path PATH /opt/homebrew/sbin
-	append_path PATH /opt/homebrew/bin
-	append_path MANPATH /opt/homebrew/share/man
-fi
 
 #
 # Mac Specific Environmental Variables
@@ -30,17 +8,24 @@ fi
 cdpath+=('${HOME}/Documents/Work/Sigma/Customers')
 export GDFONTPATH=/Library/Fonts
 export FIGNORE="$FIGNORE:Application Scripts:Global Foundries:"
+export MACOS_VER=$(sw_vers -productVersion)
 unset COMMAND_MODE
+
+#
+# Add SSH Keys from OS-X Keychain
+# Moved to a background process as this was taking 200ms to run each login.
+# May want to move to once-per-day as with compinit.
+#
+is-at-least 12.0.0 ${MACOS_VER} && SSH_ADD_OPT="--apple-load-keychain" || SSH_ADD_OPT="-A"
+/usr/bin/ssh-add ${SSH_ADD_OPT} &>| "${XDG_STATE_HOME}/ssh-add.out" &|
+unset SSH_ADD_OPT
 
 #
 # Flush DNS Cache
 #
-
-if [ -x /usr/sbin/discoveryutil ] ; then
-	alias flushcache="sudo discoveryutil mdnsflushcache" # 10.10.0 - 10.10.3
-else
-	alias flushcache="sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder" # 10.10.4 - ??
-fi
+is-at-least 10.10.4 ${MACOS_VER} && \
+  alias flushcache="sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder" || \
+  alias flushcache="sudo discoveryutil mdnsflushcache" 
 
 #
 # Enable ZSH Autosuggestions
@@ -61,17 +46,17 @@ fi
 #
 # Enable ZSH Syntx Highlighting
 #
-if [ -f /brew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] ; then
-	source /brew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-fi
+# if [ -f /brew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] ; then
+# 	source /brew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# fi
 
-if [ -f /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] ; then
-	source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-fi
+# if [ -f /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] ; then
+# 	source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# fi
 
-if [ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] ; then
-	source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-fi
+# if [ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] ; then
+# 	source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# fi
 
 #
 # General Aliases
@@ -86,67 +71,19 @@ alias hibernateon="sudo pmset -a hibernatemode 5"
 alias hibernateoff="sudo pmset -a hibernatemode 0"
 alias caff="caffeinate -disut 3600"
 
-alias ftp-on='sudo -s launchctl load -w /System/Library/LaunchDaemons/ftp.plist'
-alias ftp-off='sudo -s launchctl unload -w /System/Library/LaunchDaemons/ftp.plist'
-
-alias tftp-on='sudo -s launchctl load -w /System/Library/LaunchDaemons/tftp.plist'
-alias tftp-off='sudo -s launchctl unload -w /System/Library/LaunchDaemons/tftp.plist'
-
 alias mdns-on='sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist'
 alias mdns-off='sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist'
 
 alias cpwd='pwd|tr -d "\n"|pbcopy'
-
-#alias maclocation="scselect | egrep '^ \*' | sed 's:.*(\(.*\)):\1:'"
 alias maclocation="networksetup -getcurrentlocation"
 
 alias ql="qlmanage -p &>/dev/null" # QuickLook a file
 
 #
-# Functions
+# Moving functions into zsh function autoloads
 #
-function pman () {
-	#
-	# Open a Unix man page in Preview.app
-	#
-	if [ $# -ne 1 ]
-	then
-		echo "pman <command>"
-		return 1
-	fi
-	man -t $1 | open -f -a Preview
-}
-
-function location () {
-    # Determine mac network location
-    local location=$(networksetup -getcurrentlocation)
-    
-    echo "$location:l" # :l converts output to all lowercase
-}
-
-function ips () {
-	# List IP addresses for each active interface
-	local interface
-	local interfaces=($(networksetup -listallhardwareports | awk '/^Device: /{print $2}'))
-
-	for interface in $interfaces
-	do
-		local ip=$(ipconfig getifaddr $interface)
-		[ -n "$ip" ] && printf "%11s: %s\n" "$interface" "$ip"
-	done
-	
-	return 0 # needed so that failure of last getifaddr doesn't fail entire function
-}
-
-function f() { 
-	# Open current or specified folder in Finder
-	open -a "Finder" "${1-.}"; 
-}
-
-function macmodel() {
-	curl -s https://support-sp.apple.com/sp/product?cc=$(
-  		system_profiler SPHardwareDataType \
-    	| awk '/Serial/ {print $4}' \
-    	| cut -c 9-
-	) | sed 's|.*<configCode>\(.*\)</configCode>.*|\1|'
-}
+autoload -Uz macmodel
+autoload -Uz location
+autoload -Uz pman
+autoload -Uz f
+autoload -Uz ips

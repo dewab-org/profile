@@ -1,17 +1,32 @@
-is-executable brew || return
+if (( ! $+commands[brew] )); then
+  if [[ -x /opt/homebrew/bin/brew ]]; then
+    BREW_LOCATION="/opt/homebrew/bin/brew"
+  elif [[ -x /usr/local/bin/brew ]]; then
+    BREW_LOCATION="/usr/local/bin/brew"
+  elif [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+    BREW_LOCATION="/home/linuxbrew/.linuxbrew/bin/brew"
+  elif [[ -x "$HOME/.linuxbrew/bin/brew" ]]; then
+    BREW_LOCATION="$HOME/.linuxbrew/bin/brew"
+  else
+    return
+  fi
+fi
+
+if [[ -z "$HOMEBREW_PREFIX" ]]; then
+  if [[ -z $BREW_LOCATION ]]; then
+    eval "$(brew shellenv)"
+  else
+    eval "$("$BREW_LOCATION" shellenv)"
+  fi
+fi
+
+unset BREW_LOCATION
 
 # Add brew environment variables
 export HOMEBREW_GITHUB_API_TOKEN="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"
-source <(brew shellenv)
 
 # Add brew completions to shell
-fpath=( $fpath $(brew --prefix)/share/zsh/site-functions )
-
-function recask () {
-	brew cask uninstall --force "$1" && brew cask install --force "$1"
-}
-
-#alias brewup="brew update ; brew upgrade ; brew-cask.sh upgrade ; brew cleanup ; brew cask cleanup"
+# append_path FPATH $(brew --prefix)/share/zsh/site-functions
 
 function brew-up () {
 	brew update
