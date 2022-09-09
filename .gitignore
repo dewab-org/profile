@@ -8,3 +8,5 @@ _aria2/dht.dat
 .vscode
 .zcompdump
 zcompdump
+.zsh_history
+.zsh_sessions
