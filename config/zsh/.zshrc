@@ -8,10 +8,10 @@
 # 
 # Directories:
 # ~/.zshrc.d
-# ~/.zshrc.d/global/*.zshrc			scripts for all hosts
-# ~/.zshrc.d/hosts/<shortname>.zshrc		scripts for specific hostname (ex: bifrost, sunna, ragnarok)
+# ~/.zshrc.d/global/*.zshrc				scripts for all hosts
+# ~/.zshrc.d/hosts/<shortname>.zshrc	scripts for specific hostname (ex: bifrost, sunna, ragnarok)
 # ~/.zshrc.d/platform/<platform>.zshrc	scripts for specific OS (ex: darwin, linux, sunos)
-# ~/.zshrc.d/applications/<app>.zshrc		scripts for specific App (ex: veritas)
+# ~/.zshrc.d/applications/<app>.zshrc	scripts for specific App (ex: veritas)
 # ~/.zshrc.d/scripts/<script>.sh		scripts for use in support of profile scripts (ex: isiterm2.sh)
 #
 
@@ -32,20 +32,25 @@ ZSH_CACHE_DIR="${XDG_CACHE_HOME}/zsh"
 # Set ZSH Comp Dump
 ZSH_COMPDUMP="${XDG_CACHE_HOME}/zsh/zcompdump-${ZSH_VERSION}-${hostname}"
 
+# Set ZSH Sessions Dir
+export SHELL_SESSION_DIR="${XDG_STATE_HOME}/zsh/sessions"
+export SHELL_SESSION_FILE="${SHELL_SESSION_DIR}/${TERM_SESSION_ID}"
+[ -d "${SHELL_SESSION_DIR}" ] || mkdir -m 0700 -p "${SHELL_SESSION_DIR}"
+
 # Prevent duplicate entries in path
 declare -U path
 
 # Paths
 cdpath=( . ~ / ${HOME}/Documents )
 fpath+=( "${ZDOTDIR}/zshrc.d/functions" )
-(( ${fpath[(Ie)"$ZSH_CACHE_DIR/completions"]} )) || fpath+=("$ZSH_CACHE_DIR/completions" )
+(( ${fpath[(Ie)"${ZSH_CACHE_DIR}/completions"]} )) || fpath+=("${ZSH_CACHE_DIR}/completions" )
 
 # History Paramters
-# export HISTFILE=$HOME/.zsh_history
+# export HISTFILE=${HOME}/.zsh_history
 [ -d "${XDG_STATE_HOME}/zsh" ] || mkdir -m 0700 -p "${XDG_STATE_HOME}/zsh"
 export HISTFILE="${XDG_STATE_HOME}/zsh/history"
 export HISTSIZE=1000
-export SAVEHIST=$HISTSIZE
+export SAVEHIST=${HISTSIZE}
 export HISTORY_IGNORE="(ls|ll|l.|bg|fg|clear|exit|history|cd|df)"
 
 # Others
@@ -73,7 +78,7 @@ autoload -U colors && colors
 #
 # Completion
 #
-[ -d "${XDG_CACHE_HOME}/zsh/zcompcache" ] || mkdir -p "${XDG_CACHE_HOME}/zsh/zcompcache"
+[ -d "${XDG_CACHE_HOME}/zsh/zcompcache" ] || mkdir -m 0700 -p "${XDG_CACHE_HOME}/zsh/zcompcache"
 zstyle ':completion:*' cache-path "${XDG_CACHE_HOME}/zsh/zcompcache"
 
 # Enable is-at-least plugin for version checking
@@ -82,9 +87,12 @@ autoload -Uz is-at-least
 # Enable compinit command completion
 # autoload -U compinit # && compinit
 autoload -Uz compinit # && compinit -C -d "${XDG_CACHE_HOME}/zsh/zcompdump-${ZSH_VERSION}"
+
 # Only rebuild comp database once per day
+# Stat command DOES NOT WORK FOR LINUX. Investigate.
+# Linux: ${$(ls -al --time-style="+%j" ${ZSH_COMPDUMP})[6]}
 if [ $(date +'%j') != $(stat -f '%Sm' -t '%j' ${ZSH_COMPDUMP}) ]; then
-	compinit -d "${ZSH_COMPDUMP}"
+	compinit -d "${ZSH_COMPDUMP}" && touch "${ZSH_COMPDUMP}"
 else
 	compinit -C -d "${ZSH_COMPDUMP}"
 fi
@@ -112,7 +120,7 @@ zstyle ':completion:*' group-name ''
 zstyle ':completion:*:descriptions' format %d
 zstyle ':completion:*:descriptions' format %B%d%b
 
-# Add simple clors to kill tab completion
+# Add simple colors to kill tab completion
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
 
 # Have completion ignore case
@@ -245,7 +253,7 @@ bindkey '^Xe' edit-command-line
 #
 # Create socket directory for SSH ControlPath
 #
-[ -d ~/.ssh/cm_socket ] || mkdir -m 0700 ~/.ssh/cm_socket
+[ -d ~/.ssh/cm_socket ] || mkdir -m 0700 -p ~/.ssh/cm_socket
 
 # Fig post block. Keep at the bottom of this file.
 [[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && . "$HOME/.fig/shell/zshrc.post.zsh"

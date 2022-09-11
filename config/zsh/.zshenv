@@ -9,11 +9,6 @@ hostname=${HOST%%.*} # replaces everything including and after the first . with 
 platform=$(uname -s | tr "[A-Z]" "[a-z]")
 
 #
-# Set ZSH Configuration Root
-#
-export ZDOTDIR=${HOME}/.config/zsh
-
-#
 # Reset to default path if getconf is present
 #
 [[ $+commands[getconf] -gt 0 ]] && export PATH="$(getconf PATH)"
@@ -29,14 +24,19 @@ export XDG_STATE_HOME=${HOME}/.local/state
 # Create XDG dirs if they don't exist
 for XDG_PATH in $XDG_CONFIG_HOME $XDG_CACHE_HOME $XDG_DATA_HOME $XDG_STATE_HOME
 do
-	[ -d "${XDG_PATH}" ] || mkdir -p "${XDG_PATH}"
+	[ -d "${XDG_PATH}" ] || mkdir -m 0700 -p "${XDG_PATH}"
 done
+
+#
+# Set ZSH Configuration Root
+#
+export ZDOTDIR=${XDG_CONFIG_HOME}/zsh
 
 #
 # For non-ineractive shells, only set the path and exit
 #
 if [[ ! -o interactive ]]; then
-    for dir in /usr/bin /usr/sbin /usr/*/bin/ ~/bin ~/.custom/$platform/bin /brew/bin; do
+    for dir in /usr/bin /usr/sbin /usr/*/bin/ ~/bin ~/.custom/$platform/bin; do
         [ -d "${dir}" ] || return
         export PATH="$PATH:$dir"
     done
