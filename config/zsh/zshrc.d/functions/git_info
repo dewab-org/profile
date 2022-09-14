@@ -5,7 +5,7 @@ git_info() {
   ! git rev-parse --is-inside-work-tree > /dev/null 2>&1 && return
 
   # Git branch/tag, or name-rev if on detached head
-  local GIT_LOCATION=${$(git symbolic-ref -q HEAD || git name-rev --name-only --no-undefined --always HEAD)#(refs/heads/|tags/)}
+  local GIT_BRANCH=${$(git symbolic-ref -q HEAD || git name-rev --name-only --no-undefined --always HEAD)#(refs/heads/|tags/)}
 
   local AHEAD="%{$fg[red]%}⇡NUM%{$reset_color%}"
   local BEHIND="%{$fg[cyan]%}⇣NUM%{$reset_color%}"
@@ -17,12 +17,14 @@ git_info() {
   local -a DIVERGENCES
   local -a FLAGS
 
-  local NUM_AHEAD="$(git log --oneline @{u}.. 2> /dev/null | wc -l | tr -d ' ')"
+  # local NUM_AHEAD="$(git log --oneline @{u}.. 2> /dev/null | wc -l | tr -d ' ')"
+  local NUM_AHEAD="$(git rev-list --count @{upstream}..HEAD 2>/dev/null)"
   if [ "$NUM_AHEAD" -gt 0 ]; then
     DIVERGENCES+=( "${AHEAD//NUM/$NUM_AHEAD}" )
   fi
 
-  local NUM_BEHIND="$(git log --oneline ..@{u} 2> /dev/null | wc -l | tr -d ' ')"
+  # local NUM_BEHIND="$(git log --oneline ..@{u} 2> /dev/null | wc -l | tr -d ' ')"
+  local NUM_BEHIND="$(git rev-list --count HEAD..@{upstream})"
   if [ "$NUM_BEHIND" -gt 0 ]; then
     DIVERGENCES+=( "${BEHIND//NUM/$NUM_BEHIND}" )
   fi
@@ -45,11 +47,12 @@ git_info() {
   fi
 
   local -a GIT_INFO
-  GIT_INFO+=( "%{$fg_no_bold[red]%}[%{$reset_color%}%{$fg_no_bold[white]%}±" )
+  # GIT_INFO+=( "%{$fg_no_bold[red]%}[%{$reset_color%}%{$fg_no_bold[white]%}±" )
+  GIT_INFO+=( "%F{red}[%f%F{white}" )
   [ -n "$GIT_STATUS" ] && GIT_INFO+=( "$GIT_STATUS" )
   [[ ${#DIVERGENCES[@]} -ne 0 ]] && GIT_INFO+=( "${(j::)DIVERGENCES}" )
   [[ ${#FLAGS[@]} -ne 0 ]] && GIT_INFO+=( "${(j::)FLAGS}" )
-  GIT_INFO+=( "%{$fg_no_bold[white]%}$GIT_LOCATION%{$reset_color%}%{$fg_no_bold[red]%}]%{$reset_color%}" )
+  GIT_INFO+=( "%F{white}$GIT_BRANCH%f%F{red}]%f" )
   echo "${(j: :)GIT_INFO}"
 
 }
