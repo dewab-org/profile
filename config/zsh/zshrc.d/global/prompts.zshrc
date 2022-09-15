@@ -31,12 +31,12 @@ function +vi-git-st() {
     # for git prior to 1.7
     # ahead=$(git rev-list origin/${hook_com[branch]}..HEAD | wc -l)
     ahead=$(git rev-list --count ${hook_com[branch]}@{upstream}..HEAD 2>/dev/null)
-    (( $ahead )) && gitstatus+=( "+${ahead}" )
+    (( $ahead )) && gitstatus+=( "%F{red}⇡${ahead}%f" )
 
     # for git prior to 1.7
     # behind=$(git rev-list HEAD..origin/${hook_com[branch]} | wc -l)
     behind=$(git rev-list --count HEAD..${hook_com[branch]}@{upstream} 2>/dev/null)
-    (( $behind )) && gitstatus+=( "-${behind}" )
+    (( $behind )) && gitstatus+=( "%F{cyan}⇣${behind}%f" )
 
     hook_com[misc]+=${(j:/:)gitstatus}
 }
