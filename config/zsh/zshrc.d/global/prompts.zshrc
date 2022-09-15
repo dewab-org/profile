@@ -13,17 +13,36 @@ setopt PROMPT_SUBST
 # %k == reset background
 
 # Enable VCS information (GIT, SVN)
-# autoload -Uz vcs_info
-# zstyle ':vcs_info:*' enable git svn
-# zstyle ':vcs_info:*' check-for-changes true
-# zstyle ':vcs_info:*' unstagedstr "%F{red}●%f"
-# zstyle ':vcs_info:*' stagedstr "%F{green}●%f"
-# # zstyle ':vcs_info:git*' formats "%{$fg[grey]%}%s %{$reset_color%}%r/%S%{$fg[grey]%} %{$fg[blue]%}%b%{$reset_color%}%m%u%c%{$reset_color%} "
-# zstyle ':vcs_info:git*' formats "%F{red}[%F{blue}%b %f%m%u%c%f%F{red}]%f"
-# precmd_functions+=(vcs_info)
+autoload -Uz vcs_info
+zstyle ':vcs_info:*' enable git svn
+zstyle ':vcs_info:*' check-for-changes true
+zstyle ':vcs_info:*' unstagedstr "%F{red}●%f"
+zstyle ':vcs_info:*' stagedstr "%F{green}●%f"
+# zstyle ':vcs_info:git*' formats "%{$fg[grey]%}%s %{$reset_color%}%r/%S%{$fg[grey]%} %{$fg[blue]%}%b%{$reset_color%}%m%u%c%{$reset_color%} "
+zstyle ':vcs_info:git*' formats "%F{red}[%F{white}%b %f%m%u%c%f%F{red}]%f"
+precmd_functions+=(vcs_info)
+
+# Make sure you have added misc to your 'formats':  %m
+zstyle ':vcs_info:git*+set-message:*' hooks git-st
+function +vi-git-st() {
+    local ahead behind
+    local -a gitstatus
+
+    # for git prior to 1.7
+    # ahead=$(git rev-list origin/${hook_com[branch]}..HEAD | wc -l)
+    ahead=$(git rev-list --count ${hook_com[branch]}@{upstream}..HEAD 2>/dev/null)
+    (( $ahead )) && gitstatus+=( "+${ahead}" )
+
+    # for git prior to 1.7
+    # behind=$(git rev-list HEAD..origin/${hook_com[branch]} | wc -l)
+    behind=$(git rev-list --count HEAD..${hook_com[branch]}@{upstream} 2>/dev/null)
+    (( $behind )) && gitstatus+=( "-${behind}" )
+
+    hook_com[misc]+=${(j:/:)gitstatus}
+}
 
 # Use git_info instead of vcs_info
-autoload -Uz git_info
+# autoload -Uz git_info
 
 _normal_prompt () {
         # Non-Colorized Prompt
@@ -73,9 +92,12 @@ _color_prompt () {
 		SSHPROMPT=''
 	fi
 
-	#export PROMPT="${SSHPROMPT}${ROOTPROMPT}%{$fg_no_bold[red]%}[%{$reset_color%}%!%{$fg_no_bold[red]%}]%{$fg_no_bold[red]%}[${USERCOLOR}%n%{$reset_color%}@${HOSTCOLOR}%m %{$reset_color%}%~%{$fg_no_bold[red]%}]%{$reset_color%}${vcs_info_msg_0_}%# "
-	export PROMPT="${SSHPROMPT}${ROOTPROMPT}%F{red}[%f%!%F{red}]%F{red}[${USERCOLOR}%n%f@${HOSTCOLOR}%m %f%~%F{red}]%f$(git_info)%# "
-	# export PROMPT="${SSHPROMPT}${ROOTPROMPT}%F{red}[%f%!%F{red}]%F{red}[${USERCOLOR}%n%f@${HOSTCOLOR}%m %f%~%F{red}]%f${vcs_info_msg_0_}%# "
+	# Prompt using git_info
+	# export PROMPT="${SSHPROMPT}${ROOTPROMPT}%F{red}[%f%!%F{red}]%F{red}[${USERCOLOR}%n%f@${HOSTCOLOR}%m %f%~%F{red}]%f$(git_info)%# "
+
+	# prompt using vcs_info
+	export PROMPT="${SSHPROMPT}${ROOTPROMPT}%F{red}[%f%!%F{red}]%F{red}[${USERCOLOR}%n%f@${HOSTCOLOR}%m %f%~%F{red}]%f${vcs_info_msg_0_}%# "
+	
 	# export RPROMPT='$(_right_prompt_err_code_prompt)'
 	# RPROMPT='%(?.%F{green}✔%f.%F{red}✘%F{white}%?%f)'
 	RPROMPT='%(?..%F{red}✘%F{white}%?%f)'
