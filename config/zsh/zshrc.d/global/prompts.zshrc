@@ -14,15 +14,17 @@ setopt PROMPT_SUBST
 
 # Enable VCS information (GIT, SVN)
 autoload -Uz vcs_info
+VCS_BRANCH_CHAR=$'\ue0a0'
 zstyle ':vcs_info:*' enable git svn
+zstyle ':vcs_info:*' get-revision true
 zstyle ':vcs_info:*' check-for-changes true
 zstyle ':vcs_info:*' unstagedstr "%F{red}●%f"
 zstyle ':vcs_info:*' stagedstr "%F{green}●%f"
 # zstyle ':vcs_info:git*' formats "%{$fg[grey]%}%s %{$reset_color%}%r/%S%{$fg[grey]%} %{$fg[blue]%}%b%{$reset_color%}%m%u%c%{$reset_color%} "
-zstyle ':vcs_info:git*' formats "%F{red}[%F{white}%b %f%m%u%c%f%F{red}]%f"
+zstyle ':vcs_info:git*' formats "%F{red}[%F{white}${VCS_BRANCH_CHAR}%b %f%m%u%c%f%F{red}]%f"
 precmd_functions+=(vcs_info)
 
-# Make sure you have added misc to your 'formats':  %m
+# Adds Ahead/Behind to %m in vcs_info
 zstyle ':vcs_info:git*+set-message:*' hooks git-st
 function +vi-git-st() {
     local ahead behind
@@ -39,6 +41,19 @@ function +vi-git-st() {
     (( $behind )) && gitstatus+=( "%F{cyan}⇣${behind}%f" )
 
     hook_com[misc]+=${(j:/:)gitstatus}
+}
+
+# Adds Untracked Status to %c in vcs_info
+zstyle ':vcs_info:git*+set-message:*' hooks git-untracked
++vi-git-untracked(){
+    if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' ]] && \
+        git status --porcelain | grep '??' &> /dev/null ; then
+        # This will show the marker if there are any untracked files in repo.
+        # If instead you want to show the marker only if there are untracked
+        # files in $PWD, use:
+        #[[ -n $(git ls-files --others --exclude-standard) ]] ; then
+        hook_com[staged]+='%F{red}…%f'
+    fi
 }
 
 # Use git_info instead of vcs_info
@@ -97,6 +112,10 @@ _color_prompt () {
 
 	# prompt using vcs_info
 	export PROMPT="${SSHPROMPT}${ROOTPROMPT}%F{red}[%f%!%F{red}]%F{red}[${USERCOLOR}%n%f@${HOSTCOLOR}%m %f%~%F{red}]%f${vcs_info_msg_0_}%# "
+	
+	# Prompt using bar arrows with vcs_info
+	# export ARROW=$'\ue0b0'
+	# export PROMPT="%K{red}%F{white}%! %K{magenta}%F{red}${ARROW}%F{USERCOLOR}%n@${RHOSTCOLOR}%m %K{blue}%F{magenta}${ARROW}%F{white} %~ %K{yellow}%F{blue}${ARROW}%f ${vcs_info_msg_0_} %K{blue}%F{yellow}${ARROW}%f %#%k%F{blue}${ARROW}%f"
 	
 	# export RPROMPT='$(_right_prompt_err_code_prompt)'
 	# RPROMPT='%(?.%F{green}✔%f.%F{red}✘%F{white}%?%f)'
