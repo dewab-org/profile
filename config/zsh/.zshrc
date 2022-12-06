@@ -88,10 +88,19 @@ autoload -Uz is-at-least
 # autoload -U compinit # && compinit
 autoload -Uz compinit # && compinit -C -d "${XDG_CACHE_HOME}/zsh/zcompdump-${ZSH_VERSION}"
 
+# Enable strftime
+zmodload zsh/datetime 
+
 # Only rebuild comp database once per day
-# Stat command DOES NOT WORK FOR LINUX. Investigate.
-# Linux: ${$(ls -al --time-style="+%j" ${ZSH_COMPDUMP})[6]}
-if [ $(date +'%j') != $(stat -f '%Sm' -t '%j' ${ZSH_COMPDUMP}) ]; then
+# Linux and Darwin stat commands use completely different flags.  Get epoch
+# using platform specific flags, then compare day of year.
+if [ ${platform} = "darwin" ] ; then 
+	__zshcompdump_timestamp=$(stat -f '%Dm' ${ZSH_COMPDUMP})
+else
+	__zshcompdump_timestamp=$(stat ${ZSH_COMPDUMP} -c %Y)
+fi
+
+if [ $(strftime "%j") != $(strftime "%j" "${__zshcompdump_timestamp}") ]; then
 	compinit -d "${ZSH_COMPDUMP}" && touch "${ZSH_COMPDUMP}"
 else
 	compinit -C -d "${ZSH_COMPDUMP}"
