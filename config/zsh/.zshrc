@@ -100,7 +100,7 @@ else
 	__zshcompdump_timestamp=$(stat ${ZSH_COMPDUMP} -c %Y)
 fi
 
-if [ $(strftime "%j") != $(strftime "%j" "${__zshcompdump_timestamp}") ]; then
+if [ $(strftime "%j" "${EPOCHSECONDS}") != $(strftime "%j" "${__zshcompdump_timestamp}") ]; then
 	compinit -d "${ZSH_COMPDUMP}" && touch "${ZSH_COMPDUMP}"
 else
 	compinit -C -d "${ZSH_COMPDUMP}"
