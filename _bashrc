@@ -28,7 +28,6 @@ if [[ "$-" != *i* ]]; then
 fi
 
 #
-# Configure Variables
 #
 export CDPATH=.:~:/
 export PROMPT_COMMAND='history -a ; echo -ne "\[\033]0;\]${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/~}\[\007\]"'

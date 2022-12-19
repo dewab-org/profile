@@ -181,7 +181,7 @@ append_path MANPATH /opt/local/man
 # Miscallaneous Vars
 #
 
-export BORG_REPO="borg:."
+export BORG_REPO="ssh://borg/./"
 
 #
 # Aliases
