@@ -1,0 +1,12 @@
+is-executable awx || return
+
+export TOWER_HOST=https://rhel-ans-ctrl.lab.local/
+
+# Check for 1Password
+is-executable op || return
+
+function awx-login {
+  eval $(op run --env-file=/Users/daniel/.op/awx.env -- /usr/local/bin/awx login -kf human)
+}
+
+alias awx="awx -k"

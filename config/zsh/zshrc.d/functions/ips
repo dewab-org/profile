@@ -1,7 +1,7 @@
 function ips () {
 	# List IP addresses for each active interface
 	local interface
-	local interfaces=($(networksetup -listallhardwareports | awk '/^Device: /{print $2}'))
+	local interfaces=($(networksetup -listallhardwareports | awk '/^Device/{print $NF}'))
 
 	for interface in $interfaces
 	do
