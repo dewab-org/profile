@@ -36,7 +36,7 @@ export ZDOTDIR=${XDG_CONFIG_HOME}/zsh
 # For non-ineractive shells, only set the path and exit
 #
 if [[ ! -o interactive ]]; then
-    for dir in /usr/bin /usr/sbin /usr/*/bin/ ~/bin ~/.custom/$platform/bin; do
+    for dir in /usr/bin /usr/sbin /usr/*/bin/ ~/bin ~/.custom/$platform/bin /opt/homebrew/bin; do
         [ -d "${dir}" ] && export PATH="$PATH:$dir"
     done
     unset dir
