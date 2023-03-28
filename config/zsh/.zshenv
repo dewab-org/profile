@@ -37,8 +37,7 @@ export ZDOTDIR=${XDG_CONFIG_HOME}/zsh
 #
 if [[ ! -o interactive ]]; then
     for dir in /usr/bin /usr/sbin /usr/*/bin/ ~/bin ~/.custom/$platform/bin; do
-        [ -d "${dir}" ] || return
-        export PATH="$PATH:$dir"
+        [ -d "${dir}" ] && export PATH="$PATH:$dir"
     done
     unset dir
     return
