@@ -7,3 +7,7 @@ Thumbs.db
 .zcompdump
 .zsh_history
 .zsh_sessions
+.vscode
+secrets.yml
+credentials.yml
+*.iso
