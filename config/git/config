@@ -4,7 +4,7 @@
 
 [core]
 	  editor = vi
-	  excludesfile = /Users/daniel/.gitignore
+	Excludesfile = ~/.config/git/ignore
 	  autocrlf = input
 	  pager = 
 
