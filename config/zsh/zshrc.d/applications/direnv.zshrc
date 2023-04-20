@@ -1,7 +1,5 @@
 is-executable direnv || return
 
-# source <(direnv hook zsh)
-
 _direnv_hook() {
   trap -- '' SIGINT;
   eval "$(direnv export zsh)";

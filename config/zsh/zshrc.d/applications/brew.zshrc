@@ -22,15 +22,11 @@ fi
 
 unset BREW_LOCATION
 
-# Add brew environment variables
-export HOMEBREW_GITHUB_API_TOKEN="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"
-
 # Add brew completions to shell
-# append_path FPATH $(brew --prefix)/share/zsh/site-functions
+append_path FPATH $(brew --prefix)/share/zsh/site-functions
 
 function brew-up () {
 	brew update
 	brew upgrade
-	brew cu -a --cleanup -q
 	brew cleanup
 }

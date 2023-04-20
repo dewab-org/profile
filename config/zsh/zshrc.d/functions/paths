@@ -1,6 +1,5 @@
 function prepend_path() {
-	# Exit if directory doesn't exit
-	[[ ! -d "$2" ]] && return
+	is-directory "$2" || return
 
 	local p
 	remove_from_path "$1" "$2"
@@ -9,8 +8,7 @@ function prepend_path() {
 }
 
 function append_path() {
-	# Exit if directory doesn't exit
-	[[ ! -d "$2" ]] && return
+	is-directory "$2" || return
 
 	local p
 	remove_from_path "$1" "$2"

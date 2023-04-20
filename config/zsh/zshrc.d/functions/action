@@ -1,8 +1,5 @@
-#
 # Daniel's Action Script Reporting
-#
 
-#if [ -z "$PS1" ] ; then
 if [[ $- =~ i ]] ; then
 	RES_COL=60
 else

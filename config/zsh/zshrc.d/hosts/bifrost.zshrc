@@ -1,17 +1,8 @@
-#
 # bifrost specific bashrc script
-#
 
-#
 # Variables
-#
-#export IRCNAME="Sex is hereditary -- if your parents didn't have any, likely you won't either."
-#export IRCNAME="Heimdall"
 
-#
 # Command Aliases and Functions
-#
-
 function bans {
 	for i in $(sudo ipset list -n)
 	do 
@@ -67,13 +58,3 @@ ban: [-p] CIDR [CIDR...]
                 sudo firewall-cmd --reload
         fi
 }
-
-# BitTorrent
-#alias bt='launchmany-curses --minport 16881 --maxport 16889'
-
-# IRC
-# alias efnet='epic heimdall -l ~/.efnet.ircrc'
-# alias undernet='epic heimdall -l ~/.undernet.ircrc'
-# alias bdotcom='epic Heimdall -l ~/.bdotcom.ircrc irc.bondage.com:6663'
-# alias ircfilter='perl -pe '\''s/\e\[[\d;].*?m//g'\'''
-# alias ircmsg='egrep "\[[01][0-9]:[0-5][0-9]\wM\] \[[ 1][0-9]\]"'

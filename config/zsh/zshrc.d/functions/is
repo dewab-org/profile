@@ -18,3 +18,7 @@ function is-supported () {
 		fi
 	fi
 }
+
+function is-directory () {
+	[[ -d "$1" ]] || return 1
+}

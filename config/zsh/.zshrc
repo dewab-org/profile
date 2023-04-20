@@ -13,16 +13,10 @@
 # ~/.zshrc.d/platform/<platform>.zshrc	scripts for specific OS (ex: darwin, linux, sunos)
 # ~/.zshrc.d/applications/<app>.zshrc	scripts for specific App (ex: veritas)
 # ~/.zshrc.d/scripts/<script>.sh		scripts for use in support of profile scripts (ex: isiterm2.sh)
-#
 
-#
 # Set some varibles for use in this script
-#
 hostname=${${HOST%%.*}:l} # replaces everything including and after the first . with nothing. Then lowercases it.
 platform=${$(uname -s):l} # lowercases platform name
-
-# For non-ineractive shells, only set the path and exit
-# non-interative information moved to .zshenv
 
 # Set ZSH Cache Directories
 ZSH_CACHE_DIR="${XDG_CACHE_HOME}/zsh"
@@ -46,7 +40,6 @@ fpath+=( "${ZDOTDIR}/zshrc.d/functions" )
 (( ${fpath[(Ie)"${ZSH_CACHE_DIR}/completions"]} )) || fpath+=("${ZSH_CACHE_DIR}/completions" )
 
 # History Paramters
-# export HISTFILE=${HOME}/.zsh_history
 [ -d "${XDG_STATE_HOME}/zsh" ] || mkdir -m 0700 -p "${XDG_STATE_HOME}/zsh"
 export HISTFILE="${XDG_STATE_HOME}/zsh/history"
 export HISTSIZE=1000
@@ -58,9 +51,7 @@ export CLICOLOR=true
 export LESS="-X"
 export FIGNORE="" # files and directories to ignore with tab-completion
 
-#
 # Configure Shell Options
-#
 setopt auto_cd                      # if command is a path, cd into it
 setopt correct                      # try to correct spelling of commands
 setopt append_history               # append
@@ -70,14 +61,10 @@ setopt hist_ignore_dups             # Do not write events to history that are du
 setopt hist_reduce_blanks           # trim blanks
 setopt nonomatch                    # match BASH glob behavior.  Pass wildcard to command if unmatched (as in scp blah:* .)
 
-#
 # Enable ZSH colors
-#
 autoload -U colors && colors
 
-#
 # Completion
-#
 [ -d "${XDG_CACHE_HOME}/zsh/zcompcache" ] || mkdir -m 0700 -p "${XDG_CACHE_HOME}/zsh/zcompcache"
 zstyle ':completion:*' cache-path "${XDG_CACHE_HOME}/zsh/zcompcache"
 
@@ -146,16 +133,11 @@ zstyle ':completion:*:(ssh|scp|rsync):*:hosts-ipaddr' ignored-patterns '^(<->.<-
 # Allow for autocomplete to be case insensitive
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' '+l:|?=** r:|?=**'
 
-#
 # expand !^ !* !$ !:2 !$:h !$:t when you hit space 
-#
 # Doesn't appear that these apply to ZSH
 #bind space:magic-space
 
-#
 # Set My Paths
-#
-
 append_path PATH /sbin
 append_path PATH /usr/sbin
 append_path PATH ${HOME}/bin
@@ -166,7 +148,6 @@ append_path PATH /usr/local/bin
 append_path PATH /usr/local/sbin
 append_path PATH /opt/local/bin
 append_path PATH /opt/local/sbin
-
 append_path MANPATH /usr/man
 append_path MANPATH ${HOME}/man
 append_path MANPATH ${HOME}/.custom/${platform}/man
@@ -177,16 +158,10 @@ append_path MANPATH /usr/local/share/man
 append_path MANPATH /usr/X11R6/man
 append_path MANPATH /opt/local/man
 
-#
 # Miscallaneous Vars
-#
-
 export BORG_REPO="ssh://borg/./"
 
-#
 # Aliases
-#
-
 alias ls='ls -F'
 alias ll='ls -alh'
 alias l.='ls -d .*'
@@ -203,66 +178,45 @@ alias sudo='sudo ' # If the last character of the alias value is a blank, then t
 #alias whatismyip='curl http://aws-1.bifrost.cc/whatismyip.php ; echo '
 alias whatismyip='dig +short myip.opendns.com @resolver1.opendns.com'
 
-#
 # Run all application global zshrc scripts from $HOME/.zshrc.d/global/ (ex: prompt, colors, etc.)
-#
-
 for globalscript in ${ZDOTDIR}/zshrc.d/global/*.zshrc ; do
   source "${globalscript}"
 done
 unset globalscript
 
-#
 # Run platform specific zshrc scripts from $HOME/.zshrc.d/platform/ (ex: darwin, sunos, linux)
-#
-
 if [ -r "${ZDOTDIR}/zshrc.d/platform/${platform}.zshrc" ] ; then
 	source "${ZDOTDIR}/zshrc.d/platform/${platform}.zshrc"
 fi
 
-#
 # Run host specific zshrc scripts from $HOME/.zshrc.d/hosts/ (ex: bifrost, sunna, ragnarok)
-#
-
 if [ -r "${ZDOTDIR}/zshrc.d/hosts/${hostname}.zshrc" ] ; then
 	source "${ZDOTDIR}/zshrc.d/hosts/${hostname}.zshrc"
 fi
 
-#
 # Run all application specific zshrc scripts from $HOME/.zshrc.d/applications/ (ex: veritas)
-#
-
 for application in ${ZDOTDIR}/zshrc.d/applications/*.zshrc ; do
 	source "${application}"
 done
 unset application
 
-#
 # Set the EDITOR variable
-#
 is-executable vim && export EDITOR=$(command -v vim)
 
-#
 # Switch back to Emacs mode (changing editor switches to VI-mode for some stupid reason)
-#
 bindkey -e
 
-#
 # Change ctrl+u to kill to front of line
-#
 bindkey '^U' backward-kill-line
 
-#
 # Cntrl+X E to edit the command line in editor
-#
 autoload edit-command-line
 zle -N edit-command-line
 bindkey '^Xe' edit-command-line
 
-#
 # Create socket directory for SSH ControlPath
-#
-[ -d ~/.ssh/cm_socket ] || mkdir -m 0700 -p ~/.ssh/cm_socket
+# [ -d ~/.ssh/cm_socket ] || mkdir -m 0700 -p ~/.ssh/cm_socket
+is-directory ~/.ssh/cm_socket || mkdir -m 0700 -p ~/.ssh/cm_socket
 
 # Fig post block. Keep at the bottom of this file.
 [[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && . "$HOME/.fig/shell/zshrc.post.zsh"
