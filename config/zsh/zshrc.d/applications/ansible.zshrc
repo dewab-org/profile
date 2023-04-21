@@ -1,12 +1,20 @@
 is-executable ansible || return
 
 # added 2022-01-08 to fix issue with ansible crashing running win_* modules
-export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+# export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 
 #alias ansible="OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES ansible"
 #alias ansible-playbook="OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES ansible-playbook"
 
+function ansible-setup {
+    mkdir -p -m 700 ${XDG_DATA_HOME}/ansible/inventory
+    mkdir -p -m 700 ${XDG_DATA_HOME}/ansible/collections
+    mkdir -p -m 700 ${XDG_CONFIG_HOME}/ansible/callbacks
+    mkdir -p -m 700 ${XDG_CACHE_HOME}/ansible/facts_cache
+    mkdir -p -m 700 ${XDG_CACHE_HOME}/ansible
+}
+
 # if I wanted to do XDG for Ansible Configuration
-# export ANSIBLE_HOME="${XDG_CONFIG_HOME}/ansible"
-# export ANSIBLE_CONFIG="${XDG_CONFIG_HOME}/ansible.cfg"
-# export ANSIBLE_GALAXY_CACHE_DIR="${XDG_CACHE_HOME}/ansible/galaxy_cache"
+export ANSIBLE_HOME="${XDG_CONFIG_HOME}/ansible"
+export ANSIBLE_CONFIG="${XDG_CONFIG_HOME}/ansible/ansible.cfg"
+export ANSIBLE_GALAXY_CACHE_DIR="${XDG_CACHE_HOME}/ansible/galaxy_cache"
