@@ -3,8 +3,6 @@
 # Solaris Specific Paths
 append_path PATH /usr/openv/netbackup/bin
 append_path PATH /usr/openv/netbackup/bin/admincmd
-append_path PATH /opt/VRTS/bin
-append_path MANPATH /opt/VRTS/man
 append_path PATH /usr/sfw/bin
 append_path PATH /usr/sfw/sbin
 append_path MANPATH /usr/sfw/man
