@@ -22,3 +22,7 @@ function is-supported () {
 function is-directory () {
 	[[ -d "$1" ]] || return 1
 }
+
+function is-readable () {
+	[[ -r "$1" ]] || return 1
+}
