@@ -13,6 +13,10 @@ if [ ! -x "${mkfile}" ] && [ -x "${xfs_mkfile}" ] ; then
 	alias mkfile="${xfs_mkfile}"
 fi
 
+if [ -r  /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] ; then
+	source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+fi
+
 # Functions
 function ips() {
 	ip -o addr show scope global up | awk '{printf "%11s: %s\n", $2, $4}'
