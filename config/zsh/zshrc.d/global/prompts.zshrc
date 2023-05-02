@@ -111,7 +111,7 @@ _color_prompt () {
 	# export PROMPT="${SSHPROMPT}${ROOTPROMPT}%F{red}[%f%!%F{red}]%F{red}[${USERCOLOR}%n%f@${HOSTCOLOR}%m %f%~%F{red}]%f$(git_info)%# "
 
 	# prompt using vcs_info
-	export PROMPT="${SSHPROMPT}${ROOTPROMPT}%F{red}[%f%!%F{red}]%F{red}[${USERCOLOR}%n%f@${HOSTCOLOR}%m %f%~%F{red}]%f${vcs_info_msg_0_}%# "
+	export PROMPT="${SSHPROMPT}${ROOTPROMPT}%F{red}[%f%!%F{red}]%F{red}[${USERCOLOR}%n%f%k@${HOSTCOLOR}%m %f%~%F{red}]%f${vcs_info_msg_0_}%# "
 	
 	# Prompt using bar arrows with vcs_info
 	# export ARROW=$'\ue0b0'
