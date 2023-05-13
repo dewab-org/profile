@@ -148,6 +148,7 @@ append_path PATH /usr/local/bin
 append_path PATH /usr/local/sbin
 append_path PATH /opt/local/bin
 append_path PATH /opt/local/sbin
+append_path PATH /snap/bin
 append_path MANPATH /usr/man
 append_path MANPATH ${HOME}/man
 append_path MANPATH ${HOME}/.custom/${platform}/man
@@ -157,6 +158,7 @@ append_path MANPATH /usr/local/man
 append_path MANPATH /usr/local/share/man
 append_path MANPATH /usr/X11R6/man
 append_path MANPATH /opt/local/man
+append_path MANPATH /snap/man
 
 # Miscallaneous Vars
 export BORG_REPO="ssh://borg/./"
