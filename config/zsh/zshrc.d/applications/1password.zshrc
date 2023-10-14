@@ -12,3 +12,5 @@ op completion zsh >| "${ZSH_CACHE_DIR}/completions/_op" &|
 
 # Load opswd function (copies password to clipboard)
 autoload -Uz opswd
+
+is-readable "${HOME}/.op/plugins.sh" && source "${HOME}/.op/plugins.sh"
