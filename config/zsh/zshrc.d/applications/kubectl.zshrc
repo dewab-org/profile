@@ -1,7 +1,5 @@
 is-executable kubectl || return
 
-# source <(kubectl completion zsh)
-
 if [[ ! -f "${ZSH_CACHE_DIR}/completions/_kubectl" ]]; then
   autoload -Uz _kubectl
   typeset -g -A _comps

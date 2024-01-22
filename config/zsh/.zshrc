@@ -55,11 +55,14 @@ export FIGNORE="" # files and directories to ignore with tab-completion
 setopt auto_cd                      # if command is a path, cd into it
 setopt correct                      # try to correct spelling of commands
 setopt append_history               # append
-# setopt complete_aliases             # make the alias a distinct command for completion purposes
+setopt complete_aliases             # make the alias a distinct command for completion purposes
 setopt extended_history             # save timestamp of command and duration
 setopt hist_ignore_dups             # Do not write events to history that are duplicates of previous events
 setopt hist_reduce_blanks           # trim blanks
 setopt nonomatch                    # match BASH glob behavior.  Pass wildcard to command if unmatched (as in scp blah:* .)
+
+# Change paths to only store unique entries
+typeset -aU path fpath manpath cdpath
 
 # Enable ZSH colors
 autoload -U colors && colors

@@ -56,3 +56,5 @@
 	required = true
 [http]
 	postBuffer = 524288000
+[push]
+	autoSetupRemote = true

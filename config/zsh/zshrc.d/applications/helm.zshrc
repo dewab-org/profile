@@ -1,13 +1,9 @@
 is-executable helm || return
 
-# If the completion file does not exist, generate it and then source it
-# Otherwise, source it and regenerate in the background
-if [[ ! -f "$ZSH_CACHE_DIR/completions/_helm" ]]; then
-  helm completion zsh | tee "$ZSH_CACHE_DIR/completions/_helm" >/dev/null
-  source "$ZSH_CACHE_DIR/completions/_helm"
-else
-  source "$ZSH_CACHE_DIR/completions/_helm"
-  helm completion zsh | tee "$ZSH_CACHE_DIR/completions/_helm" >/dev/null &|
+if [[ ! -f "${ZSH_CACHE_DIR}/completions/_helm" ]]; then
+  autoload -Uz _helm
+  typeset -g -A _comps
+  _comps[op]=_helm
 fi
 
 helm completion zsh >| "${ZSH_CACHE_DIR}/completions/_helm" &|
