@@ -10,3 +10,4 @@ _aria2/dht.dat
 zcompdump
 .zsh_history
 .zsh_sessions
+**/iterm_integration.sh-*
