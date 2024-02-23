@@ -55,6 +55,11 @@ alias mdns-off='sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple
 alias cpwd='pwd|tr -d "\n"|pbcopy'
 alias ql="qlmanage -p &>/dev/null" # QuickLook a file
 
+# Microsoft Office Aliases
+alias excel="open -a 'Microsoft Excel'"
+alias word="open -a 'Microsoft Word'"
+alias powerpoint="open -a 'Microsoft PowerPoint'"
+
 # Moving functions into zsh function autoloads
 autoload -Uz macmodel
 autoload -Uz location
