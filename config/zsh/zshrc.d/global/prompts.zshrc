@@ -23,43 +23,53 @@ zstyle ':vcs_info:*' unstagedstr "%F{red}●%f"
 zstyle ':vcs_info:*' stagedstr "%F{green}●%f"
 zstyle ':vcs_info:git*' formats "%F{red}[%F{white}${VCS_BRANCH_CHAR}%b %f%m%u%c%f%F{red}]%f"
 zstyle ':vcs_info:git*' actionformats "%F{red}[%F{white}${VCS_BRANCH_CHAR}%b|%f%m%a%u%c%f%F{red}]%f"
+zstyle ':vcs_info:git*+set-message:*' hooks git-st git-untracked vi-git-stash vi-git-remotebranch
 # precmd_functions+=(vcs_info)
 add-zsh-hook precmd vcs_info
 
 # Adds Ahead/Behind to %m in vcs_info
-zstyle ':vcs_info:git*+set-message:*' hooks git-st
 function +vi-git-st() {
-    local ahead behind
-    local -a gitstatus
-
-    # for git prior to 1.7
-    # ahead=$(git rev-list origin/${hook_com[branch]}..HEAD | wc -l)
-    ahead=$(git rev-list --count ${hook_com[branch]}@{upstream}..HEAD 2>/dev/null)
-    (( $ahead )) && gitstatus+=( "%F{red}⇡${ahead}%f" )
-
-    # for git prior to 1.7
-    # behind=$(git rev-list HEAD..origin/${hook_com[branch]} | wc -l)
-    behind=$(git rev-list --count HEAD..${hook_com[branch]}@{upstream} 2>/dev/null)
-    (( $behind )) && gitstatus+=( "%F{cyan}⇣${behind}%f" )
-
-    hook_com[misc]+=${(j:/:)gitstatus}
+	local -a gitstatus
+	local -a ahead_and_behind=(
+		$(git rev-list --left-right --count HEAD...${hook_com[branch]}@{upstream} 2>/dev/null)
+	)
+	(( ${ahead_and_behind[1]} )) && gitstatus+=( "%F{red}⇡${ahead_and_behind[1]}%f" )
+	(( ${ahead_and_behind[2]} )) && gitstatus+=( "%F{cyan}⇣${ahead_and_behind[2]}%f" )
+	hook_com[misc]+=${(j:/:)gitstatus}
 }
 
 # Adds Untracked Status to %c in vcs_info
-zstyle ':vcs_info:git*+set-message:*' hooks git-untracked
-+vi-git-untracked(){
-    if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' ]] && \
-        git status --porcelain | grep '??' &> /dev/null ; then
-        # This will show the marker if there are any untracked files in repo.
-        # If instead you want to show the marker only if there are untracked
-        # files in $PWD, use:
-        #[[ -n $(git ls-files --others --exclude-standard) ]] ; then
-        hook_com[staged]+='%F{red}…%f'
-    fi
+function +vi-git-untracked(){
+	if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' ]] && \
+			git status --porcelain | grep '??' &> /dev/null ; then
+			# This will show the marker if there are any untracked files in repo.
+			# If instead you want to show the marker only if there are untracked
+			# files in $PWD, use:
+			#[[ -n $(git ls-files --others --exclude-standard) ]] ; then
+			hook_com[staged]+='%F{red}…%f'
+	fi
 }
 
-# Use git_info instead of vcs_info
-# autoload -Uz git_info
+function +vi-git-stash() {
+  local -a stashes diff
+  stashes=$(git stash list --count 2>/dev/null)
+  (( $stashes )) && diff="%F{yellow}⚑${stashes}%f"
+  hook_com[misc]+=${diff}
+}
+
+function +vi-git-remotebranch() {
+	local remote
+	# Are we on a remote-tracking branch?
+	remote=${$(git rev-parse --verify ${hook_com[branch]}@{upstream} \
+			--symbolic-full-name 2>/dev/null)/refs\/remotes\/}
+	# The first test will show a tracking branch whenever there is one. The
+	# second test, however, will only show the remote branch's name if it
+	# differs from the local one.
+	if [[ -n ${remote} ]] ; then
+	#if [[ -n ${remote} && ${remote#*/} != ${hook_com[branch]} ]] ; then
+			hook_com[branch]="${hook_com[branch]} [${remote}]"
+	fi
+}
 
 _normal_prompt () {
         # Non-Colorized Prompt
