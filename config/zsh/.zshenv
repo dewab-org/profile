@@ -6,7 +6,7 @@
 # Set some varibles for use in this script
 #
 hostname=${HOST%%.*} # replaces everything including and after the first . with nothing.
-platform=$(uname -s | tr "[A-Z]" "[a-z]")
+platform=${$(uname -s):l} # lowercases platform name
 
 #
 # Reset to default path if getconf is present
