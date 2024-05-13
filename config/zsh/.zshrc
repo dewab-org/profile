@@ -83,20 +83,24 @@ autoload -Uz compinit # && compinit -C -d "${XDG_CACHE_HOME}/zsh/zcompdump-${ZSH
 # Enable strftime
 zmodload zsh/datetime 
 
-# Only rebuild comp database once per day
-# Linux and Darwin stat commands use completely different flags.  Get epoch
-# using platform specific flags, then compare day of year.
-if [ ${platform} = "darwin" ] ; then 
-	__zshcompdump_timestamp=$(stat -f '%Dm' ${ZSH_COMPDUMP})
-else
-	__zshcompdump_timestamp=$(stat ${ZSH_COMPDUMP} -c %Y)
-fi
+# Function to check and rebuild completion database if necessary
+function check_and_rebuild_compdb() {
+    local db_timestamp
 
-if [ $(strftime "%j" "${EPOCHSECONDS}") != $(strftime "%j" "${__zshcompdump_timestamp}") ]; then
-	compinit -d "${ZSH_COMPDUMP}" && touch "${ZSH_COMPDUMP}"
-else
-	compinit -C -d "${ZSH_COMPDUMP}"
-fi
+    if [ "$platform" = "darwin" ]; then
+        db_timestamp=$(command stat -f '%Dm' "${ZSH_COMPDUMP}")
+    else
+        db_timestamp=$(command stat "${ZSH_COMPDUMP}" -c %Y)
+    fi
+
+    if [ "$(strftime "%j" "${EPOCHSECONDS}")" != "$(strftime "%j" "${db_timestamp}")" ]; then
+        compinit -d "${ZSH_COMPDUMP}" && touch "${ZSH_COMPDUMP}"
+    else
+        compinit -C -d "${ZSH_COMPDUMP}"
+    fi
+}
+
+check_and_rebuild_compdb
 
 # Enable bash completion support
 autoload -U +X bashcompinit && bashcompinit
@@ -160,6 +164,7 @@ append_path MANPATH /usr/man
 append_path MANPATH ${HOME}/man
 append_path MANPATH ${HOME}/.custom/${platform}/man
 append_path MANPATH ${HOME}/.custom/${platform}/share/man
+append_path MANPATH ${HOME}/.local/man
 append_path MANPATH /usr/share/man
 append_path MANPATH /usr/local/man
 append_path MANPATH /usr/local/share/man
