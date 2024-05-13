@@ -60,6 +60,7 @@ setopt extended_history             # save timestamp of command and duration
 setopt hist_ignore_dups             # Do not write events to history that are duplicates of previous events
 setopt hist_reduce_blanks           # trim blanks
 setopt nonomatch                    # match BASH glob behavior.  Pass wildcard to command if unmatched (as in scp blah:* .)
+setopt prompt_subst				    # allow prompt expansion of vars
 
 # Change paths to only store unique entries
 typeset -aU path fpath manpath cdpath

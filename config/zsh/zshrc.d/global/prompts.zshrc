@@ -13,16 +13,18 @@ setopt PROMPT_SUBST
 # %k == reset background
 
 # Enable VCS information (GIT, SVN)
-autoload -Uz vcs_info
+# autoload -Uz vcs_info
+autoload -Uz add-zsh-hook vcs_info 
 VCS_BRANCH_CHAR=$'\ue0a0'
 zstyle ':vcs_info:*' enable git svn
 zstyle ':vcs_info:*' get-revision true
 zstyle ':vcs_info:*' check-for-changes true
 zstyle ':vcs_info:*' unstagedstr "%F{red}●%f"
 zstyle ':vcs_info:*' stagedstr "%F{green}●%f"
-# zstyle ':vcs_info:git*' formats "%{$fg[grey]%}%s %{$reset_color%}%r/%S%{$fg[grey]%} %{$fg[blue]%}%b%{$reset_color%}%m%u%c%{$reset_color%} "
 zstyle ':vcs_info:git*' formats "%F{red}[%F{white}${VCS_BRANCH_CHAR}%b %f%m%u%c%f%F{red}]%f"
-precmd_functions+=(vcs_info)
+zstyle ':vcs_info:git*' actionformats "%F{red}[%F{white}${VCS_BRANCH_CHAR}%b|%f%m%a%u%c%f%F{red}]%f"
+# precmd_functions+=(vcs_info)
+add-zsh-hook precmd vcs_info
 
 # Adds Ahead/Behind to %m in vcs_info
 zstyle ':vcs_info:git*+set-message:*' hooks git-st
