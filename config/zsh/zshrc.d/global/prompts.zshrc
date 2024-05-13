@@ -80,25 +80,12 @@ _normal_prompt () {
         fi
 }
 
-# _right_prompt_err_code_prompt () {
-# 	# set an error string for the prompt, if applicable
-# 	local LAST_EXIT_CODE=$?
-# 	if [[ $LAST_EXIT_CODE -eq 0 ]]
-#         then
-#             ERRPROMPT=" "
-#         else
-#             ERRPROMPT="%{$fg_no_bold[blue]%}-%{$fg_no_bold[red]%}%{$bg_no_bold[white]%} $LAST_EXIT_CODE %{$reset_color%}%{$fg_no_bold[blue]%}-%{$reset_color%}"
-#         fi
-
-# 	echo "${ERRPROMPT}"
-# }
-
 _color_prompt () {
 	case "$hostname" in
 		sunna)         	HOSTCOLOR="%F{white}" ;;
-		uller)		    HOSTCOLOR="%F{magenta}" ;;
+		uller)					HOSTCOLOR="%F{magenta}" ;;
 		uller-wifi)	    HOSTCOLOR="%F{magenta}" ;;
-		freya)		    HOSTCOLOR="%F{blue}" ;;
+		freya)					HOSTCOLOR="%F{blue}" ;;
 		freya-wifi)	    HOSTCOLOR="%F{blue}" ;;
 		bifrost)        HOSTCOLOR="%F{cyan}" ;;
 		*)              HOSTCOLOR="%f" ;;
@@ -107,20 +94,16 @@ _color_prompt () {
 	case "$USER" in
 		Daniel)		USERCOLOR="%f" ;;
 		heimdall)	USERCOLOR="%f" ;;
-		root)		USERCOLOR="%F{red}%K{white}" ; 
-					ROOTPROMPT="%F{red}[%F{green}ROOT%F{red}]%f" ;;
-		*)          USERCOLOR="%F{green}" ;;
+		root)			USERCOLOR="%F{red}%K{white}" ; 
+							ROOTPROMPT="%F{red}[%F{green}ROOT%F{red}]%f" ;;
+		*)				USERCOLOR="%F{green}" ;;
 	esac
 
 	if [ -n "$SSH_CONNECTION" ] ; then
-		# SSHPROMPT="%{$fg_no_bold[red]%}[%{$fg_no_bold[blue]%}SSH%{$fg_no_bold[red]%}]%{$reset_color%}"	
 		SSHPROMPT="%F{red}[%F{blue}SSH%F{red}]%f"	
 	else
 		SSHPROMPT=''
 	fi
-
-	# Prompt using git_info
-	# export PROMPT="${SSHPROMPT}${ROOTPROMPT}%F{red}[%f%!%F{red}]%F{red}[${USERCOLOR}%n%f@${HOSTCOLOR}%m %f%~%F{red}]%f$(git_info)%# "
 
 	# prompt using vcs_info
 	export PROMPT="${SSHPROMPT}${ROOTPROMPT}%F{red}[%f%!%F{red}]%F{red}[${USERCOLOR}%n%f%k@${HOSTCOLOR}%m %f%~%F{red}]%f${vcs_info_msg_0_}%# "
@@ -129,8 +112,6 @@ _color_prompt () {
 	# export ARROW=$'\ue0b0'
 	# export PROMPT="%K{red}%F{white}%! %K{magenta}%F{red}${ARROW}%F{USERCOLOR}%n@${RHOSTCOLOR}%m %K{blue}%F{magenta}${ARROW}%F{white} %~ %K{yellow}%F{blue}${ARROW}%f ${vcs_info_msg_0_} %K{blue}%F{yellow}${ARROW}%f %#%k%F{blue}${ARROW}%f"
 	
-	# export RPROMPT='$(_right_prompt_err_code_prompt)'
-	# RPROMPT='%(?.%F{green}✔%f.%F{red}✘%F{white}%?%f)'
 	RPROMPT='%(?..%F{red}✘%F{white}%?%f)'
 	export SUDO_PS1=${PROMPT}
 }
