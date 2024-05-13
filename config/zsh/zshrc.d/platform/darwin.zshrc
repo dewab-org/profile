@@ -19,28 +19,21 @@ is-at-least 10.10.4 ${MACOS_VER} && \
   alias flushcache="sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder" || \
   alias flushcache="sudo discoveryutil mdnsflushcache" 
 
+# Enable ZSH Autosuggestions & Syntax Highlighting
+zsh_script_paths=(
+  # ZSH Autosuggestions
+  "/brew/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  "/usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  "/opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  # ZSH Syntax Highlighting
+  "/brew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  "/usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  "/opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+)
 
-# Enable ZSH Autosuggestions
-if [ -f  /brew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] ; then
-	source /brew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-fi
-if [ -f  /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] ; then
-	source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-fi
-if [ -f  /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] ; then
-	source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-fi
-
-# Enable ZSH Syntx Highlighting
-if [ -f /brew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] ; then
-	source /brew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-fi
-if [ -f /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] ; then
-	source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-fi
-if [ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] ; then
-	source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-fi
+for script in "${zsh_script_paths[@]}"; do
+  is-readable "${script}" && source "${script}"
+done
 
 # General Aliases
 alias am='open -a "Activity Monitor"'

@@ -51,16 +51,17 @@ export CLICOLOR=true
 export LESS="-X"
 export FIGNORE="" # files and directories to ignore with tab-completion
 
-# Configure Shell Options
-setopt auto_cd                      # if command is a path, cd into it
-setopt correct                      # try to correct spelling of commands
-setopt append_history               # append
-setopt complete_aliases             # make the alias a distinct command for completion purposes
-setopt extended_history             # save timestamp of command and duration
-setopt hist_ignore_dups             # Do not write events to history that are duplicates of previous events
-setopt hist_reduce_blanks           # trim blanks
-setopt nonomatch                    # match BASH glob behavior.  Pass wildcard to command if unmatched (as in scp blah:* .)
-setopt prompt_subst				    # allow prompt expansion of vars
+# Configure Shell Options (setopt)
+# auto_cd				# if command is a path, cd into it
+# correct				# try to correct spelling of commands
+# append_history		# append
+# complete_aliases		# make the alias a distinct command for completion purposes
+# extended_history		# save timestamp of command and duration
+# hist_ignore_dups		# Do not write events to history that are duplicates of previous events
+# hist_reduce_blanks	# trim blanks
+# nonomatch				# match BASH glob behavior.  Pass wildcard to command if unmatched (as in scp blah:* .)
+# prompt_subst			# allow prompt expansion of vars
+setopt auto_cd correct append_history complete_aliases extended_history hist_ignore_dups hist_reduce_blanks nonomatch prompt_subst
 
 # Change paths to only store unique entries
 typeset -aU path fpath manpath cdpath
@@ -147,6 +148,7 @@ append_path PATH /usr/sbin
 append_path PATH ${HOME}/bin
 append_path PATH ${HOME}/.custom/${platform}/bin
 append_path PATH ${HOME}/.custom/${platform}/sbin
+append_path PATH ${HOME}/.local/bin
 append_path PATH /usr/X11R6/bin
 append_path PATH /usr/local/bin
 append_path PATH /usr/local/sbin
@@ -178,12 +180,10 @@ alias cpan="sudo perl -MCPAN -e shell"
 alias nslookup='/usr/bin/nslookup -sil'
 alias grpe='grep'
 alias rb='source ${ZDOTDIR}/.zshrc'
-#alias ipgrep="grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'"
 alias ipgrep="grep -Eo '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)'"
 alias mailgrep="grep -Eo '\b[a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+\b'"
 alias sortcount="sort | uniq -c | sort -n"
 alias sudo='sudo ' # If the last character of the alias value is a blank, then the next command word following the alias is also checked for alias expansion.
-#alias whatismyip='curl http://aws-1.bifrost.cc/whatismyip.php ; echo '
 alias whatismyip='dig +short myip.opendns.com @resolver1.opendns.com'
 
 # Run all application global zshrc scripts from $HOME/.zshrc.d/global/ (ex: prompt, colors, etc.)
@@ -197,7 +197,7 @@ if [ -r "${ZDOTDIR}/zshrc.d/platform/${platform}.zshrc" ] ; then
 	source "${ZDOTDIR}/zshrc.d/platform/${platform}.zshrc"
 fi
 
-# Run host specific zshrc scripts from $HOME/.zshrc.d/hosts/ (ex: bifrost, sunna, ragnarok)
+# Run host specific zshrc scripts from $HOME/.zshrc.d/hosts/
 if [ -r "${ZDOTDIR}/zshrc.d/hosts/${hostname}.zshrc" ] ; then
 	source "${ZDOTDIR}/zshrc.d/hosts/${hostname}.zshrc"
 fi

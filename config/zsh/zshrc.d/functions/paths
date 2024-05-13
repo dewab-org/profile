@@ -17,23 +17,25 @@ function append_path() {
 }
 
 function remove_from_path() {
-	local a
-	local p
-	local s
-	local r
-	eval "p=\$$1"  # get value of specified path
-		a=( ${(s/:/)p} )  # turn it into an array
-	
-	# return if $2 isn't in path
-	if [[ ${a[(i)${2}]} -gt ${#a} ]] && return
-	
-	# rebuild path from elements not matching $2
-	for s in $a; do
-		if [[ ! $s == $2 ]]; then
-			[[ -z "$r" ]] && r="$s" || r="$r:$s"
-		fi
-	done
-	eval $1=\""$r"\"
+    local path_list
+    local new_path
+    local element_to_remove
+    local path_var_name="$1"
+    local path_value="${(P)path_var_name}"
+    
+    if [[ "${path_value}" != *"${2}"* ]]; then
+        return
+    fi
+    
+    path_list=( ${(s/:/)path_value} )
+    
+    for element in "${path_list[@]}"; do
+        if [[ "${element}" != "${2}" ]]; then
+            new_path="${new_path}${new_path:+:}${element}"
+        fi
+    done
+    
+    eval "${path_var_name}=\"${new_path}\""
 }
 
 function showpath () {
