@@ -25,8 +25,9 @@ def create_link(source_path, target_path, force, debug=False):
             os.unlink(target_path)
             print(f"Removed existing symlink: {target_path}")
         if not os.path.exists(target_path):
-            os.symlink(source_path, target_path)
-            print(f"Created symlink: {target_path} -> {source_path}")
+            absolute_source_path = os.path.abspath(source_path)
+            os.symlink(absolute_source_path, target_path)
+            print(f"Created symlink: {target_path} -> {absolute_source_path}")
         else:
             print(f"Symlink already exists: {target_path}")
     except Exception as e:

@@ -6,6 +6,11 @@
             "mode": "0755"
         },
         {
+            "source": "config/zsh/.zshenv",
+            "target": "zshenv-test",
+            "type": "copy"
+        },
+        {
             "target": ".config",
             "type": "directory",
             "mode": "0700"
