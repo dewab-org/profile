@@ -2,7 +2,7 @@
 #
 # https://iterm2.com/shell_integration/bash
 # https://iterm2.com/shell_integration/zsh
-# https://github.com/gnachman/iterm2-website/blob/master/source/utilities/it2check
+# https://iterm2.com/utilities/it2check
 
 IT2CHECK="${ZDOTDIR}/zshrc.d/scripts/it2check"
 ITERM_INTEGRATION="${ZDOTDIR}/zshrc.d/scripts/iterm_integration.sh"

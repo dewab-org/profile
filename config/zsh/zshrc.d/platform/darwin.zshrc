@@ -2,7 +2,7 @@
 
 # Mac Specific Environmental Variables
 export GDFONTPATH=/Library/Fonts
-export FIGNORE="$FIGNORE:Application Scripts:Global Foundries:"
+export FIGNORE="$FIGNORE:Application Scripts:"
 export MACOS_VER=$(sw_vers -productVersion)
 unset COMMAND_MODE
 
@@ -12,7 +12,6 @@ unset COMMAND_MODE
 is-at-least 12.0.0 ${MACOS_VER} && SSH_ADD_OPT="--apple-load-keychain" || SSH_ADD_OPT="-A"
 /usr/bin/ssh-add ${SSH_ADD_OPT} &>| "${XDG_STATE_HOME}/ssh-add.out" &|
 unset SSH_ADD_OPT
-
 
 # Flush DNS Cache
 is-at-least 10.10.4 ${MACOS_VER} && \
