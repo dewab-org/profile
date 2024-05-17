@@ -5,7 +5,7 @@
 [[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && . "$HOME/.fig/shell/zshrc.pre.zsh"
 
 # Daniel's .zshrc
-# 
+#
 # Directories:
 # ~/.zshrc.d
 # ~/.zshrc.d/global/*.zshrc				scripts for all hosts
@@ -81,7 +81,7 @@ autoload -Uz is-at-least
 autoload -Uz compinit # && compinit -C -d "${XDG_CACHE_HOME}/zsh/zcompdump-${ZSH_VERSION}"
 
 # Enable strftime
-zmodload zsh/datetime 
+zmodload zsh/datetime
 
 # Function to check and rebuild completion database if necessary
 function check_and_rebuild_compdb() {
@@ -142,7 +142,7 @@ zstyle ':completion:*:(ssh|scp|rsync):*:hosts-ipaddr' ignored-patterns '^(<->.<-
 # Allow for autocomplete to be case insensitive
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' '+l:|?=** r:|?=**'
 
-# expand !^ !* !$ !:2 !$:h !$:t when you hit space 
+# expand !^ !* !$ !:2 !$:h !$:t when you hit space
 # Doesn't appear that these apply to ZSH
 #bind space:magic-space
 

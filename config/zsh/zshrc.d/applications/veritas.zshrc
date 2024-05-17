@@ -6,7 +6,7 @@
 #
 # NetBackup
 #
-if [ -d "/usr/openv" ] ; then 
+if [ -d "/usr/openv" ] ; then
 	append_path PATH /usr/openv/netbackup/bin
 	append_path PATH /usr/openv/netbackup/bin/admincmd
 	append_path PATH /usr/openv/netbackup/bin/support

@@ -8,6 +8,6 @@ function ips () {
 		local ip=$(ipconfig getifaddr $interface)
 		[ -n "$ip" ] && printf "%11s: %s\n" "$interface" "$ip"
 	done
-	
+
 	return 0 # needed so that failure of last getifaddr doesn't fail entire function
 }

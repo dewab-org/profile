@@ -8,7 +8,7 @@ function nix-host () {
 	fi
 	#echo perl -ni -e \'print unless /^$1/\' ~/.ssh/known_hosts | sh
 	local host
-	for host in "$@" 
+	for host in "$@"
 	do
 	  echo "Removing ${host}... "
 	  ssh-keygen -R "${host}"

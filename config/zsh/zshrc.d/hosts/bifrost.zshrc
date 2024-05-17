@@ -5,7 +5,7 @@
 # Command Aliases and Functions
 function bans {
 	for i in $(sudo ipset list -n)
-	do 
+	do
 		echo -n "$i: "
 		sudo ipset list $i | tail -n +8 | wc -l
 	done

@@ -1,6 +1,6 @@
 function location () {
     # Determine mac network location
     local location=$(networksetup -getcurrentlocation)
-    
+
     echo "$location:l" # :l converts output to all lowercase
 }

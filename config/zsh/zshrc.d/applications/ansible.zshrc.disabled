@@ -21,6 +21,6 @@ export ANSIBLE_GALAXY_CACHE_DIR="${XDG_CACHE_HOME}/ansible/galaxy_cache"
 export ANSIBLE_GALAXY_TOKEN_PATH="${XDG_DATA_HOME}/ansible/galaxy_token"
 
 #
-# I haven't been able to make ansible-navigator work reliably 
+# I haven't been able to make ansible-navigator work reliably
 # whilst moving the ansible configuration to XDG directories
 #

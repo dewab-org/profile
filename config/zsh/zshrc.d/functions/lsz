@@ -11,20 +11,20 @@ lsz() {
     fi
 
     case "$1" in
-        *.tar.bz2|*.tar.gz|*.tar|*.tbz2|*.tgz) 
+        *.tar.bz2|*.tar.gz|*.tar|*.tbz2|*.tgz)
             tar tvf "$1"
             ;;
-        *.zip|*.cbz) 
+        *.zip|*.cbz)
             unzip -l "$1"
             ;;
-        *.rar|*.cbr) 
+        *.rar|*.cbr)
             unrar l "$1"
             ;;
-        *.7z)    
+        *.7z)
             7z l "$1"
             ;;
-        *)     
-            echo "'$1' unrecognized." 
+        *)
+            echo "'$1' unrecognized."
             ;;
     esac
 }

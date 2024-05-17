@@ -11,7 +11,7 @@ function ftp-server() {
 
     zparseopts -D -E -M -F -K -- \
         {h,-help}=flag_help \
-        d:=arg_sharedir || 
+        d:=arg_sharedir ||
         return
 
     [[ -z "$flag_help" ]] || { print -l $usage && return }

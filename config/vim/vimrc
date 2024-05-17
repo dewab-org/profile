@@ -89,8 +89,8 @@ set showmatch
 set mat=2
 
 " show line numbers
-"set number 
-" was getting in the way of copy and paste! 
+"set number
+" was getting in the way of copy and paste!
 " Use the location in the status line instead!
 
 " show cursorline

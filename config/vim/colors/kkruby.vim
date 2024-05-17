@@ -1,6 +1,6 @@
 " Eddie Colorscheme for 256 and GUI
 " Author: Matt Sacks , kk , Mitko Kostov <mitkok@7thoughts.com>
-" 
+"
 " This is my adaptation of the pastelmod eclipse theme from my co-worker Eddie
 " who spent too much time developing these specific colors.
 " Hex color conversion functions borrowed from the themes 'Desert256' and
@@ -450,5 +450,3 @@ if has("gui_running") || &t_Co == 88 || &t_Co == 256
     hi Visual ctermbg=236
   endif
 endif
-
-

@@ -7,14 +7,14 @@ setopt PROMPT_SUBST
 #
 # Notes:
 # See https://zsh.sourceforge.io/Doc/Release/Prompt-Expansion.html
-# %F{colorname} == Foreground colorname 
+# %F{colorname} == Foreground colorname
 # %f == reset foreground
 # %K{colorname} == Background colorname
 # %k == reset background
 
 # Enable VCS information (GIT, SVN)
 # autoload -Uz vcs_info
-autoload -Uz add-zsh-hook vcs_info 
+autoload -Uz add-zsh-hook vcs_info
 VCS_BRANCH_CHAR=$'\ue0a0'
 zstyle ':vcs_info:*' enable git svn
 zstyle ':vcs_info:*' get-revision true
@@ -94,24 +94,24 @@ _color_prompt () {
 	case "$USER" in
 		Daniel)		USERCOLOR="%f" ;;
 		heimdall)	USERCOLOR="%f" ;;
-		root)			USERCOLOR="%F{red}%K{white}" ; 
+		root)			USERCOLOR="%F{red}%K{white}" ;
 							ROOTPROMPT="%F{red}[%F{green}ROOT%F{red}]%f" ;;
 		*)				USERCOLOR="%F{green}" ;;
 	esac
 
 	if [ -n "$SSH_CONNECTION" ] ; then
-		SSHPROMPT="%F{red}[%F{blue}SSH%F{red}]%f"	
+		SSHPROMPT="%F{red}[%F{blue}SSH%F{red}]%f"
 	else
 		SSHPROMPT=''
 	fi
 
 	# prompt using vcs_info
 	export PROMPT="${SSHPROMPT}${ROOTPROMPT}%F{red}[%f%!%F{red}]%F{red}[${USERCOLOR}%n%f%k@${HOSTCOLOR}%m %f%~%F{red}]%f${vcs_info_msg_0_}%# "
-	
+
 	# Prompt using bar arrows with vcs_info
 	# export ARROW=$'\ue0b0'
 	# export PROMPT="%K{red}%F{white}%! %K{magenta}%F{red}${ARROW}%F{USERCOLOR}%n@${RHOSTCOLOR}%m %K{blue}%F{magenta}${ARROW}%F{white} %~ %K{yellow}%F{blue}${ARROW}%f ${vcs_info_msg_0_} %K{blue}%F{yellow}${ARROW}%f %#%k%F{blue}${ARROW}%f"
-	
+
 	RPROMPT='%(?..%F{red}✘%F{white}%?%f)'
 	export SUDO_PS1=${PROMPT}
 }

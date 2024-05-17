@@ -1,5 +1,8 @@
 ---
 files:
+  - source: "config/wgetrc"
+    target: ".config/wgetrc"
+    type: link
   - target: ".config"
     type: directory
     mode: "0700"

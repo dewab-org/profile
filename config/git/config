@@ -6,7 +6,7 @@
 	  editor = vi
 	Excludesfile = ~/.config/git/ignore
 	  autocrlf = input
-	  pager = 
+	  pager =
 
 [color]
 	branch = auto

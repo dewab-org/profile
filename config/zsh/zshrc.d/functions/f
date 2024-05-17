@@ -1,4 +1,4 @@
-function f() { 
+function f() {
 	# Open current or specified folder in Finder
-	open -a "Finder" "${1-.}"; 
+	open -a "Finder" "${1-.}";
 }

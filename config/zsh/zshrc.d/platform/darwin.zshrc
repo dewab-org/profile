@@ -16,7 +16,7 @@ unset SSH_ADD_OPT
 # Flush DNS Cache
 is-at-least 10.10.4 ${MACOS_VER} && \
   alias flushcache="sudo dscacheutil -flushcache ; sudo killall -HUP mDNSResponder" || \
-  alias flushcache="sudo discoveryutil mdnsflushcache" 
+  alias flushcache="sudo discoveryutil mdnsflushcache"
 
 # Enable ZSH Autosuggestions & Syntax Highlighting
 zsh_script_paths=(
