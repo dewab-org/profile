@@ -1,0 +1,14 @@
+layout_python() {
+    if [[ -d ".venv" ]]; then
+        VIRTUAL_ENV="$(pwd)/.venv"
+    fi
+
+    if [[ -z $VIRTUAL_ENV || ! -d $VIRTUAL_ENV ]]; then
+        log_status "No virtual environment exists. Executing \`python3 -m venv .venv\`."
+        python3 -m venv .venv
+        VIRTUAL_ENV="$(pwd)/.venv"
+    fi
+
+    # Activate the virtual environment
+    . $VIRTUAL_ENV/bin/activate
+}

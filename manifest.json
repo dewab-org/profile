@@ -44,6 +44,11 @@
       "source": "config/yamllint",
       "target": "${XDG_CONFIG_HOME}/yamllint",
       "type": "link"
+    },
+    {
+      "source": "config/direnv",
+      "target": "${XDG_CONFIG_HOME}/direnv",
+      "type": "link"
     }
   ],
   "gitrepos": [
@@ -55,6 +60,10 @@
       "source": "https://github.com/romkatv/powerlevel10k.git",
       "target": "${XDG_DATA_HOME}/zsh/plugins/powerlevel10k",
       "depth": 1
+    },
+    {
+      "source": "https://github.com/dewab/brewfile.git",
+      "target": "${XDG_CONFIG_HOME}/homebrew"
     }
   ]
 }

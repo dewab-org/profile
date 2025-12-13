@@ -5,8 +5,10 @@ import os
 import shutil
 import json
 import subprocess
+import re
+from string import Template
 
-def create_directory(target_path, mode, debug=False):
+def create_directory(target_path, mode, debug=False, dry_run=False):
     """
     Creates a directory at the specified target path with the given mode (permissions).
 
@@ -21,15 +23,23 @@ def create_directory(target_path, mode, debug=False):
     try:
         if debug:
             print(f"Creating directory: {target_path}")
-        if not os.path.exists(target_path):
-            os.makedirs(target_path, mode=int(mode, 8))
-            print(f"Created directory: {target_path}")
-        else:
-            print(f"Directory already exists: {target_path}")
+        if os.path.exists(target_path):
+            if dry_run:
+                print(f"[dry-run] Directory already exists: {target_path}")
+            else:
+                print(f"Directory already exists: {target_path}")
+            return
+
+        if dry_run:
+            print(f"[dry-run] Would create directory: {target_path} (mode {mode})")
+            return
+
+        os.makedirs(target_path, mode=int(mode, 8))
+        print(f"Created directory: {target_path}")
     except Exception as e:
         print(f"Failed to create directory {target_path}: {e}")
 
-def create_link(source_path, target_path, force, debug=False):
+def create_link(source_path, target_path, force, debug=False, dry_run=False):
     """
     Creates a symbolic link from source_path to target_path. If force is True and the target exists, it will be removed.
 
@@ -43,21 +53,36 @@ def create_link(source_path, target_path, force, debug=False):
         Exception: If the symbolic link creation fails.
     """
     try:
+        absolute_source_path = os.path.abspath(source_path)
         if debug:
             print(f"Creating symlink: {source_path} -> {target_path}")
-        if os.path.exists(target_path) and force:
-            os.unlink(target_path)
-            print(f"Removed existing symlink: {target_path}")
-        if not os.path.exists(target_path):
-            absolute_source_path = os.path.abspath(source_path)
+
+        target_exists = os.path.exists(target_path)
+        will_create = True
+
+        if target_exists and force:
+            if dry_run:
+                print(f"[dry-run] Would remove existing target: {target_path}")
+            else:
+                os.unlink(target_path)
+                print(f"Removed existing symlink: {target_path}")
+        elif target_exists and not force:
+            will_create = False
+            if dry_run:
+                print(f"[dry-run] Target exists; would skip linking: {target_path}")
+            else:
+                print(f"Symlink already exists: {target_path}")
+
+        if will_create:
+            if dry_run:
+                print(f"[dry-run] Would create symlink: {target_path} -> {absolute_source_path}")
+                return
             os.symlink(absolute_source_path, target_path)
             print(f"Created symlink: {target_path} -> {absolute_source_path}")
-        else:
-            print(f"Symlink already exists: {target_path}")
     except Exception as e:
         print(f"Failed to create symlink {target_path}: {e}")
 
-def create_copy(source_path, target_path, force, debug=False):
+def create_copy(source_path, target_path, force, debug=False, dry_run=False):
     """
     Copies a file from source_path to target_path. If force is True and the target exists, it will be renamed.
 
@@ -73,18 +98,32 @@ def create_copy(source_path, target_path, force, debug=False):
     try:
         if debug:
             print(f"Copying file: {source_path} -> {target_path}")
-        if os.path.exists(target_path) and force:
-            os.rename(target_path, target_path + ".orig")
-            print(f"Renamed existing file: {target_path} -> {target_path}.orig")
-        if not os.path.exists(target_path):
-            shutil.copy(source_path, target_path)
-            print(f"Copied file: {source_path} -> {target_path}")
-        else:
-            print(f"File already exists: {target_path}")
+
+        target_exists = os.path.exists(target_path)
+
+        if target_exists and force:
+            if dry_run:
+                print(f"[dry-run] Would rename existing file: {target_path} -> {target_path}.orig")
+            else:
+                os.rename(target_path, target_path + ".orig")
+                print(f"Renamed existing file: {target_path} -> {target_path}.orig")
+        elif target_exists and not force:
+            if dry_run:
+                print(f"[dry-run] Target exists; would skip copy: {target_path}")
+            else:
+                print(f"File already exists: {target_path}")
+            return
+
+        if dry_run:
+            print(f"[dry-run] Would copy file: {source_path} -> {target_path}")
+            return
+
+        shutil.copy(source_path, target_path)
+        print(f"Copied file: {source_path} -> {target_path}")
     except Exception as e:
         print(f"Failed to copy file from {source_path} to {target_path}: {e}")
 
-def clone_git_repo(source_url, target_path, force=False, debug=False, depth=None):
+def clone_git_repo(source_url, target_path, force=False, debug=False, depth=None, dry_run=False):
     """
     Clones a git repository from source_url to target_path.
     If force is True and the target exists, it will be removed first.
@@ -92,6 +131,23 @@ def clone_git_repo(source_url, target_path, force=False, debug=False, depth=None
     If depth is provided, limit the clone/pull to that depth.
     """
     try:
+        if dry_run:
+            depth_info = f" with depth {depth}" if depth else ""
+            if os.path.exists(target_path):
+                if force:
+                    print(f"[dry-run] Would remove existing directory before clone: {target_path}")
+                    print(f"[dry-run] Would clone {source_url} -> {target_path}{depth_info}")
+                else:
+                    git_dir = os.path.join(target_path, ".git")
+                    if os.path.isdir(git_dir):
+                        print(f"[dry-run] Would pull latest in git repo: {target_path}{depth_info}")
+                    else:
+                        print(f"[dry-run] Directory exists but is not a git repo: {target_path}")
+                return
+
+            print(f"[dry-run] Would clone {source_url} -> {target_path}{depth_info}")
+            return
+
         if os.path.exists(target_path):
             if force:
                 if debug:
@@ -127,11 +183,34 @@ def clone_git_repo(source_url, target_path, force=False, debug=False, depth=None
     except Exception as e:
         print(f"Failed to clone or update git repo {source_url} to {target_path}: {e}")
 
-def expand_path(path):
-    """Expand environment variables and user tilde in a path."""
-    return os.path.expanduser(os.path.expandvars(path))
+def resolve_target_path(path, base_home):
+    """
+    Expand a target path using environment variables and sensible defaults.
+    Falls back to XDG defaults if the variables are unset and ensures unresolved
+    variables do not create unexpected literal directories.
+    """
+    env_defaults = {
+        "XDG_DATA_HOME": os.path.join(base_home, ".local", "share"),
+        "XDG_CONFIG_HOME": os.path.join(base_home, ".config"),
+        "XDG_STATE_HOME": os.path.join(base_home, ".local", "state"),
+        "XDG_CACHE_HOME": os.path.join(base_home, ".cache"),
+    }
+    env = {**env_defaults, **os.environ}
 
-def process_files(files, force=False, override_home=None, debug=False, gitrepos=None, directories=None):
+    expanded = Template(path).safe_substitute(env)
+    expanded = os.path.expanduser(expanded)
+
+    # If any variables are still unresolved, skip this path.
+    if re.search(r"\$(?:\{[^}]+\}|[A-Za-z0-9_]+)", expanded):
+        print(f"Warning: Skipping path with unresolved variable(s): {path}")
+        return None
+
+    if not os.path.isabs(expanded):
+        expanded = os.path.join(base_home, expanded)
+
+    return os.path.normpath(expanded)
+
+def process_files(files, force=False, override_home=None, debug=False, gitrepos=None, directories=None, dry_run=False):
     """
     Processes file operations, directory creation, and git repo clones.
     """
@@ -140,27 +219,32 @@ def process_files(files, force=False, override_home=None, debug=False, gitrepos=
     # Process directories
     if directories:
         for directory in directories:
-            dir_target = os.path.join(base_home, expand_path(directory["target"]))
-            create_directory(dir_target, directory.get("mode", "0700"), debug=debug)
+            dir_target = resolve_target_path(directory["target"], base_home)
+            if dir_target:
+                create_directory(dir_target, directory.get("mode", "0700"), debug=debug, dry_run=dry_run)
 
     # Process regular files
     for file in files:
-        target_path = os.path.join(base_home, expand_path(file["target"]))
+        target_path = resolve_target_path(file["target"], base_home)
+        if not target_path:
+            continue
         if file["type"] == "directory":
-            create_directory(target_path, file.get("mode", "0700"), debug=debug)
+            create_directory(target_path, file.get("mode", "0700"), debug=debug, dry_run=dry_run)
         elif file["type"] == "link":
-            create_link(file["source"], target_path, force=force, debug=debug)
+            create_link(file["source"], target_path, force=force, debug=debug, dry_run=dry_run)
         elif file["type"] == "copy":
-            create_copy(file["source"], target_path, force=force, debug=debug)
+            create_copy(file["source"], target_path, force=force, debug=debug, dry_run=dry_run)
         else:
             print(f"Unknown file type: {file['type']}")
 
     # Process git repositories
     if gitrepos:
         for repo in gitrepos:
-            repo_target = os.path.join(base_home, expand_path(repo["target"]))
+            repo_target = resolve_target_path(repo["target"], base_home)
+            if not repo_target:
+                continue
             depth = repo.get("depth")
-            clone_git_repo(repo["source"], repo_target, force=force, debug=debug, depth=depth)
+            clone_git_repo(repo["source"], repo_target, force=force, debug=debug, depth=depth, dry_run=dry_run)
 
 def main():
     """
@@ -171,6 +255,7 @@ def main():
         -F/--force: Force overwrite of existing files.
         -O/--override-home: Override the user's home directory with a different path.
         -d/--debug: Enable debug mode for verbose output.
+        -n/--dry-run: Show what would be done without making changes.
 
     The manifest file should be a JSON file containing a "files" key with a list of file operations.
     Each file operation should include:
@@ -184,6 +269,7 @@ def main():
     parser.add_argument("-F", "--force", action="store_true", help="Force overwrite existing files")
     parser.add_argument("-O", "--override-home", help="Override the user's home directory with a different path")
     parser.add_argument("-d", "--debug", action="store_true", help="Enable debug mode with extra output")
+    parser.add_argument("-n", "--dry-run", action="store_true", help="Show actions without making changes")
     args = parser.parse_args()
 
     manifest_file = args.file
@@ -212,7 +298,8 @@ def main():
                 override_home=args.override_home,
                 debug=args.debug,
                 gitrepos=gitrepos,
-                directories=directories
+                directories=directories,
+                dry_run=args.dry_run
             )
         else:
             print("No 'files', 'gitrepos', or 'directories' key found in data.")
