@@ -11,3 +11,5 @@ Thumbs.db
 secrets.yml
 credentials.yml
 *.iso
+
+**/.claude/settings.local.json
