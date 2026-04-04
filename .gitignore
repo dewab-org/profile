@@ -19,7 +19,7 @@ zcompcache/
 tmp/
 .tmp/
 _aria2/dht.dat
-**/iterm_integration.sh-*
+**/term_integration.sh-*
 
 # Env/secrets
 .env
@@ -37,3 +37,6 @@ zcompdump
 .idea/
 .venv/
 node_modules/
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/

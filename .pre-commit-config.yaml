@@ -1,26 +1,43 @@
 repos:
-      - repo: local
-        hooks:
-          - id: markdownlint
-            name: Markdown linting
-            description: Lint markdown files using markdownlint-cli2
-            entry: markdownlint-cli2 --config .markdownlint.yaml
-            language: system
-            files: \.md$
-      - repo: https://github.com/pre-commit/pre-commit-hooks
-        rev: v4.4.0
-        hooks:
-           - id: trailing-whitespace
-           - id: end-of-file-fixer
-           - id: check-shebang-scripts-are-executable
-           - id: check-json
-           - id: check-yaml
-           - id: check-added-large-files
-           - id: check-case-conflict
-           - id: check-merge-conflict
-           - id: detect-private-key
-           - id: mixed-line-ending
-      - repo: https://github.com/gitleaks/gitleaks
-        rev: v8.16.1
-        hooks:
-           - id: gitleaks
+   - repo: https://github.com/pre-commit/pre-commit-hooks
+     rev: v6.0.0
+     hooks:
+       - id: trailing-whitespace
+       - id: end-of-file-fixer
+       - id: check-shebang-scripts-are-executable
+       - id: check-json
+       - id: check-yaml
+       - id: check-added-large-files
+       - id: check-case-conflict
+       - id: check-merge-conflict
+       - id: detect-private-key
+       - id: mixed-line-ending
+   - repo: https://github.com/gitleaks/gitleaks
+     rev: v8.30.0
+     hooks:
+       - id: gitleaks
+   - repo: https://github.com/igorshubovych/markdownlint-cli
+     rev: v0.48.0
+     hooks:
+       - id: markdownlint
+         args:
+           - --config
+           - .markdownlint.yaml
+   - repo: https://github.com/astral-sh/ruff-pre-commit
+     rev: v0.15.9
+     hooks:
+       - id: ruff
+       - id: ruff-format
+   - repo: https://github.com/rhysd/actionlint
+     rev: v1.7.12
+     hooks:
+       - id: actionlint
+   - repo: https://github.com/shellcheck-py/shellcheck-py
+     rev: v0.10.0.1
+     hooks:
+       - id: shellcheck
+         exclude: ^config/zsh/
+   - repo: https://github.com/crate-ci/typos
+     rev: v1.28.0
+     hooks:
+       - id: typos

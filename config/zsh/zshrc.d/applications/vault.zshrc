@@ -1,5 +1,5 @@
 is-executable vault || return
 
-# HashiCorp Vault
+# HashCorp Vault
 
 complete -C vault vault

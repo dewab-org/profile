@@ -23,7 +23,7 @@ prompt_tool=p10k
 # ~/.zshrc.d/applications/<app>.zshrc	scripts for specific App (ex: veritas)
 # ~/.zshrc.d/scripts/<script>.sh		scripts for use in support of profile scripts (ex: isiterm2.sh)
 
-# Set some varibles for use in this script
+# Set some variables for use in this script
 hostname=${${HOST%%.*}:l} # replaces everything including and after the first . with nothing. Then lowercases it.
 platform=${$(uname -s):l} # lowercases platform name
 
@@ -48,7 +48,7 @@ cdpath=( . ~ / ${HOME}/Documents )
 fpath+=( "${ZDOTDIR}/zshrc.d/functions" )
 (( ${fpath[(Ie)"${ZSH_CACHE_DIR}/completions"]} )) || fpath+=("${ZSH_CACHE_DIR}/completions" )
 
-# History Paramters
+# History Parameters
 [ -d "${XDG_STATE_HOME}/zsh" ] || mkdir -m 0700 -p "${XDG_STATE_HOME}/zsh"
 export HISTFILE="${XDG_STATE_HOME}/zsh/history"
 export HISTSIZE=1000

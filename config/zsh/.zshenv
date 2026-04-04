@@ -3,7 +3,7 @@
 #
 
 #
-# Set some varibles for use in this script
+# Set some variables for use in this script
 #
 hostname=${HOST%%.*} # replaces everything including and after the first . with nothing.
 platform=${$(uname -s):l} # lowercases platform name

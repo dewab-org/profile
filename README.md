@@ -32,40 +32,49 @@ config/zsh/
 ## Applications Configured
 
 ### Development Tools
+
 - **Git**: gh, gitea, fd, fzf, fzf-git.sh
 - **Docker**: docker, lazydocker (recommended)
 - **Kubernetes**: kubernetes, minikube, tanzu
 - **Cloud**: aws, az, oracle, vault, step
 
 ### Editors & Pagers
+
 - **vim**, **bat**, **less**, **eza**, **ncdu**
 
 ### Version Management
+
 - **conda**, **pyenv**, **rbenv**, **asdf**, **nodenv**, **goenv**
 
 ### Utilities
+
 - **direnv**, **tmux**, **zoxide**, **atuin**, **fzf**, **fd**, **rg**
 
 ### Other
+
 - **1password**, **gnupg**, **sqlite**, **yq**, **pandoc**
 
 ## Key Features
 
 ### Instant Prompt
+
 Powerlevel10k instant prompt enabled for fast shell startup.
 
 ### Completion
+
 - fzf-tab for interactive tab completion
 - bash completion support
 - Case-insensitive completion
 
 ### Git Workflow
+
 - `gco` - checkout branch via fzf
 - `gbr` - list branches via fzf
 - `glog` - visualize git log via fzf
 - `gcf` - fixup commits via fzf
 
 ### Directory Navigation
+
 - `z` - zoxide jump
 - `zf` - zoxide fzf picker
 
