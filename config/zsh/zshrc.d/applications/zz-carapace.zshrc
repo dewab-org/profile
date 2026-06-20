@@ -1,8 +1,9 @@
-# Carapace completion (native-first).
-# Loads after application-specific completion files. Native completions are
-# preferred wherever they exist — they are richer and often dynamic (e.g. gh
-# completes live PRs/repos, kubectl completes live pods/namespaces) — and
-# Carapace fills in completions for the many commands that have no native one.
+# Carapace completion (rich-native-first).
+# Loads after application-specific completion files. Rich native completers are
+# preferred — real _<tool> functions, often dynamic (e.g. gh completes live
+# PRs/repos, kubectl completes live pods/namespaces). Carapace handles everything
+# else: commands with no native completer, and those whose only "native" completer
+# is a thin bridge (bash complete -C, argcomplete, gnu_generic) that Carapace beats.
 [[ "${CARAPACE_COMPLETIONS:-1}" == 1 ]] || return
 is-executable carapace || return
 
@@ -30,16 +31,26 @@ done
 
 source "${_carapace_completion}"
 
-# Restore native completers (richer than Carapace's static specs). Carapace keeps
-# the commands that had no native completion. Commands listed in
-# CARAPACE_FORCE_COMPLETIONS stay on Carapace even when a native completer exists.
+# Restore native completers, but only the genuinely rich ones. Thin "bridge"
+# completers are usually thinner than Carapace's maintained spec, so leave those
+# on Carapace:
+#   _bash_complete -C <cmd>  the tool's own `complete -C` bash shim
+#   _*_argcomplete           Python argcomplete shim
+#   _gnu_generic             generic --help scraper
+# Bonus: those bridges run the command to complete, which for op-wrapped tools
+# (e.g. vault) triggers a 1Password prompt on TAB; Carapace's static spec doesn't.
+# CARAPACE_FORCE_COMPLETIONS keeps a command on Carapace even with a rich native one.
 for _carapace_cmd in ${(k)_carapace_native_snapshot}; do
   [[ "${_comps[$_carapace_cmd]}" == _carapace_completer ]] || continue
   [[ " ${CARAPACE_FORCE_COMPLETIONS} " == *" ${_carapace_cmd} "* ]] && continue
-  compdef "${_carapace_native_snapshot[$_carapace_cmd]}" "${_carapace_cmd}" 2>/dev/null
+  _carapace_native=${_carapace_native_snapshot[$_carapace_cmd]}
+  case "${_carapace_native}" in
+    _bash_complete*|*_argcomplete|_gnu_generic) continue ;;
+  esac
+  compdef "${_carapace_native}" "${_carapace_cmd}" 2>/dev/null
 done
 
 command_completion "${_carapace_completion}" carapace _carapace zsh &|
 
-unset _carapace_completion _carapace_cmd
+unset _carapace_completion _carapace_cmd _carapace_native
 unset _carapace_native_snapshot
