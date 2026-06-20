@@ -1,0 +1,7 @@
+# typos (crate-ci/typos) configuration.
+[default.extend-words]
+# "iTerm2" product name; its shell-integration scripts (iterm.zshrc,
+# iterm_integration.sh, it2check) use many ITERM/iterm/iterm2 identifiers.
+iterm = "iterm"
+# tmux.conf comment wordplay: "prefix + alt + l (l as in *l*ist)".
+ist = "ist"
