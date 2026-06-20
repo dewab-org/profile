@@ -19,9 +19,15 @@ command_completion "${_kubectl_completion_file}" kubectl completion zsh &|
 
 autoload -Uz add-zsh-hook
 __kube__compdefs() {
-  compdef _kubectl kubectl
-  compdef k=kubectl
-  (( have_kubecolor )) && compdef kubecolor=kubectl
+  if [[ "${CARAPACE_COMPLETIONS:-1}" == 1 && "${_comps[kubectl]}" == _carapace_completer ]]; then
+    # Carapace has no specs for these aliases, so retain native completion.
+    compdef _kubectl k
+    (( have_kubecolor )) && compdef _kubectl kubecolor
+  else
+    compdef _kubectl kubectl
+    compdef k=kubectl
+    (( have_kubecolor )) && compdef kubecolor=kubectl
+  fi
   add-zsh-hook -d precmd __kube__compdefs 2>/dev/null
 }
 add-zsh-hook precmd __kube__compdefs
