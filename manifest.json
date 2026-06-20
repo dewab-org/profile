@@ -71,6 +71,11 @@
       "type": "link"
     },
     {
+      "source": "config/glow",
+      "target": "${XDG_CONFIG_HOME}/glow",
+      "type": "link"
+    },
+    {
       "source": "config/btop",
       "target": "${XDG_CONFIG_HOME}/btop",
       "type": "link"

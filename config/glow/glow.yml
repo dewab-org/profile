@@ -1,0 +1,12 @@
+# style name or JSON path (default "auto").
+# Catppuccin Mocha is applied via the `--style` flag in glow.zshrc, since glow
+# does not expand ~ or env vars in this field (keeps this file portable).
+style: "auto"
+# mouse support (TUI-mode only)
+mouse: false
+# use pager to display markdown
+pager: true
+# word-wrap at width
+width: 80
+# show all files, including hidden and ignored.
+all: false
