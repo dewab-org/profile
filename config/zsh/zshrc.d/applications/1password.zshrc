@@ -1,28 +1,38 @@
 is-executable op || return
 
-# source <(op completion zsh)
-
+# Keep op's own completion definition fresh.
 if [[ ! -f "${ZSH_CACHE_DIR}/completions/_op" ]]; then
   autoload -Uz _op
   typeset -g -A _comps
   _comps[op]=_op
 fi
-
 op completion zsh >| "${ZSH_CACHE_DIR}/completions/_op" &|
 
-is-readable "${HOME}/.op/plugins.sh" && source "${HOME}/.op/plugins.sh"
+# 1Password CLI plugin wrappers.
+#
+# These previously lived in the op-generated ~/.op/plugins.sh, but that file is
+# machine-specific, untracked, and overwritten by `op plugin init`. Define them
+# here instead: version-controlled, portable, and as functions (not aliases) so
+# shell completion resolves to the wrapped command's own completer rather than
+# completing `op`. Each is guarded on its tool being installed; add new plugins
+# here after running `op plugin init <tool>`.
+for _op_plugin in gh tea vault; do
+  is-executable "${_op_plugin}" && functions[$_op_plugin]="op plugin run -- ${_op_plugin} \"\$@\""
+done
+unset _op_plugin
 
-# op plugins.sh aliases commands to "op plugin run -- <cmd>". With complete_aliases
-# off (our default), zsh expands such an alias before completing, so e.g.
-# `gh <TAB>` completes `op` instead of gh. Convert these aliases to functions —
-# functions are not expanded for completion, so zsh uses the wrapped command's
-# own completer (carapace/native). Mirrors how plugins.sh already defines `step`.
-if [[ -n "${OP_PLUGIN_ALIASES_SOURCED}" ]]; then
-  for _op_alias in ${(k)aliases}; do
-    if [[ "${aliases[$_op_alias]}" == "op plugin run -- "* ]]; then
-      functions[$_op_alias]="${aliases[$_op_alias]} \"\$@\""
-      unalias -- "${_op_alias}"
-    fi
-  done
-  unset _op_alias
+if is-executable awx; then
+  awx() { op run --env-file="${HOME}/.op/awx.env" -- awx "$@" }
+fi
+
+if is-executable step; then
+  step() {
+    local tmpfile ret
+    tmpfile="$(mktemp -q /tmp/.step.XXXXXX)" || return 1
+    op inject -i "${HOME}/.step/secret.txt.tpl" -o "${tmpfile}" -f >/dev/null
+    STEP_PROVISIONER="dwhicker@bifrost.cc" STEP_PROVISIONER_PASSWORD_FILE="${tmpfile}" command step "$@"
+    ret=$?
+    rm -f "${tmpfile}"
+    return $ret
+  }
 fi
