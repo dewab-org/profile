@@ -1,0 +1,72 @@
+---
+# Catppuccin-flavored mdless theme.
+# mdless uses ANSI color names; with a Catppuccin terminal palette these
+# resolve to Catppuccin colors (blue=blue, magenta=pink, cyan=teal, etc).
+# Backgrounds are left unset so the terminal's Catppuccin base shows through.
+metadata:
+  border: d blue
+  marker: d cyan
+  color: d white
+emphasis:
+  bold: b
+  italic: u i
+  bold-italic: b u i
+h1:
+  color: b magenta
+  pad: d magenta
+  pad_char: "═"
+h2:
+  color: b blue
+  pad: d blue
+  pad_char: "─"
+h3:
+  color: u b cyan
+h4:
+  color: u cyan
+h5:
+  color: b yellow
+h6:
+  color: yellow
+link:
+  brackets: d white
+  text: u b blue
+  url: cyan
+image:
+  bang: red
+  brackets: d white
+  title: cyan
+  url: u yellow
+list:
+  bullet: b red
+  number: b blue
+  color: white
+footnote:
+  brackets: d white
+  caret: b yellow
+  title: x yellow
+  note: u white
+code_span:
+  marker: d white
+  color: b green
+code_block:
+  marker: intense_black
+  bg: ""
+  color: white
+  border: blue
+  title: magenta
+  eol: intense_black
+  pygments_theme: monokai
+dd:
+  marker: d red
+  color: b white
+hr:
+  color: d white
+table:
+  border: d blue
+  header: b yellow
+  divider: d blue
+  color: white
+  bg: ""
+html:
+  brackets: d yellow
+  color: yellow

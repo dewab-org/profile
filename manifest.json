@@ -49,6 +49,36 @@
       "source": "config/direnv",
       "target": "${XDG_CONFIG_HOME}/direnv",
       "type": "link"
+    },
+    {
+      "source": "config/k9s",
+      "target": "${XDG_CONFIG_HOME}/k9s",
+      "type": "link"
+    },
+    {
+      "source": "config/bat",
+      "target": "${XDG_CONFIG_HOME}/bat",
+      "type": "link"
+    },
+    {
+      "source": "config/btop",
+      "target": "${XDG_CONFIG_HOME}/btop",
+      "type": "link"
+    },
+    {
+      "source": "config/htop",
+      "target": "${XDG_CONFIG_HOME}/htop",
+      "type": "link"
+    },
+    {
+      "source": "config/mdless",
+      "target": "${XDG_CONFIG_HOME}/mdless",
+      "type": "link"
+    },
+    {
+      "source": "config/tmux",
+      "target": "${XDG_CONFIG_HOME}/tmux",
+      "type": "link"
     }
   ],
   "gitrepos": [

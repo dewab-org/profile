@@ -1,5 +1,23 @@
+# Catppuccin Mocha — truecolor (38;2;R;G;B) semantic overrides
+# Remaining file-type colors come from the terminal's ANSI palette (iTerm2 profile)
+export EZA_COLORS="\
+di=38;2;116;199;236:\
+ex=38;2;166;227;161:\
+ln=38;2;148;226;213:\
+or=38;2;243;139;168;1:\
+da=38;2;147;153;178:\
+sn=38;2;205;214;244:\
+sb=38;2;147;153;178:\
+uu=38;2;205;214;244:\
+ga=38;2;166;227;161:\
+gm=38;2;249;226;175:\
+gd=38;2;243;139;168:\
+gv=38;2;203;166;247:\
+gt=38;2;250;179;135"
+
 # Prefer eza, then exa; otherwise leave the base ls aliases from .zshrc
 if is-executable eza; then
+  alias ls='eza --icons --color-scale -F'
   alias ll='eza --classify --long --icons --color-scale --all'
   alias l.='eza --list-dirs .* --icons --color-scale'
   alias la='eza --classify --icons --color-scale --all'
@@ -7,6 +25,7 @@ if is-executable eza; then
 fi
 
 if is-executable exa; then
+  alias ls='exa --icons --color-scale -F'
   alias ll='exa --classify --long --icons --color-scale --all'
   alias l.='exa --list-dirs .* --icons --color-scale'
   alias la='exa --classify --icons --color-scale --all'

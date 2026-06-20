@@ -31,6 +31,7 @@ Plugin 'VundleVim/Vundle.vim'
 "
 "
 Plugin 'tpope/vim-fugitive'
+Plugin 'catppuccin/vim', { 'as': 'catppuccin' }
 
 " airline plugin 2019-02-26
 Plugin 'vim-airline/vim-airline'
@@ -114,7 +115,7 @@ function! HasPaste()
 endfunction
 
 " Set Airline Theme
-let g:airline_theme='cool'
+let g:airline_theme='catppuccin_mocha'
 
 "Fonts for the Status Line
 let g:airline_powerline_fonts = 1
@@ -124,7 +125,8 @@ if !exists('g:airline_symbols')
 endif
 
 " Set color scheme
-"colorscheme molokai
+let g:catppuccin_flavour = 'mocha'
+colorscheme catppuccin_mocha
 
 au BufNewFile,BufRead *.zshrc set filetype=zsh
 
