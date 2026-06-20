@@ -9,6 +9,12 @@ is-executable carapace || return
 
 _carapace_completion="${ZSH_CACHE_DIR}/completions/_carapace"
 
+# Bridge to other completion systems for commands Carapace has no native spec for
+# (extends coverage to e.g. bash-completion-only tools). Backends that aren't
+# installed are skipped silently. Must be exported before the completer is
+# generated/run. Override by setting CARAPACE_BRIDGES before this file loads.
+export CARAPACE_BRIDGES="${CARAPACE_BRIDGES-bash,fish,inshellisense}"
+
 autoload -Uz command_completion
 
 # The first shell needs a completion definition to source. Subsequent daily
