@@ -16,14 +16,14 @@ op completion zsh >| "${ZSH_CACHE_DIR}/completions/_op" &|
 # shell completion resolves to the wrapped command's own completer rather than
 # completing `op`. Each is guarded on its tool being installed; add new plugins
 # here after running `op plugin init <tool>`.
-for _op_plugin in gh tea vault; do
+#
+# gh is intentionally NOT wrapped: it uses native keyring auth (`gh auth login`,
+# account dewab74). The op gh plugin injects GH_TOKEN, which overrides the
+# keyring with a stale token and causes "HTTP 401: Bad credentials".
+for _op_plugin in tea vault; do
   is-executable "${_op_plugin}" && functions[$_op_plugin]="op plugin run -- ${_op_plugin} \"\$@\""
 done
 unset _op_plugin
-
-if is-executable awx; then
-  awx() { op run --env-file="${HOME}/.op/awx.env" -- awx "$@" }
-fi
 
 if is-executable step; then
   step() {
