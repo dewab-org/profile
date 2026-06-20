@@ -7,6 +7,11 @@
 command_completion() {
   local target="$1"; shift
 
+  # Bail quietly on an empty target; otherwise the redirection below writes to an
+  # empty path and leaks "no such file or directory" to the console during init
+  # (which trips Powerlevel10k's instant-prompt warning).
+  [[ -n "$target" ]] || return 1
+
   # Remaining args are the generator command
   (( $# )) || return 1
   local -a _gen_cmd

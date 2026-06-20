@@ -61,6 +61,11 @@
       "type": "link"
     },
     {
+      "source": "config/ghostty",
+      "target": "${XDG_CONFIG_HOME}/ghostty",
+      "type": "link"
+    },
+    {
       "source": "config/btop",
       "target": "${XDG_CONFIG_HOME}/btop",
       "type": "link"
