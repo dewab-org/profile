@@ -66,6 +66,11 @@
       "type": "link"
     },
     {
+      "source": "config/fd",
+      "target": "${XDG_CONFIG_HOME}/fd",
+      "type": "link"
+    },
+    {
       "source": "config/btop",
       "target": "${XDG_CONFIG_HOME}/btop",
       "type": "link"

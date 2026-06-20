@@ -1,0 +1,4 @@
+# Global fd ignore file ($XDG_CONFIG_HOME/fd/ignore), .gitignore syntax.
+# Applies to every fd run (lowest precedence). Repo .gitignore/.fdignore still apply.
+.git/
+.DS_Store
