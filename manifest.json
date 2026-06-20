@@ -76,6 +76,11 @@
       "type": "link"
     },
     {
+      "source": "config/starship.toml",
+      "target": "${XDG_CONFIG_HOME}/starship.toml",
+      "type": "link"
+    },
+    {
       "source": "config/btop",
       "target": "${XDG_CONFIG_HOME}/btop",
       "type": "link"

@@ -10,8 +10,8 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# prompt_tool=starship
-prompt_tool=p10k
+prompt_tool=starship
+# prompt_tool=p10k
 
 # Daniel's .zshrc
 #
