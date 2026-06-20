@@ -1,0 +1,223 @@
+{
+  "$comment": "Binary tools deployed into ~/.local/bin by install.py. Each tool resolves the LATEST release for the current platform. Match patterns are Python regexes (re.fullmatch) applied to release asset names; {arch} expands to the alternation of arch synonyms for the running machine. Tools without a 'match' entry for the current OS are skipped with a notice (e.g. eza has no macOS binary upstream).",
+  "$comment_brew": "On macOS, if Homebrew is present the brew formula is preferred and symlinked into dest. The formula name defaults to the tool 'name'; override with a 'brew' string, or set 'brew': false to opt out (e.g. kctrl, which has no core formula). Use --no-brew to force binary downloads.",
+  "dest": "~/.local/bin",
+  "tools": [
+    {
+      "name": "k9s",
+      "provider": "github",
+      "repo": "derailed/k9s",
+      "bin": "k9s",
+      "match": {
+        "darwin": "k9s_Darwin_{arch}\\.tar\\.gz",
+        "linux": "k9s_Linux_{arch}\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "kubectl",
+      "provider": "kubectl",
+      "bin": "kubectl",
+      "brew": "kubernetes-cli"
+    },
+    {
+      "name": "kubecolor",
+      "provider": "github",
+      "repo": "kubecolor/kubecolor",
+      "bin": "kubecolor",
+      "match": {
+        "darwin": "kubecolor_.*_darwin_{arch}\\.tar\\.gz",
+        "linux": "kubecolor_.*_linux_{arch}\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "eza",
+      "provider": "github",
+      "repo": "eza-community/eza",
+      "bin": "eza",
+      "note": "Upstream publishes Linux binaries only; on macOS install via Homebrew.",
+      "match": {
+        "linux": "eza_{arch}-unknown-linux-gnu\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "fzf",
+      "provider": "github",
+      "repo": "junegunn/fzf",
+      "bin": "fzf",
+      "match": {
+        "darwin": "fzf-.*-darwin_{arch}\\.tar\\.gz",
+        "linux": "fzf-.*-linux_{arch}\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "direnv",
+      "provider": "github",
+      "repo": "direnv/direnv",
+      "bin": "direnv",
+      "match": {
+        "darwin": "direnv\\.darwin-{arch}",
+        "linux": "direnv\\.linux-{arch}"
+      }
+    },
+    {
+      "name": "gh",
+      "provider": "github",
+      "repo": "cli/cli",
+      "bin": "gh",
+      "match": {
+        "darwin": "gh_.*_macOS_{arch}\\.zip",
+        "linux": "gh_.*_linux_{arch}\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "ripgrep",
+      "provider": "github",
+      "repo": "BurntSushi/ripgrep",
+      "bin": "rg",
+      "match": {
+        "darwin": "ripgrep-.*-{arch}-apple-darwin\\.tar\\.gz",
+        "linux": "ripgrep-.*-{arch}-unknown-linux-(?:musl|gnu)\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "fd",
+      "provider": "github",
+      "repo": "sharkdp/fd",
+      "bin": "fd",
+      "match": {
+        "darwin": "fd-.*-{arch}-apple-darwin\\.tar\\.gz",
+        "linux": "fd-.*-{arch}-unknown-linux-(?:musl|gnu)\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "gdu-go",
+      "provider": "github",
+      "repo": "dundee/gdu",
+      "bin": "gdu",
+      "brew": "gdu",
+      "archive_bin": "gdu_(?:darwin|linux)_(?:amd64|arm64)",
+      "match": {
+        "darwin": "gdu_darwin_{arch}\\.tgz",
+        "linux": "gdu_linux_{arch}\\.tgz"
+      }
+    },
+    {
+      "name": "helm",
+      "provider": "helm",
+      "repo": "helm/helm",
+      "bin": "helm"
+    },
+    {
+      "name": "yq",
+      "provider": "github",
+      "repo": "mikefarah/yq",
+      "bin": "yq",
+      "match": {
+        "darwin": "yq_darwin_{arch}",
+        "linux": "yq_linux_{arch}"
+      }
+    },
+    {
+      "name": "jq",
+      "provider": "github",
+      "repo": "jqlang/jq",
+      "bin": "jq",
+      "match": {
+        "darwin": "jq-macos-{arch}",
+        "linux": "jq-linux-{arch}"
+      }
+    },
+    {
+      "name": "kubectx",
+      "provider": "github",
+      "repo": "ahmetb/kubectx",
+      "bin": "kubectx",
+      "match": {
+        "darwin": "kubectx_.*_darwin_{arch}\\.tar\\.gz",
+        "linux": "kubectx_.*_linux_{arch}\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "kctrl",
+      "provider": "github",
+      "repo": "carvel-dev/kapp-controller",
+      "bin": "kctrl",
+      "brew": false,
+      "match": {
+        "darwin": "kctrl-darwin-{arch}",
+        "linux": "kctrl-linux-{arch}"
+      }
+    },
+    {
+      "name": "glow",
+      "provider": "github",
+      "repo": "charmbracelet/glow",
+      "bin": "glow",
+      "match": {
+        "darwin": "glow_.*_Darwin_{arch}\\.tar\\.gz",
+        "linux": "glow_.*_Linux_{arch}\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "jless",
+      "provider": "github",
+      "repo": "PaulJuliusMartinez/jless",
+      "bin": "jless",
+      "note": "Upstream publishes only x86_64 for Linux; arm64-Linux is skipped.",
+      "match": {
+        "darwin": "jless-.*-{arch}-apple-darwin\\.zip",
+        "linux": "jless-.*-{arch}-unknown-linux-gnu\\.zip"
+      }
+    },
+    {
+      "name": "zoxide",
+      "provider": "github",
+      "repo": "ajeetdsouza/zoxide",
+      "bin": "zoxide",
+      "match": {
+        "darwin": "zoxide-.*-{arch}-apple-darwin\\.tar\\.gz",
+        "linux": "zoxide-.*-{arch}-unknown-linux-musl\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "bat",
+      "provider": "github",
+      "repo": "sharkdp/bat",
+      "bin": "bat",
+      "match": {
+        "darwin": "bat-.*-{arch}-apple-darwin\\.tar\\.gz",
+        "linux": "bat-.*-{arch}-unknown-linux-(?:musl|gnu)\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "git-delta",
+      "provider": "github",
+      "repo": "dandavison/delta",
+      "bin": "delta",
+      "match": {
+        "darwin": "delta-.*-{arch}-apple-darwin\\.tar\\.gz",
+        "linux": "delta-.*-{arch}-unknown-linux-(?:musl|gnu)\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "vivid",
+      "provider": "github",
+      "repo": "sharkdp/vivid",
+      "bin": "vivid",
+      "match": {
+        "darwin": "vivid-.*-{arch}-apple-darwin\\.tar\\.gz",
+        "linux": "vivid-.*-{arch}-unknown-linux-(?:musl|gnu)\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "starship",
+      "provider": "github",
+      "repo": "starship/starship",
+      "bin": "starship",
+      "match": {
+        "darwin": "starship-{arch}-apple-darwin\\.tar\\.gz",
+        "linux": "starship-{arch}-unknown-linux-(?:musl|gnu)\\.tar\\.gz"
+      }
+    }
+  ]
+}
