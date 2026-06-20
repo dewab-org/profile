@@ -11,7 +11,7 @@
 :pager: true
 :preserve_linebreaks: true
 :remote_images: false
-:syntax_higlight: false
+:syntax_highlight: false
 :taskpaper: false
 :theme: catppuccin
 :transclude: true
