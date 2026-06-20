@@ -1,3 +1,38 @@
 is-executable starship || return
 
+export STARSHIP_CONFIG="${XDG_CONFIG_HOME:-${HOME}/.config}/starship.toml"
 eval "$(starship init zsh)"
+
+# Show Kubernetes context only while entering a Kubernetes-related command.
+autoload -Uz add-zle-hook-widget
+
+_starship_kubernetes_command_state() {
+  emulate -L zsh
+  setopt extended_glob
+
+  local -i active=0
+  local command_pattern
+  command_pattern='(k|kube[^[:space:]]*|k9s|helm|helmfile|oc|istioctl|kogito|flux|fluxctl|stern|cmctl|sparkctl)'
+
+  if [[ "${BUFFER}" =~ "(^[[:space:]]*|[;&|()][[:space:]]*)(sudo[[:space:]]+|command[[:space:]]+|env[[:space:]]+)*${command_pattern}([[:space:]]|$)" ]]; then
+    active=1
+  fi
+
+  if (( active )); then
+    if [[ -z "${STARSHIP_KUBERNETES_ACTIVE:-}" ]]; then
+      export STARSHIP_KUBERNETES_ACTIVE=1
+      zle .reset-prompt
+    fi
+  elif [[ -n "${STARSHIP_KUBERNETES_ACTIVE:-}" ]]; then
+    unset STARSHIP_KUBERNETES_ACTIVE
+    zle .reset-prompt
+  fi
+}
+
+_starship_kubernetes_command_reset() {
+  unset STARSHIP_KUBERNETES_ACTIVE
+}
+
+add-zle-hook-widget line-pre-redraw _starship_kubernetes_command_state
+add-zle-hook-widget line-init _starship_kubernetes_command_reset
+add-zle-hook-widget line-finish _starship_kubernetes_command_reset

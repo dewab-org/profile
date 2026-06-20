@@ -27,6 +27,7 @@ __kube__compdefs() {
 add-zsh-hook precmd __kube__compdefs
 
 if (( have_kubecolor )); then
+  export KUBECOLOR_CONFIG="${XDG_CONFIG_HOME:-${HOME}/.config}/kubecolor.yaml"
   alias kubectl='kubecolor'
 fi
 

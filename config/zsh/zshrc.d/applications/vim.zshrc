@@ -3,6 +3,13 @@ is-executable vim || return
 export GVIMINIT='let $MYGVIMRC="$XDG_CONFIG_HOME/vim/gvimrc" | source $MYGVIMRC'
 export VIMINIT='let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc" | source $MYVIMRC'
 
+# VIMINIT is for Vim and takes precedence over Neovim's native init.lua.
+if is-executable nvim; then
+    function nvim {
+        VIMINIT= command nvim "$@"
+    }
+fi
+
 function vim-setup {
     if [ -d ${XDG_DATA_HOME}/vim/bundle/Vundle.vim ] ; then
         # Update Vundle

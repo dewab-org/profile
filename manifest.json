@@ -36,6 +36,11 @@
       "type": "link"
     },
     {
+      "source": "config/nvim",
+      "target": "${XDG_CONFIG_HOME}/nvim",
+      "type": "link"
+    },
+    {
       "source": "config/aria2",
       "target": "${XDG_CONFIG_HOME}/aria2",
       "type": "link"
@@ -53,6 +58,11 @@
     {
       "source": "config/k9s",
       "target": "${XDG_CONFIG_HOME}/k9s",
+      "type": "link"
+    },
+    {
+      "source": "config/kubecolor.yaml",
+      "target": "${XDG_CONFIG_HOME}/kubecolor.yaml",
       "type": "link"
     },
     {
@@ -109,6 +119,11 @@
     {
       "source": "https://github.com/romkatv/powerlevel10k.git",
       "target": "${XDG_DATA_HOME}/zsh/plugins/powerlevel10k",
+      "depth": 1
+    },
+    {
+      "source": "https://github.com/catppuccin/nvim.git",
+      "target": "${XDG_DATA_HOME}/nvim/site/pack/themes/start/catppuccin",
       "depth": 1
     },
     {
