@@ -1,9 +1,39 @@
 # Empty values reset the configuration to the default value
+
+# ── Theme ──
 theme = Catppuccin Mocha
 
+# ── Font ──
 font-family = "FiraCode Nerd Font Mono"
 font-family-bold = "FiraCode Nerd Font Mono Bold"
 font-size = 15
-
+font-thicken = true
+# FiraCode ligatures are ON by default; to kill them: font-feature = -calt,-liga,-dlig
 # font-family-italic = "FiraCode Nerd Font Mono"
 # font-family-bold-italic = "FiraCode Nerd Font Mono"
+
+# ── macOS keys — required for Alt/Meta bindings in nvim, tmux, fzf ──
+macos-option-as-alt = true
+
+# ── Shell integration (zsh; powers cursor shape, prompt jumps, title) ──
+shell-integration = zsh
+shell-integration-features = cursor,sudo,title
+
+# ── Selection / clipboard ──
+copy-on-select = clipboard
+
+# ── Window / appearance ──
+background-opacity = 0.96
+background-blur = 20
+macos-titlebar-style = tabs
+window-save-state = always
+window-padding-x = 8
+window-padding-y = 6
+mouse-hide-while-typing = true
+
+# ── Quality of life ──
+scrollback-limit = 100000
+confirm-close-surface = false
+
+# ── Quick dropdown terminal (global hotkey) ──
+keybind = global:cmd+grave_accent=toggle_quick_terminal
