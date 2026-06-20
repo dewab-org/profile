@@ -4,6 +4,7 @@ format = """
 [](fg:surface0)\
 $os\
 $username\
+$hostname\
 ${custom.directory_icon}\
 $directory\
 ${custom.git_provider}\
@@ -92,6 +93,12 @@ show_always = false
 style_user = "bg:surface0 fg:overlay1"
 style_root = "bold bg:surface0 fg:red"
 format = '[ ](fg:overlay0 bg:surface0)[ $user]($style)'
+
+[hostname]
+ssh_only = false
+ssh_symbol = " "
+style = "bg:surface0 fg:overlay1"
+format = '[ ](fg:overlay0 bg:surface0)[ $ssh_symbol$hostname]($style)'
 
 [directory]
 style = "bold bg:surface0 fg:blue"
@@ -362,9 +369,6 @@ disabled = true
 
 [hg_branch]
 symbol = " "
-
-[hostname]
-ssh_symbol = " "
 
 [julia]
 symbol = " "
