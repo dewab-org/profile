@@ -26,27 +26,27 @@ done
 unset _op_plugin
 
 # step-ca: wrap step so its provisioner credentials come from 1Password.
-is-executable step || return
-
-step() {
-  # All step-ca secrets live in one 1Password item, referenced in
-  # ~/.step/provisioner as op://<vault>/<item> — so nothing 1Password-specific
-  # is hardcoded here. Fetch username + password in a SINGLE op call (one auth
-  # prompt), take the provisioner from the username field, and stream the password
-  # via process substitution — never written to disk.
-  local _ref _vault _item _json _user _pass
-  is-readable "${HOME}/.step/provisioner" || {
-    print -u2 "step: ~/.step/provisioner not found; expected an op://<vault>/<item> reference"
-    return 1
+is-executable step && {
+  step() {
+    # All step-ca secrets live in one 1Password item, referenced in
+    # ~/.step/provisioner as op://<vault>/<item> — so nothing 1Password-specific
+    # is hardcoded here. Fetch username + password in a SINGLE op call (one auth
+    # prompt), take the provisioner from the username field, and stream the password
+    # via process substitution — never written to disk.
+    local _ref _vault _item _json _user _pass
+    is-readable "${HOME}/.step/provisioner" || {
+      print -u2 "step: ~/.step/provisioner not found; expected an op://<vault>/<item> reference"
+      return 1
+    }
+    _ref="$(<"${HOME}/.step/provisioner")"   # op://vault/item
+    _ref="${_ref#op://}"
+    _vault="${_ref%%/*}"
+    _item="${_ref#*/}"
+    _json="$(op item get "${_item}" --vault "${_vault}" --fields label=username,label=password --format json)" || return
+    _user="$(jq -r '.[] | select(.label=="username") | .value' <<<"${_json}")"
+    _pass="$(jq -r '.[] | select(.label=="password") | .value' <<<"${_json}")"
+    STEP_PROVISIONER="${_user}" \
+    STEP_PROVISIONER_PASSWORD_FILE=<(print -r -- "${_pass}") \
+      command step "$@"
   }
-  _ref="$(<"${HOME}/.step/provisioner")"   # op://vault/item
-  _ref="${_ref#op://}"
-  _vault="${_ref%%/*}"
-  _item="${_ref#*/}"
-  _json="$(op item get "${_item}" --vault "${_vault}" --fields label=username,label=password --format json)" || return
-  _user="$(jq -r '.[] | select(.label=="username") | .value' <<<"${_json}")"
-  _pass="$(jq -r '.[] | select(.label=="password") | .value' <<<"${_json}")"
-  STEP_PROVISIONER="${_user}" \
-  STEP_PROVISIONER_PASSWORD_FILE=<(print -r -- "${_pass}") \
-    command step "$@"
 }
