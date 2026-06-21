@@ -16,8 +16,11 @@ font-thicken = true
 macos-option-as-alt = true
 
 # ── Shell integration (zsh; powers cursor shape, prompt jumps, title) ──
+# ssh-terminfo installs Ghostty's terminfo on remotes (full keys/colors);
+# ssh-env is the fallback (sets TERM=xterm-256color) when it can't, so SSH to
+# hosts lacking the xterm-ghostty entry doesn't break arrows/delete/colors.
 shell-integration = zsh
-shell-integration-features = cursor,sudo,title,ssh-terminfo
+shell-integration-features = cursor,sudo,title,ssh-terminfo,ssh-env
 
 # ── Selection / clipboard ──
 copy-on-select = clipboard
