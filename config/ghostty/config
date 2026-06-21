@@ -17,7 +17,7 @@ macos-option-as-alt = true
 
 # ── Shell integration (zsh; powers cursor shape, prompt jumps, title) ──
 shell-integration = zsh
-shell-integration-features = cursor,sudo,title
+shell-integration-features = cursor,sudo,title,ssh-terminfo
 
 # ── Selection / clipboard ──
 copy-on-select = clipboard

@@ -12,7 +12,8 @@ format = """
 [](fg:surface0)\
 $os\
 $username\
-$hostname\
+${custom.local_hostname}\
+${custom.ssh_hostname}\
 ${custom.directory_icon}\
 $directory\
 ${custom.git_provider}\
@@ -102,11 +103,19 @@ style_user = "bg:surface0 fg:overlay1"
 style_root = "bold bg:surface0 fg:red"
 format = '[ ](fg:overlay0 bg:surface0)[ $user]($style)'
 
-[hostname]
-ssh_only = false
-ssh_symbol = " "
+[custom.local_hostname]
+command = "hostname -s"
+when = '[ -z "${SSH_CONNECTION}${SSH_CLIENT}${SSH_TTY}" ]'
+shell = ["sh"]
 style = "bg:surface0 fg:overlay1"
-format = '[ ](fg:overlay0 bg:surface0)[ $ssh_symbol$hostname]($style)'
+format = '[ ](fg:overlay0 bg:surface0)[ $output]($style)'
+
+[custom.ssh_hostname]
+command = "hostname -s"
+when = '[ -n "${SSH_CONNECTION}${SSH_CLIENT}${SSH_TTY}" ]'
+shell = ["sh"]
+style = "bold bg:red fg:crust"
+format = '[](fg:surface0 bg:red)[  $output ]($style)[](fg:red bg:surface0)'
 
 [directory]
 style = "bold bg:surface0 fg:blue"
