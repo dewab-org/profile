@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+
 layout_python() {
     if [[ -d ".venv" ]]; then
         VIRTUAL_ENV="$(pwd)/.venv"
@@ -10,5 +12,6 @@ layout_python() {
     fi
 
     # Activate the virtual environment
-    . $VIRTUAL_ENV/bin/activate
+    # shellcheck disable=SC1091
+    . "$VIRTUAL_ENV/bin/activate"
 }

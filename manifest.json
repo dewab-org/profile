@@ -56,6 +56,11 @@
       "type": "link"
     },
     {
+      "source": "config/atuin/themes",
+      "target": "${XDG_CONFIG_HOME}/atuin/themes",
+      "type": "link"
+    },
+    {
       "source": "config/k9s",
       "target": "${XDG_CONFIG_HOME}/k9s",
       "type": "link"

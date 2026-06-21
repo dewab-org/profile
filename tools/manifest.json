@@ -159,6 +159,17 @@
       }
     },
     {
+      "name": "switcher",
+      "provider": "github",
+      "repo": "danielfoehrKn/kubeswitch",
+      "bin": "switcher",
+      "brew": "danielfoehrkn/switch/switcher",
+      "match": {
+        "darwin": "switcher_darwin_{arch}",
+        "linux": "switcher_linux_{arch}"
+      }
+    },
+    {
       "name": "glow",
       "provider": "github",
       "repo": "charmbracelet/glow",

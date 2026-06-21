@@ -55,6 +55,26 @@ end
 
 local lualine_ok, lualine = pcall(require, "lualine")
 if lualine_ok then
+  local palette_ok, palette = pcall(
+    require("catppuccin.palettes").get_palette,
+    "mocha"
+  )
+  local colors = palette_ok and palette or {
+    blue = "#89b4fa",
+    crust = "#11111b",
+    green = "#a6e3a1",
+    lavender = "#b4befe",
+    mauve = "#cba6f7",
+    peach = "#fab387",
+    red = "#f38ba8",
+    sapphire = "#74c7ec",
+    surface0 = "#313244",
+    surface1 = "#45475a",
+    teal = "#94e2d5",
+    text = "#cdd6f4",
+    yellow = "#f9e2af",
+  }
+
   lualine.setup({
     options = {
       icons_enabled = true,
@@ -76,19 +96,40 @@ if lualine_ok then
     sections = {
       lualine_a = { "mode" },
       lualine_b = {
-        "branch",
+        {
+          "branch",
+          color = {
+            bg = colors.surface0,
+            fg = colors.green,
+            gui = "bold",
+          },
+        },
         {
           "diff",
+          color = {
+            bg = colors.surface0,
+            fg = colors.yellow,
+          },
           symbols = {
             added = "+",
             modified = "~",
             removed = "-",
+          },
+          diff_color = {
+            added = { fg = colors.green },
+            modified = { fg = colors.yellow },
+            removed = { fg = colors.red },
           },
         },
       },
       lualine_c = {
         {
           "filename",
+          color = {
+            bg = colors.surface1,
+            fg = colors.blue,
+            gui = "bold",
+          },
           file_status = true,
           newfile_status = true,
           path = 1,
@@ -103,6 +144,10 @@ if lualine_ok then
       lualine_x = {
         {
           "diagnostics",
+          color = {
+            bg = colors.surface0,
+            fg = colors.text,
+          },
           sources = { "nvim_diagnostic" },
           symbols = {
             error = "E:",
@@ -110,13 +155,56 @@ if lualine_ok then
             info = "I:",
             hint = "H:",
           },
+          diagnostics_color = {
+            error = { fg = colors.red },
+            warn = { fg = colors.yellow },
+            info = { fg = colors.sapphire },
+            hint = { fg = colors.teal },
+          },
         },
-        "encoding",
-        "fileformat",
-        "filetype",
+        {
+          "encoding",
+          color = {
+            bg = colors.surface0,
+            fg = colors.lavender,
+          },
+        },
+        {
+          "fileformat",
+          color = {
+            bg = colors.surface0,
+            fg = colors.peach,
+          },
+        },
+        {
+          "filetype",
+          color = {
+            bg = colors.surface1,
+            fg = colors.mauve,
+            gui = "bold",
+          },
+        },
       },
-      lualine_y = { "progress" },
-      lualine_z = { "location" },
+      lualine_y = {
+        {
+          "progress",
+          color = {
+            bg = colors.surface0,
+            fg = colors.teal,
+            gui = "bold",
+          },
+        },
+      },
+      lualine_z = {
+        {
+          "location",
+          color = {
+            bg = colors.blue,
+            fg = colors.crust,
+            gui = "bold",
+          },
+        },
+      },
     },
     inactive_sections = {
       lualine_a = {},

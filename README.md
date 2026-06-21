@@ -1,102 +1,203 @@
 # Profile Configuration
 
-Personal shell and development environment configuration.
+Personal shell, terminal, editor, and command-line tooling for macOS and Linux.
+The configuration follows XDG paths, uses Zsh as the interactive shell, and is
+bootstrapped from declarative JSON manifests.
 
-## Shell Configuration
+## Highlights
 
-- **Shell**: zsh with Powerlevel10k prompt
-- **File Manager**: eza (ls replacement), fd (find replacement)
-- **File Search**: rg (ripgrep), fzf
-- **Git**: gh, fzf, fzf-git.sh
-- **Directory Navigation**: zoxide
-- **History**: atuin
-- **Terminal Multiplexer**: tmux
+- **Prompt:** Starship with Catppuccin Mocha styling, Git context, runtime
+  indicators, and a distinct SSH hostname segment.
+- **Terminal:** Ghostty configuration with Nerd Font support and automatic
+  remote `xterm-ghostty` terminfo installation.
+- **Completion:** Native Zsh completions, Carapace fallback coverage, Bash
+  completion compatibility, and fzf-tab.
+- **History and navigation:** Atuin, Zoxide, fzf, fd, and ripgrep.
+- **Editors:** Vim and Neovim configurations. Neovim includes Catppuccin,
+  lualine, Gitsigns, fzf-lua, LSP support, Blink completion, and Conform
+  formatting.
+- **Containers and Kubernetes:** Docker, lazydocker, kubectl, kubecolor, k9s,
+  Helm, Helmfile, kubectx, kubens, and optional Tanzu/Carvel tools.
+- **Security:** 1Password CLI integration, Gitleaks, Trivy, Grype, Vault, and
+  Smallstep CLI support.
 
-## Structure
+## Requirements
 
+- Git
+- Python 3.8 or newer
+- Zsh
+- A Nerd Font for prompt and editor icons
+
+Homebrew is optional. On macOS, the tool installer prefers available Homebrew
+formulae; otherwise it downloads public release binaries.
+
+## Installation
+
+Clone the repository and run the profile bootstrap:
+
+```sh
+git clone https://github.com/dewab-org/profile.git ~/.profile.d
+cd ~/.profile.d
+python3 setup.py
 ```
-config/zsh/
-├── .zshrc                 # Main zsh configuration
-├── .zshenv                # Environment variables (all sessions)
-├── .p10k.zsh              # Powerlevel10k prompt config
-└── zshrc.d/
-    ├── global/            # Host-agnostic configs
-    │   ├── prompts.zshrc
-    │   └── grep.zshrc
-    ├── platform/          # OS-specific configs
-    │   └── darwin.zshrc
-    ├── applications/      # Application configs (44 apps)
-    └── functions/         # Custom shell functions
+
+`setup.py` reads `manifest.json` and:
+
+- creates required XDG directories;
+- links tracked configuration into `$HOME` and `$XDG_CONFIG_HOME`;
+- copies files that should not be linked;
+- clones or updates Zsh and Neovim plugins;
+- honors pinned plugin branches, such as Blink's stable `v1` branch.
+
+Useful options:
+
+```sh
+python3 setup.py --dry-run
+python3 setup.py --force
+python3 setup.py --debug
+python3 setup.py --override-home /alternate/home
 ```
 
-## Applications Configured
+`--force` replaces existing link targets. For copied files, the existing file
+is preserved with an `.orig` suffix.
 
-### Development Tools
+## Command-Line Tool Installer
 
-- **Git**: gh, gitea, fd, fzf, fzf-git.sh
-- **Docker**: docker, lazydocker (recommended)
-- **Kubernetes**: kubernetes, minikube, tanzu
-- **Cloud**: aws, az, oracle, vault, step
+`tools/install.py` installs current release binaries into `~/.local/bin`.
+It supports macOS and Linux on AMD64 and ARM64.
 
-### Editors & Pagers
+```sh
+tools/install.py
+tools/install.py --list
+tools/install.py --only fzf bat atuin
+tools/install.py --prefer-binary
+tools/install.py --no-brew
+tools/install.py --dest ~/bin
+```
 
-- **vim**, **bat**, **less**, **eza**, **ncdu**
+GitHub release metadata and assets are public and are fetched anonymously; the
+installer does not use `GITHUB_TOKEN` or the GitHub CLI.
 
-### Version Management
+The primary manifest includes:
 
-- **conda**, **pyenv**, **rbenv**, **asdf**, **nodenv**, **goenv**
+- **Shell:** Starship, Carapace, Atuin, Zoxide, Direnv, and ASSH
+- **Search and files:** fzf, ripgrep, fd, eza, bat, vivid, glow, jless, and gdu
+- **Git and containers:** gh, delta, lazygit, and lazydocker
+- **Kubernetes:** kubectl, kubecolor, k9s, Helm, Helmfile, kubectx, and kubens
+- **Data and security:** jq, yq, Gitleaks, and Smallstep CLI
 
-### Utilities
+Optional Tanzu, Carvel, Velero, and Cluster API tools use a separate manifest:
 
-- **direnv**, **tmux**, **zoxide**, **atuin**, **fzf**, **fd**, **rg**
+```sh
+tools/install.py --manifest tools/manifest-tanzu.json
+```
 
-### Other
+## Repository Layout
 
-- **1password**, **gnupg**, **sqlite**, **yq**, **pandoc**
+```text
+.
+├── config/                    Tracked application configuration
+│   ├── ghostty/               Ghostty terminal configuration
+│   ├── git/                   Git configuration
+│   ├── nvim/                  Neovim Lua configuration
+│   ├── vim/                   Vim configuration
+│   └── zsh/
+│       ├── .zshenv            XDG and non-interactive environment setup
+│       ├── .zshrc             Interactive shell initialization
+│       └── zshrc.d/
+│           ├── applications/  Conditional application integrations
+│           ├── functions/     Autoloaded Zsh functions
+│           ├── global/        Prompt and shared configuration
+│           ├── hosts/         Host-specific configuration
+│           └── platform/      OS-specific configuration
+├── manifest.json              Dotfile and plugin bootstrap manifest
+├── setup.py                   Profile bootstrap
+└── tools/
+    ├── install.py             Release binary installer
+    ├── manifest.json          Primary tool manifest
+    └── manifest-tanzu.json    Optional Tanzu/Carvel manifest
+```
 
-## Key Features
+## Zsh
 
-### Instant Prompt
+Application files guard themselves with helpers such as `is-executable`, so
+the same profile can run on systems with different tool sets.
 
-Powerlevel10k instant prompt enabled for fast shell startup.
+`zz-selections.zshrc` applies preferences after application integrations load.
+For example, command history uses Atuin when available and falls back to fzf's
+history widget otherwise.
 
-### Completion
+Completion files generated by commands are cached under
+`$XDG_CACHE_HOME/zsh/completions`. The `command_completion` helper refreshes
+them periodically, writes them atomically, and compiles larger definitions.
+Rich native completers are preferred; Carapace fills remaining coverage.
 
-- fzf-tab for interactive tab completion
-- bash completion support
-- Case-insensitive completion
+Atuin provides Catppuccin-themed, fully framed interactive history search,
+while Zoxide replaces `cd` with ranked directory navigation. fzf supplies file,
+history, and completion interfaces.
 
-### Git Workflow
-
-- `gco` - checkout branch via fzf
-- `gbr` - list branches via fzf
-- `glog` - visualize git log via fzf
-- `gcf` - fixup commits via fzf
-
-### Directory Navigation
-
-- `z` - zoxide jump
-- `zf` - zoxide fzf picker
-
-## Performance Optimizations
-
-- One-shot compdump rebuild (daily)
-- Lazy-loaded bash completion
-- Instant prompt for Powerlevel10k
-- Minimal application loading
-
-## Adding Applications
-
-Add a new application config in `config/zsh/zshrc.d/applications/<name>.zshrc`:
+To add an application integration:
 
 ```zsh
-is-executable <app> || return
+is-executable example || return
 
-# Configure application
-export <VAR>="value"
+export EXAMPLE_CONFIG="${XDG_CONFIG_HOME}/example/config"
+alias ex="example"
+```
 
-# Or add aliases
-alias <alias>="<command>"
+Save it as `config/zsh/zshrc.d/applications/example.zshrc`.
+
+## Neovim
+
+Neovim plugins use its native `pack/*/start` layout and are installed by
+`setup.py`; Neovim does not download plugins during startup.
+
+Configured capabilities include:
+
+- Catppuccin Mocha colors
+- colorful lualine status line
+- Git signs and status
+- fzf-lua file, buffer, Git, help, and grep pickers
+- Blink LSP, path, snippet, and buffer completion
+- native Neovim LSP configurations for installed language servers
+- Conform formatting and format-on-save
+
+Language servers are enabled only when their executables are available.
+Configured formatters include Ruff, Prettier, Terraform, and jq.
+
+## Remote Hosts
+
+Ghostty's `ssh-terminfo` shell integration installs the `xterm-ghostty`
+terminfo entry on SSH hosts when needed. This preserves Backspace, cursor keys,
+colors, and other terminal capabilities.
+
+The Starship hostname segment changes color during SSH sessions to make remote
+shells visually distinct.
+
+## Validation
+
+Install the pre-commit hooks:
+
+```sh
+pre-commit install
+```
+
+Run all repository checks:
+
+```sh
+pre-commit run --all-files
+```
+
+The checks cover whitespace, JSON, YAML, Markdown, Python formatting and lint,
+ShellCheck, secrets, spelling, merge conflicts, and file safety.
+
+Additional useful checks:
+
+```sh
+zsh -n config/zsh/.zshrc config/zsh/zshrc.d/**/*.zshrc
+python3 setup.py --dry-run
+tools/install.py --list
+nvim --headless '+checkhealth' +qa
 ```
 
 ## License
