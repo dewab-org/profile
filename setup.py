@@ -164,7 +164,7 @@ def clone_git_repo(
                     git_dir = os.path.join(target_path, ".git")
                     if os.path.isdir(git_dir):
                         print(
-                            f"[dry-run] Would pull latest in git repo: {target_path}"
+                            f"[dry-run] Would fetch+reset to latest in git repo: {target_path}"
                             f"{depth_info}{branch_info}"
                         )
                     else:
@@ -231,18 +231,24 @@ def clone_git_repo(
                         subprocess.check_call(
                             ["git", "-C", target_path, "checkout", branch]
                         )
-                    pull_cmd = ["git", "-C", target_path, "pull", "--ff-only"]
+                    # Fetch and hard-reset so local changes/divergence are
+                    # always discarded in favor of the remote.
+                    fetch_cmd = ["git", "-C", target_path, "fetch"]
                     if depth is not None:
-                        pull_cmd.extend(["--depth", str(depth)])
+                        fetch_cmd.extend(["--depth", str(depth)])
+                    fetch_cmd.append("origin")
                     if branch:
-                        pull_cmd.extend(["origin", branch])
+                        fetch_cmd.append(branch)
                     if debug:
                         print(
-                            f"Repo exists, pulling latest in {target_path} "
+                            f"Repo exists, fetching+resetting {target_path} "
                             f"with depth={depth}, branch={branch}"
                         )
-                    subprocess.check_call(pull_cmd)
-                    print(f"Pulled latest in git repo: {target_path}")
+                    subprocess.check_call(fetch_cmd)
+                    subprocess.check_call(
+                        ["git", "-C", target_path, "reset", "--hard", "FETCH_HEAD"]
+                    )
+                    print(f"Reset to latest in git repo: {target_path}")
                 else:
                     print(f"Directory exists but is not a git repo: {target_path}")
         else:
