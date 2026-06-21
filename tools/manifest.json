@@ -239,6 +239,17 @@
       }
     },
     {
+      "name": "assh",
+      "provider": "github",
+      "repo": "moul/assh",
+      "bin": "assh",
+      "brew": "assh",
+      "match": {
+        "darwin": "assh_.*_darwin_{arch}\\.tar\\.gz",
+        "linux": "assh_.*_linux_{arch}\\.tar\\.gz"
+      }
+    },
+    {
       "name": "gitleaks",
       "provider": "github",
       "repo": "gitleaks/gitleaks",

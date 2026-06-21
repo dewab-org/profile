@@ -8,3 +8,5 @@ autoload -Uz _atuin command_completion
 _comps[atuin]=_atuin
 
 command_completion "${_atuin_completion}" atuin gen-completions --shell zsh &|
+
+eval "$(atuin init zsh)"

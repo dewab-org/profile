@@ -6,7 +6,9 @@ export VIMINIT='let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc" | source $MYVIMRC'
 # VIMINIT is for Vim and takes precedence over Neovim's native init.lua.
 if is-executable nvim; then
     function nvim {
-        VIMINIT= command nvim "$@"
+        local VIMINIT GVIMINIT
+        unset VIMINIT GVIMINIT
+        command nvim "$@"
     }
 fi
 
