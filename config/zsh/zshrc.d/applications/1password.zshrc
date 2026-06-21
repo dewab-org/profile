@@ -27,12 +27,15 @@ unset _op_plugin
 
 if is-executable step; then
   step() {
-    local tmpfile ret
-    tmpfile="$(mktemp -q /tmp/.step.XXXXXX)" || return 1
-    op inject -i "${HOME}/.step/secret.txt.tpl" -o "${tmpfile}" -f >/dev/null
-    STEP_PROVISIONER="dwhicker@bifrost.cc" STEP_PROVISIONER_PASSWORD_FILE="${tmpfile}" command step "$@"
-    ret=$?
-    rm -f "${tmpfile}"
-    return $ret
+    # All step-ca secrets live in one 1Password item. ~/.step/secret.txt.tpl holds
+    # the password pointer (op://vault/item/password), so nothing 1Password-specific
+    # is hardcoded here. Derive the item, take the provisioner from its username
+    # field, and stream the password via process substitution — never written to disk.
+    local _pwref _item
+    _pwref="$(<"${HOME}/.step/secret.txt.tpl")"
+    _item="${_pwref%/*}"
+    STEP_PROVISIONER="$(op read "${_item}/username")" \
+    STEP_PROVISIONER_PASSWORD_FILE=<(op read "${_pwref}") \
+      command step "$@"
   }
 fi
