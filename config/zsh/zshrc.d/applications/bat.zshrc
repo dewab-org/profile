@@ -10,11 +10,19 @@ fi
 
 alias cat="$_bat_bin"
 
-# Shell completion (regenerated/cached by command_completion)
-autoload -Uz _bat command_completion
+# Debian/Ubuntu package a native _batcat completer and older bat releases do
+# not support `--completion`. Prefer the packaged completer in that case.
 (( ${+_comps} )) || typeset -g -A _comps
-_comps[bat]=_bat
-command_completion "${ZSH_CACHE_DIR}/completions/_bat" "$_bat_bin" --completion zsh &|
+if (( $+commands[batcat] )); then
+  autoload -Uz _batcat
+  _comps[bat]=_batcat
+  _comps[batcat]=_batcat
+elif "$_bat_bin" --help 2>/dev/null | command grep -q -- '--completion'; then
+  # Newer bat releases can generate their own completion definition.
+  autoload -Uz _bat command_completion
+  _comps[bat]=_bat
+  command_completion "${ZSH_CACHE_DIR}/completions/_bat" "$_bat_bin" --completion zsh &|
+fi
 
 # Colored, themed man pages via bat (uses bat's Catppuccin Mocha theme).
 export MANPAGER="sh -c 'col -bx | ${_bat_bin} --language man --plain'"

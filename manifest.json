@@ -132,6 +132,47 @@
       "depth": 1
     },
     {
+      "source": "https://github.com/nvim-lua/plenary.nvim.git",
+      "target": "${XDG_DATA_HOME}/nvim/site/pack/dependencies/start/plenary",
+      "depth": 1
+    },
+    {
+      "source": "https://github.com/nvim-tree/nvim-web-devicons.git",
+      "target": "${XDG_DATA_HOME}/nvim/site/pack/ui/start/nvim-web-devicons",
+      "depth": 1
+    },
+    {
+      "source": "https://github.com/lewis6991/gitsigns.nvim.git",
+      "target": "${XDG_DATA_HOME}/nvim/site/pack/git/start/gitsigns",
+      "depth": 1
+    },
+    {
+      "source": "https://github.com/ibhagwan/fzf-lua.git",
+      "target": "${XDG_DATA_HOME}/nvim/site/pack/navigation/start/fzf-lua",
+      "depth": 1
+    },
+    {
+      "source": "https://github.com/neovim/nvim-lspconfig.git",
+      "target": "${XDG_DATA_HOME}/nvim/site/pack/lsp/start/nvim-lspconfig",
+      "depth": 1
+    },
+    {
+      "source": "https://github.com/Saghen/blink.cmp.git",
+      "target": "${XDG_DATA_HOME}/nvim/site/pack/completion/start/blink.cmp",
+      "branch": "v1",
+      "depth": 1
+    },
+    {
+      "source": "https://github.com/stevearc/conform.nvim.git",
+      "target": "${XDG_DATA_HOME}/nvim/site/pack/formatting/start/conform.nvim",
+      "depth": 1
+    },
+    {
+      "source": "https://github.com/nvim-lualine/lualine.nvim.git",
+      "target": "${XDG_DATA_HOME}/nvim/site/pack/ui/start/lualine",
+      "depth": 1
+    },
+    {
       "source": "https://github.com/dewab/brewfile.git",
       "target": "${XDG_CONFIG_HOME}/homebrew"
     }

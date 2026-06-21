@@ -132,30 +132,40 @@ def create_copy(source_path, target_path, force, debug=False, dry_run=False):
 
 
 def clone_git_repo(
-    source_url, target_path, force=False, debug=False, depth=None, dry_run=False
+    source_url,
+    target_path,
+    force=False,
+    debug=False,
+    depth=None,
+    branch=None,
+    dry_run=False,
 ):
     """
     Clones a git repository from source_url to target_path.
     If force is True and the target exists, it will be removed first.
     If the repo exists and force is False, do a git pull instead.
     If depth is provided, limit the clone/pull to that depth.
+    If branch is provided, clone and update only that branch.
     """
     try:
         if dry_run:
             depth_info = f" with depth {depth}" if depth else ""
+            branch_info = f" on branch {branch}" if branch else ""
             if os.path.exists(target_path):
                 if force:
                     print(
                         f"[dry-run] Would remove existing directory before clone: {target_path}"
                     )
                     print(
-                        f"[dry-run] Would clone {source_url} -> {target_path}{depth_info}"
+                        f"[dry-run] Would clone {source_url} -> {target_path}"
+                        f"{depth_info}{branch_info}"
                     )
                 else:
                     git_dir = os.path.join(target_path, ".git")
                     if os.path.isdir(git_dir):
                         print(
-                            f"[dry-run] Would pull latest in git repo: {target_path}{depth_info}"
+                            f"[dry-run] Would pull latest in git repo: {target_path}"
+                            f"{depth_info}{branch_info}"
                         )
                     else:
                         print(
@@ -163,7 +173,10 @@ def clone_git_repo(
                         )
                 return
 
-            print(f"[dry-run] Would clone {source_url} -> {target_path}{depth_info}")
+            print(
+                f"[dry-run] Would clone {source_url} -> {target_path}"
+                f"{depth_info}{branch_info}"
+            )
             return
 
         if os.path.exists(target_path):
@@ -171,33 +184,79 @@ def clone_git_repo(
                 if debug:
                     print(f"Removing existing directory before clone: {target_path}")
                 shutil.rmtree(target_path)
-                clone_cmd = ["git", "clone", source_url, target_path]
+                clone_cmd = ["git", "clone"]
                 if depth is not None:
                     clone_cmd.extend(["--depth", str(depth)])
+                if branch:
+                    clone_cmd.extend(["--branch", branch, "--single-branch"])
+                clone_cmd.extend([source_url, target_path])
                 if debug:
-                    print(f"Cloning {source_url} into {target_path} with depth={depth}")
+                    print(
+                        f"Cloning {source_url} into {target_path} "
+                        f"with depth={depth}, branch={branch}"
+                    )
                 subprocess.check_call(clone_cmd)
                 print(f"Cloned git repo: {source_url} -> {target_path}")
             else:
                 git_dir = os.path.join(target_path, ".git")
                 if os.path.isdir(git_dir):
-                    pull_cmd = ["git", "-C", target_path, "pull"]
+                    if branch:
+                        branch_exists = (
+                            subprocess.call(
+                                [
+                                    "git",
+                                    "-C",
+                                    target_path,
+                                    "show-ref",
+                                    "--verify",
+                                    "--quiet",
+                                    f"refs/heads/{branch}",
+                                ]
+                            )
+                            == 0
+                        )
+                        if not branch_exists:
+                            fetch_cmd = [
+                                "git",
+                                "-C",
+                                target_path,
+                                "fetch",
+                            ]
+                            if depth is not None:
+                                fetch_cmd.extend(["--depth", str(depth)])
+                            fetch_cmd.extend(
+                                ["origin", f"{branch}:refs/heads/{branch}"]
+                            )
+                            subprocess.check_call(fetch_cmd)
+                        subprocess.check_call(
+                            ["git", "-C", target_path, "checkout", branch]
+                        )
+                    pull_cmd = ["git", "-C", target_path, "pull", "--ff-only"]
                     if depth is not None:
                         pull_cmd.extend(["--depth", str(depth)])
+                    if branch:
+                        pull_cmd.extend(["origin", branch])
                     if debug:
                         print(
-                            f"Repo exists, pulling latest in {target_path} with depth={depth}"
+                            f"Repo exists, pulling latest in {target_path} "
+                            f"with depth={depth}, branch={branch}"
                         )
                     subprocess.check_call(pull_cmd)
                     print(f"Pulled latest in git repo: {target_path}")
                 else:
                     print(f"Directory exists but is not a git repo: {target_path}")
         else:
-            clone_cmd = ["git", "clone", source_url, target_path]
+            clone_cmd = ["git", "clone"]
             if depth is not None:
                 clone_cmd.extend(["--depth", str(depth)])
+            if branch:
+                clone_cmd.extend(["--branch", branch, "--single-branch"])
+            clone_cmd.extend([source_url, target_path])
             if debug:
-                print(f"Cloning {source_url} into {target_path} with depth={depth}")
+                print(
+                    f"Cloning {source_url} into {target_path} "
+                    f"with depth={depth}, branch={branch}"
+                )
             subprocess.check_call(clone_cmd)
             print(f"Cloned git repo: {source_url} -> {target_path}")
     except Exception as e:
@@ -285,12 +344,14 @@ def process_files(
             if not repo_target:
                 continue
             depth = repo.get("depth")
+            branch = repo.get("branch")
             clone_git_repo(
                 repo["source"],
                 repo_target,
                 force=force,
                 debug=debug,
                 depth=depth,
+                branch=branch,
                 dry_run=dry_run,
             )
 

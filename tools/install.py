@@ -18,7 +18,8 @@ Usage:
     ./install.py --prefer-binary     # download binaries, brew only as fallback
     ./install.py --no-brew           # never use brew (binaries only)
 
-Set GITHUB_TOKEN to raise the GitHub API rate limit (anonymous = 60 req/hr).
+GitHub release metadata is fetched anonymously because all configured
+repositories and assets are public.
 """
 
 from __future__ import annotations
@@ -72,9 +73,6 @@ def _request(url: str, accept: str | None = None) -> bytes:
     headers = {"User-Agent": UA}
     if accept:
         headers["Accept"] = accept
-    token = os.environ.get("GITHUB_TOKEN")
-    if token and "api.github.com" in url:
-        headers["Authorization"] = f"Bearer {token}"
     req = urllib.request.Request(url, headers=headers)
     with urllib.request.urlopen(req, timeout=60) as resp:
         return resp.read()
