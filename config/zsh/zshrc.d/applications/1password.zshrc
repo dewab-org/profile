@@ -33,7 +33,7 @@ if is-executable step; then
     # prompt), take the provisioner from the username field, and stream the password
     # via process substitution — never written to disk.
     local _ref _vault _item _json _user _pass
-    if [[ ! -r "${HOME}/.step/provisioner" ]]; then
+    if ! is-readable "${HOME}/.step/provisioner"; then
       print -u2 "step: ~/.step/provisioner not found; expected an op://<vault>/<item> reference"
       return 1
     fi
