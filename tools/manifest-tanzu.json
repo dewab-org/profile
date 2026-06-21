@@ -92,6 +92,17 @@
       }
     },
     {
+      "name": "vendir",
+      "provider": "github",
+      "repo": "carvel-dev/vendir",
+      "bin": "vendir",
+      "brew": false,
+      "match": {
+        "darwin": "vendir-darwin-{arch}",
+        "linux": "vendir-linux-{arch}"
+      }
+    },
+    {
       "name": "clusterctl",
       "provider": "github",
       "repo": "kubernetes-sigs/cluster-api",
