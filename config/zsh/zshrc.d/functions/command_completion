@@ -1,8 +1,10 @@
 #! /bin/zsh
 #
-# command_completion <target> -- <generator command...>
+# command_completion <target> <generator command...>
 # - Regenerates the completion file when missing or older than COMMAND_COMPLETION_MAX_AGE_DAYS (default: 1).
 # - Compiles to <target>.zwc when present and size meets COMMAND_COMPLETION_COMPILE_THRESHOLD_BYTES (default: 10240).
+# - Replaces generated and compiled files atomically so concurrent shells never
+#   observe partially written completion data, and serializes updates per target.
 
 command_completion() {
   local target="$1"; shift
@@ -16,6 +18,16 @@ command_completion() {
   (( $# )) || return 1
   local -a _gen_cmd
   _gen_cmd=("$@")
+
+  # Keep source generation and bytecode compilation in one critical section.
+  # The lock file is intentionally persistent: unlinking it could let a third
+  # process lock a new inode while an existing process still holds the old one.
+  zmodload -F zsh/system b:zsystem 2>/dev/null || return 1
+  local lock_file="${target:h}/.${target:t}.lock"
+  : >| "${lock_file}" 2>/dev/null || return 1
+  integer lock_fd
+  zsystem flock -t "${COMMAND_COMPLETION_LOCK_TIMEOUT_SECONDS:-10}" \
+    -f lock_fd "${lock_file}" 2>/dev/null || return 1
 
   integer today mtime_day=0 size=0 size_known=0 regenerate=0 max_age_days compile_threshold
   (( today = EPOCHSECONDS / 86400 ))
@@ -38,8 +50,30 @@ command_completion() {
   fi
 
   if (( regenerate )); then
-    size_known=0  # file will be rewritten; recalc below
-    builtin command "${_gen_cmd[@]}" >| "${target}" || return $?
+    local generated="${target:h}/.${target:t}.tmp.$$.$RANDOM"
+    builtin command "${_gen_cmd[@]}" >| "${generated}"
+    local generator_status=$?
+    if (( generator_status )) || [[ ! -s "${generated}" ]]; then
+      builtin command rm -f -- "${generated}"
+      if (( generator_status )); then
+        zsystem flock -u ${lock_fd}
+        return ${generator_status}
+      fi
+      zsystem flock -u ${lock_fd}
+      return 1
+    fi
+
+    builtin command mv -f -- "${generated}" "${target}" || {
+      local move_status=$?
+      builtin command rm -f -- "${generated}"
+      zsystem flock -u ${lock_fd}
+      return ${move_status}
+    }
+
+    # A compiled file belongs to the previous source. Remove it immediately so
+    # equal timestamp granularity cannot cause zsh to load stale bytecode.
+    builtin command rm -f -- "${target}.zwc"
+    size_known=0  # file was replaced; recalc below
   fi
 
   if (( !size_known )); then
@@ -59,6 +93,18 @@ command_completion() {
   fi
 
   if (( do_compile )) && [[ ! -e "${target}.zwc" || "${target}" -nt "${target}.zwc" ]]; then
-    builtin zcompile -R -- "${target}.zwc" "${target}" 2>/dev/null
+    local compiled="${target:h}/.${target:t}.zwc.tmp.$$.$RANDOM.zwc"
+    builtin zcompile -R -- "${compiled}" "${target}" 2>/dev/null || {
+      builtin command rm -f -- "${compiled}"
+      zsystem flock -u ${lock_fd}
+      return 0
+    }
+    builtin command mv -f -- "${compiled}" "${target}.zwc" || {
+      builtin command rm -f -- "${compiled}"
+      zsystem flock -u ${lock_fd}
+      return 0
+    }
   fi
+
+  zsystem flock -u ${lock_fd}
 }
