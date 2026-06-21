@@ -218,6 +218,83 @@
         "darwin": "starship-{arch}-apple-darwin\\.tar\\.gz",
         "linux": "starship-{arch}-unknown-linux-(?:musl|gnu)\\.tar\\.gz"
       }
+    },
+    {
+      "name": "carapace",
+      "provider": "github",
+      "repo": "carapace-sh/carapace-bin",
+      "bin": "carapace",
+      "match": {
+        "darwin": "carapace-bin_.*_darwin_{arch}\\.tar\\.gz",
+        "linux": "carapace-bin_.*_linux_{arch}\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "atuin",
+      "provider": "github",
+      "repo": "atuinsh/atuin",
+      "bin": "atuin",
+      "match": {
+        "darwin": "atuin-{arch}-apple-darwin\\.tar\\.gz",
+        "linux": "atuin-{arch}-unknown-linux-(?:musl|gnu)\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "gitleaks",
+      "provider": "github",
+      "repo": "gitleaks/gitleaks",
+      "bin": "gitleaks",
+      "match": {
+        "darwin": "gitleaks_.*_darwin_{arch}\\.tar\\.gz",
+        "linux": "gitleaks_.*_linux_{arch}\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "step",
+      "provider": "github",
+      "repo": "smallstep/cli",
+      "bin": "step",
+      "match": {
+        "darwin": "step_darwin_.*_{arch}\\.tar\\.gz",
+        "linux": "step_linux_.*_{arch}\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "trivy",
+      "provider": "github",
+      "repo": "aquasecurity/trivy",
+      "bin": "trivy",
+      "note": "Upstream assets use macOS-ARM64 / Linux-64bit naming the {arch} aliases don't cover, so binary download is skipped; installed via Homebrew on macOS. Add explicit match patterns to support Linux binary downloads."
+    },
+    {
+      "name": "grype",
+      "provider": "github",
+      "repo": "anchore/grype",
+      "bin": "grype",
+      "match": {
+        "darwin": "grype_.*_darwin_{arch}\\.tar\\.gz",
+        "linux": "grype_.*_linux_{arch}\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "lazygit",
+      "provider": "github",
+      "repo": "jesseduffield/lazygit",
+      "bin": "lazygit",
+      "match": {
+        "darwin": "lazygit_.*_darwin_{arch}\\.tar\\.gz",
+        "linux": "lazygit_.*_linux_{arch}\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "lazydocker",
+      "provider": "github",
+      "repo": "jesseduffield/lazydocker",
+      "bin": "lazydocker",
+      "match": {
+        "darwin": "lazydocker_.*_Darwin_{arch}\\.tar\\.gz",
+        "linux": "lazydocker_.*_Linux_{arch}\\.tar\\.gz"
+      }
     }
   ]
 }
