@@ -16,4 +16,8 @@ autoload -Uz _bat command_completion
 _comps[bat]=_bat
 command_completion "${ZSH_CACHE_DIR}/completions/_bat" "$_bat_bin" --completion zsh &|
 
+# Colored, themed man pages via bat (uses bat's Catppuccin Mocha theme).
+export MANPAGER="sh -c 'col -bx | ${_bat_bin} --language man --plain'"
+export MANROFFOPT="-c"
+
 unset _bat_bin

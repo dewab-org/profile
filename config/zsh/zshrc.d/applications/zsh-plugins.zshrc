@@ -1,5 +1,9 @@
 # Load optional Zsh plugins from common package-manager and user locations.
 # This file sorts late so syntax highlighting is initialized after other plugins.
+
+# Catppuccin Mocha: dim the autosuggestion to overlay0 (read at suggestion time).
+export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#6c7086'
+
 function _load_zsh_plugins() {
   local root plugin_path
   local -a plugin_roots

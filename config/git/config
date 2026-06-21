@@ -42,8 +42,24 @@
 	diffFilter = delta --color-only
 
 [delta]
-	features = side-by-side line-numbers decorations
+	features = catppuccin-mocha side-by-side line-numbers decorations
 	whitespace-error-style = 22 reverse
+
+[delta "catppuccin-mocha"]
+	dark = true
+	syntax-theme = Catppuccin Mocha
+	minus-style = syntax "#34293a"
+	minus-emph-style = syntax "#53394c"
+	plus-style = syntax "#2c3439"
+	plus-emph-style = syntax "#404f4a"
+	line-numbers-minus-style = "#f38ba8"
+	line-numbers-plus-style = "#a6e3a1"
+	line-numbers-zero-style = "#6c7086"
+	line-numbers-left-style = "#45475a"
+	line-numbers-right-style = "#45475a"
+	hunk-header-style = file line-number syntax
+	hunk-header-decoration-style = "#89b4fa" box ul
+	hunk-header-line-number-style = "#fab387"
 
 [delta "decorations"]
 	commit-decoration-style = bold yellow box ul
