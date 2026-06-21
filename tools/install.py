@@ -46,6 +46,7 @@ ARCH_ALIASES = {
 ARCHIVE_SUFFIXES = (".tar.gz", ".tgz", ".tar.xz", ".txz", ".tar.bz2", ".zip")
 STATE_FILE = ".tools-installed.json"
 UA = "profile.d-tools-installer"
+_warned_invalid_github_token = False
 
 
 # ── platform ────────────────────────────────────────────────────────────────
@@ -69,15 +70,35 @@ def arch_regex(arch: str) -> str:
 
 # ── http ─────────────────────────────────────────────────────────────────────
 def _request(url: str, accept: str | None = None) -> bytes:
+    global _warned_invalid_github_token
+
     headers = {"User-Agent": UA}
     if accept:
         headers["Accept"] = accept
     token = os.environ.get("GITHUB_TOKEN")
-    if token and "api.github.com" in url:
+    github_api = "api.github.com" in url
+    if token and github_api:
         headers["Authorization"] = f"Bearer {token}"
     req = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(req, timeout=60) as resp:
-        return resp.read()
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            return resp.read()
+    except urllib.error.HTTPError as error:
+        if not (token and github_api and error.code == 401):
+            raise
+
+        if not _warned_invalid_github_token:
+            print(
+                "warning: GITHUB_TOKEN was rejected by GitHub; "
+                "retrying API requests anonymously",
+                file=sys.stderr,
+            )
+            _warned_invalid_github_token = True
+
+        headers.pop("Authorization", None)
+        anonymous_req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(anonymous_req, timeout=60) as resp:
+            return resp.read()
 
 
 def get_json(url: str) -> dict:
