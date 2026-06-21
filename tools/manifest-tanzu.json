@@ -1,0 +1,105 @@
+{
+  "$comment": "Optional Tanzu / Carvel / Cluster API tooling. NOT installed by default. Run explicitly: tools/install.py --manifest tools/manifest-tanzu.json. Same schema as manifest.json. 'carvel' is the suite ytt/imgpkg/kbld/kapp/kwt/kctrl (no single 'carvel' binary).",
+  "dest": "~/.local/bin",
+  "tools": [
+    {
+      "name": "tanzu-cli",
+      "provider": "github",
+      "repo": "vmware-tanzu/tanzu-cli",
+      "bin": "tanzu",
+      "brew": false,
+      "archive_bin": "tanzu-cli-(?:darwin|linux)_(?:amd64|arm64)",
+      "match": {
+        "darwin": "tanzu-cli-darwin-{arch}\\.tar\\.gz",
+        "linux": "tanzu-cli-linux-{arch}\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "velero",
+      "provider": "github",
+      "repo": "vmware-tanzu/velero",
+      "bin": "velero",
+      "archive_bin": "velero",
+      "match": {
+        "darwin": "velero-v.*-darwin-{arch}\\.tar\\.gz",
+        "linux": "velero-v.*-linux-{arch}\\.tar\\.gz"
+      }
+    },
+    {
+      "name": "ytt",
+      "provider": "github",
+      "repo": "carvel-dev/ytt",
+      "bin": "ytt",
+      "brew": false,
+      "match": {
+        "darwin": "ytt-darwin-{arch}",
+        "linux": "ytt-linux-{arch}"
+      }
+    },
+    {
+      "name": "imgpkg",
+      "provider": "github",
+      "repo": "carvel-dev/imgpkg",
+      "bin": "imgpkg",
+      "brew": false,
+      "match": {
+        "darwin": "imgpkg-darwin-{arch}",
+        "linux": "imgpkg-linux-{arch}"
+      }
+    },
+    {
+      "name": "kbld",
+      "provider": "github",
+      "repo": "carvel-dev/kbld",
+      "bin": "kbld",
+      "brew": false,
+      "match": {
+        "darwin": "kbld-darwin-{arch}",
+        "linux": "kbld-linux-{arch}"
+      }
+    },
+    {
+      "name": "kapp",
+      "provider": "github",
+      "repo": "carvel-dev/kapp",
+      "bin": "kapp",
+      "brew": false,
+      "match": {
+        "darwin": "kapp-darwin-{arch}",
+        "linux": "kapp-linux-{arch}"
+      }
+    },
+    {
+      "name": "kwt",
+      "provider": "github",
+      "repo": "carvel-dev/kwt",
+      "bin": "kwt",
+      "brew": false,
+      "match": {
+        "darwin": "kwt-darwin-{arch}",
+        "linux": "kwt-linux-{arch}"
+      }
+    },
+    {
+      "name": "kctrl",
+      "provider": "github",
+      "repo": "carvel-dev/kapp-controller",
+      "bin": "kctrl",
+      "brew": false,
+      "match": {
+        "darwin": "kctrl-darwin-{arch}",
+        "linux": "kctrl-linux-{arch}"
+      }
+    },
+    {
+      "name": "clusterctl",
+      "provider": "github",
+      "repo": "kubernetes-sigs/cluster-api",
+      "bin": "clusterctl",
+      "match": {
+        "darwin": "clusterctl-darwin-{arch}",
+        "linux": "clusterctl-linux-{arch}"
+      }
+    }
+  ]
+}

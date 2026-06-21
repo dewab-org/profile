@@ -108,6 +108,16 @@
       "bin": "helm"
     },
     {
+      "name": "helmfile",
+      "provider": "github",
+      "repo": "helmfile/helmfile",
+      "bin": "helmfile",
+      "match": {
+        "darwin": "helmfile_.*_darwin_{arch}\\.tar\\.gz",
+        "linux": "helmfile_.*_linux_{arch}\\.tar\\.gz"
+      }
+    },
+    {
       "name": "yq",
       "provider": "github",
       "repo": "mikefarah/yq",
@@ -135,17 +145,6 @@
       "match": {
         "darwin": "kubectx_.*_darwin_{arch}\\.tar\\.gz",
         "linux": "kubectx_.*_linux_{arch}\\.tar\\.gz"
-      }
-    },
-    {
-      "name": "kctrl",
-      "provider": "github",
-      "repo": "carvel-dev/kapp-controller",
-      "bin": "kctrl",
-      "brew": false,
-      "match": {
-        "darwin": "kctrl-darwin-{arch}",
-        "linux": "kctrl-linux-{arch}"
       }
     },
     {
