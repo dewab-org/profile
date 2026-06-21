@@ -13,16 +13,19 @@ ITERM_INTEGRATION="${ZDOTDIR}/zshrc.d/scripts/iterm_integration.sh"
 # Check if running inside of a tmux session, and if so skip iterm checking as it doesn't like tmux start scripts
 [ -n "${TMUX}" ] && return
 
-# Using isiterm2.sh to determine whether the connected terminal is iTerm or not
-if [ -x "${IT2CHECK}" ] && [ -x "${ITERM_INTEGRATION}" ]
-then
-	${IT2CHECK} && ITERM=true
-else
-	return
-fi
+# Bail unless both helper scripts are present.
+[ -x "${IT2CHECK}" ] && [ -x "${ITERM_INTEGRATION}" ] || return
+
+# Only load the integration when it2check confirms a real iTerm2. Previously the
+# script sourced unconditionally (it2check's result was assigned to ITERM but never
+# used to gate), so the integration ran in Terminal.app, Ghostty, etc. too — leaking
+# OSC 1337 / FTCS prompt-mark escapes (a stray prompt mark and extra line, made worse
+# alongside starship). Outside iTerm2, it2check exits non-zero and we bail here.
+"${IT2CHECK}" || return
+ITERM=true
 
 # Run the iterm integration script
-source ${ITERM_INTEGRATION}
+source "${ITERM_INTEGRATION}"
 
 function iterm-up () {
 	# Download and replace the iTerm bash shell integration script
