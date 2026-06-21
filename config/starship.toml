@@ -4,6 +4,10 @@
 # prompt mark sitting cleanly at the prompt start instead of on a blank line.
 add_newline = false
 
+# Allow longer directory scans before giving up (default 30ms); avoids the
+# "Scanning current directory timed out" warning in busy dirs like /tmp.
+scan_timeout = 50
+
 format = """
 [](fg:surface0)\
 $os\
