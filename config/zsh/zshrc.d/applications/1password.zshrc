@@ -27,16 +27,16 @@ unset _op_plugin
 
 if is-executable step; then
   step() {
-    # All step-ca secrets live in one 1Password item. ~/.step/secret.txt.tpl holds
-    # the password pointer (op://vault/item/password), so nothing 1Password-specific
+    # All step-ca secrets live in one 1Password item, referenced in
+    # ~/.step/secret.txt.tpl as op://<vault>/<item> — so nothing 1Password-specific
     # is hardcoded here. Fetch username + password in a SINGLE op call (one auth
     # prompt), take the provisioner from the username field, and stream the password
     # via process substitution — never written to disk.
-    local _pwref _ref _vault _item _json _user _pass
-    _pwref="$(<"${HOME}/.step/secret.txt.tpl")"   # op://vault/item/password
-    _ref="${_pwref#op://}"
+    local _ref _vault _item _json _user _pass
+    _ref="$(<"${HOME}/.step/secret.txt.tpl")"   # op://vault/item
+    _ref="${_ref#op://}"
     _vault="${_ref%%/*}"
-    _item="${_ref#*/}"; _item="${_item%/*}"
+    _item="${_ref#*/}"
     _json="$(op item get "${_item}" --vault "${_vault}" --fields label=username,label=password --format json)" || return
     _user="$(jq -r '.[] | select(.label=="username") | .value' <<<"${_json}")"
     _pass="$(jq -r '.[] | select(.label=="password") | .value' <<<"${_json}")"
