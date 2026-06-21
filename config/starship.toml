@@ -107,6 +107,7 @@ format = '[ ](fg:overlay0 bg:surface0)[ $ssh_symbol$hostname]($style)'
 [directory]
 style = "bold bg:surface0 fg:blue"
 format = '[ $path]($style)'
+truncate_to_repo = false
 truncation_length = 3
 truncation_symbol = "…/"
 home_symbol = "~"
