@@ -1,12 +1,10 @@
 is-executable op || return
 
-# Keep op's own completion definition fresh.
-is-readable "${ZSH_CACHE_DIR}/completions/_op" || {
-  autoload -Uz _op
-  typeset -g -A _comps
-  _comps[op]=_op
-}
-op completion zsh >| "${ZSH_CACHE_DIR}/completions/_op" &|
+# op's own shell completion (cached + refreshed daily by command_completion).
+autoload -Uz _op command_completion
+(( ${+_comps} )) || typeset -g -A _comps
+_comps[op]=_op
+command_completion "${ZSH_CACHE_DIR}/completions/_op" op completion zsh &|
 
 # 1Password CLI plugin wrappers.
 #
