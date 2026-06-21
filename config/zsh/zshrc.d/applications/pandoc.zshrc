@@ -1,9 +1,6 @@
 is-executable pandoc || return
 
-if [[ ! -f "${ZSH_CACHE_DIR}/completions/_pandoc" ]]; then
-  autoload -Uz _pandoc
-  typeset -g -A _comps
-  _comps[pandoc]=_pandoc
-fi
-
-pandoc --bash-completion >| "${ZSH_CACHE_DIR}/completions/_pandoc" &|
+autoload -Uz _pandoc command_completion
+(( ${+_comps} )) || typeset -g -A _comps
+_comps[pandoc]=_pandoc
+command_completion "${ZSH_CACHE_DIR}/completions/_pandoc" pandoc --bash-completion &|
