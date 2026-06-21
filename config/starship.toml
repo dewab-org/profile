@@ -1,5 +1,9 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
+# No leading blank line before the prompt: keeps iTerm2's shell-integration
+# prompt mark sitting cleanly at the prompt start instead of on a blank line.
+add_newline = false
+
 format = """
 [](fg:surface0)\
 $os\
