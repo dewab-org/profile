@@ -17,18 +17,22 @@ gt=38;2;250;179;135"
 
 # Prefer eza, then exa; otherwise leave the base ls aliases from .zshrc
 if is-executable eza; then
-  alias ls='eza --icons --color-scale -F'
-  alias ll='eza --classify --long --icons --color-scale --all'
-  alias l.='eza --list-dirs .* --icons --color-scale'
+  alias ls='eza --classify --icons --color-scale'
+  alias ll='eza --classify --icons --color-scale --long --all'
+  alias l.='eza --classify --icons --color-scale --list-dirs .* '
   alias la='eza --classify --icons --color-scale --all'
-  alias tree='eza --tree --icons'
+  alias lr='eza --classify --icons --color-scale --long --all --sort=newest'  # ls -ltr: newest last
+  alias lR='eza --classify --icons --color-scale --long --all --recurse'      # ls -lR: recursive
+  alias tree='eza --classify --icons --color-scale --tree'
   return
 fi
 
 if is-executable exa; then
-  alias ls='exa --icons --color-scale -F'
-  alias ll='exa --classify --long --icons --color-scale --all'
-  alias l.='exa --list-dirs .* --icons --color-scale'
+  alias ls='exa --classify --icons --color-scale'
+  alias ll='exa --classify --icons --color-scale --long --all'
+  alias l.='exa --classify --icons --color-scale --list-dirs .* '
   alias la='exa --classify --icons --color-scale --all'
-  alias tree='exa --tree --icons'
+  alias lr='exa --classify --icons --color-scale --long --all --sort=newest'  # ls -ltr: newest last
+  alias lR='exa --classify --icons --color-scale --long --all --recurse'      # ls -lR: recursive
+  alias tree='exa --classify --icons --color-scale --tree'
 fi
