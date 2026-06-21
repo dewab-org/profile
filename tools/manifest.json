@@ -260,23 +260,6 @@
       }
     },
     {
-      "name": "trivy",
-      "provider": "github",
-      "repo": "aquasecurity/trivy",
-      "bin": "trivy",
-      "note": "Upstream assets use macOS-ARM64 / Linux-64bit naming the {arch} aliases don't cover, so binary download is skipped; installed via Homebrew on macOS. Add explicit match patterns to support Linux binary downloads."
-    },
-    {
-      "name": "grype",
-      "provider": "github",
-      "repo": "anchore/grype",
-      "bin": "grype",
-      "match": {
-        "darwin": "grype_.*_darwin_{arch}\\.tar\\.gz",
-        "linux": "grype_.*_linux_{arch}\\.tar\\.gz"
-      }
-    },
-    {
       "name": "lazygit",
       "provider": "github",
       "repo": "jesseduffield/lazygit",
