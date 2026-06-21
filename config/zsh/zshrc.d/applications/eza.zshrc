@@ -15,7 +15,6 @@ gd=38;2;243;139;168:\
 gv=38;2;203;166;247:\
 gt=38;2;250;179;135"
 
-# Prefer eza, then exa; otherwise leave the base ls aliases from .zshrc
 if is-executable eza; then
   alias ls='eza --classify --icons --color-scale'
   alias ll='eza --classify --icons --color-scale --long --all'
