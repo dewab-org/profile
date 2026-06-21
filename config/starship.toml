@@ -114,8 +114,8 @@ format = '[ ](fg:overlay0 bg:surface0)[ $output]($style)'
 command = "hostname -s"
 when = '[ -n "${SSH_CONNECTION}${SSH_CLIENT}${SSH_TTY}" ]'
 shell = ["sh"]
-style = "bold bg:red fg:crust"
-format = '[](fg:surface0 bg:red)[  $output ]($style)[](fg:red bg:surface0)'
+style = "bold bg:surface0 fg:red"
+format = '[ ](fg:overlay0 bg:surface0)[  $output]($style)'
 
 [directory]
 style = "bold bg:surface0 fg:blue"
