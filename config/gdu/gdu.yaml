@@ -1,0 +1,21 @@
+# gdu (gdu-go) configuration — Catppuccin Mocha theme.
+# gdu reads ~/.config/gdu/gdu.yaml; only the style section is set here, so all
+# other options fall back to gdu's built-in defaults.
+style:
+    header:
+        text-color: '#cdd6f4'        # text
+        background-color: '#45475a'  # surface1
+        hidden: false
+    footer:
+        text-color: '#cdd6f4'        # text
+        background-color: '#45475a'  # surface1
+        number-color: '#a6e3a1'      # green
+    selected-row:
+        text-color: '#1e1e2e'        # base
+        background-color: '#89b4fa'   # blue
+    result-row:
+        number-color: '#fab387'      # peach (sizes)
+        directory-color: '#89b4fa'   # blue (directories)
+    progress-modal:
+        show-disk-progress-bar: true
+    use-old-size-bar: false

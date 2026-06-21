@@ -86,6 +86,11 @@
       "type": "link"
     },
     {
+      "source": "config/gdu",
+      "target": "${XDG_CONFIG_HOME}/gdu",
+      "type": "link"
+    },
+    {
       "source": "config/starship.toml",
       "target": "${XDG_CONFIG_HOME}/starship.toml",
       "type": "link"
