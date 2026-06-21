@@ -28,12 +28,12 @@ unset _op_plugin
 if is-executable step; then
   step() {
     # All step-ca secrets live in one 1Password item, referenced in
-    # ~/.step/secret.txt.tpl as op://<vault>/<item> — so nothing 1Password-specific
+    # ~/.step/provisioner as op://<vault>/<item> — so nothing 1Password-specific
     # is hardcoded here. Fetch username + password in a SINGLE op call (one auth
     # prompt), take the provisioner from the username field, and stream the password
     # via process substitution — never written to disk.
     local _ref _vault _item _json _user _pass
-    _ref="$(<"${HOME}/.step/secret.txt.tpl")"   # op://vault/item
+    _ref="$(<"${HOME}/.step/provisioner")"   # op://vault/item
     _ref="${_ref#op://}"
     _vault="${_ref%%/*}"
     _item="${_ref#*/}"
