@@ -148,6 +148,17 @@
       }
     },
     {
+      "name": "kubens",
+      "provider": "github",
+      "repo": "ahmetb/kubectx",
+      "bin": "kubens",
+      "brew": "kubectx",
+      "match": {
+        "darwin": "kubens_.*_darwin_{arch}\\.tar\\.gz",
+        "linux": "kubens_.*_linux_{arch}\\.tar\\.gz"
+      }
+    },
+    {
       "name": "glow",
       "provider": "github",
       "repo": "charmbracelet/glow",
