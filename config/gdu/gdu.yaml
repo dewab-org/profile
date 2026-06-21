@@ -1,6 +1,11 @@
-# gdu (gdu-go) configuration — Catppuccin Mocha theme.
-# gdu reads ~/.config/gdu/gdu.yaml; only the style section is set here, so all
-# other options fall back to gdu's built-in defaults.
+# gdu (gdu-go) configuration.
+# gdu reads ~/.config/gdu/gdu.yaml; only the options below are set, so all other
+# options fall back to gdu's built-in defaults.
+
+# Show the number of items (files) in each directory by default (TUI 'c' key).
+show-item-count: true
+
+# ── Catppuccin Mocha theme ──
 style:
     header:
         text-color: '#cdd6f4'        # text
