@@ -15,6 +15,8 @@ Usage:
     ./install.py --force             # re-download even if up to date
     ./install.py --dry-run           # resolve + report, download nothing
     ./install.py --dest ~/bin        # override destination
+    ./install.py --prefer-binary     # download binaries, brew only as fallback
+    ./install.py --no-brew           # never use brew (binaries only)
 
 Set GITHUB_TOKEN to raise the GitHub API rate limit (anonymous = 60 req/hr).
 """
@@ -247,9 +249,28 @@ def save_state(dest_dir: Path, state: dict) -> None:
 
 # ── main ─────────────────────────────────────────────────────────────────────
 def process(tool, osname, arch, dest_dir, state, args, brew_prefix):
-    name = tool["name"]
-    if brew_prefix and brew_formula(tool):
+    """Dispatch to brew or binary, honoring the requested preference.
+
+    Default on macOS: brew (when a formula exists), else binary download.
+    --prefer-binary: binary download (when available for this platform), and
+    only fall back to brew if no binary exists here.
+    --no-brew: binary only (sets brew_prefix=None upstream).
+    """
+    brew_ok = bool(brew_prefix and brew_formula(tool))
+    if args.prefer_binary:
+        try:
+            return process_binary(tool, osname, arch, dest_dir, state, args)
+        except Skip:
+            if brew_ok:
+                return process_brew(tool, dest_dir, brew_prefix, state, args)
+            raise
+    if brew_ok:
         return process_brew(tool, dest_dir, brew_prefix, state, args)
+    return process_binary(tool, osname, arch, dest_dir, state, args)
+
+
+def process_binary(tool, osname, arch, dest_dir, state, args):
+    name = tool["name"]
     resolver = RESOLVERS.get(tool["provider"])
     if not resolver:
         return "fail", f"unknown provider {tool['provider']!r}"
@@ -293,7 +314,14 @@ def main(argv=None):
     )
     ap.add_argument("--list", action="store_true", help="show plan and exit")
     ap.add_argument(
-        "--no-brew", action="store_true", help="ignore Homebrew, always fetch binaries"
+        "--no-brew",
+        action="store_true",
+        help="ignore Homebrew entirely, always fetch binaries",
+    )
+    ap.add_argument(
+        "--prefer-binary",
+        action="store_true",
+        help="prefer downloaded binaries over brew, falling back to brew only when no binary exists for this platform",
     )
     args = ap.parse_args(argv)
 
@@ -306,9 +334,12 @@ def main(argv=None):
     brew_prefix = None
     if osname == "darwin" and not args.no_brew and brew_path():
         brew_prefix = _brew("--prefix").strip()
-    method = (
-        f"brew @ {brew_prefix} (binary fallback)" if brew_prefix else "binary downloads"
-    )
+    if not brew_prefix:
+        method = "binary downloads"
+    elif args.prefer_binary:
+        method = f"binary downloads (brew @ {brew_prefix} fallback)"
+    else:
+        method = f"brew @ {brew_prefix} (binary fallback)"
     print(f"platform: {osname}/{arch}   dest: {dest_dir}   method: {method}\n")
 
     tools = manifest["tools"]
