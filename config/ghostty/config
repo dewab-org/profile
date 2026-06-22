@@ -39,4 +39,6 @@ scrollback-limit = 100000
 confirm-close-surface = false
 
 # ── Quick dropdown terminal (global hotkey) ──
-keybind = global:cmd+grave_accent=toggle_quick_terminal
+# Disabled: the global cmd+` hotkey grabbed the key system-wide and conflicted
+# with Supacode. Rebind to another key (e.g. global:cmd+escape) to re-enable.
+# keybind = global:cmd+grave_accent=toggle_quick_terminal
