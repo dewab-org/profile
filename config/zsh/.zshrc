@@ -160,6 +160,7 @@ autoload -Uz convert_seconds
 autoload -Uz convert_seconds_human_readable
 autoload -Uz rules && rules
 autoload -Uz lsz
+autoload -Uz ips   # cross-platform (macOS + Linux); must load on all hosts
 autoload -Uz tg
 
 # Enable completion list menu
