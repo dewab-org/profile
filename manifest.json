@@ -86,6 +86,11 @@
       "type": "link"
     },
     {
+      "source": "config/ripgrep",
+      "target": "${XDG_CONFIG_HOME}/ripgrep",
+      "type": "link"
+    },
+    {
       "source": "config/glow",
       "target": "${XDG_CONFIG_HOME}/glow",
       "type": "link"

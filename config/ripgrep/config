@@ -1,0 +1,7 @@
+# ripgrep configuration (loaded via $RIPGREP_CONFIG_PATH; see rg.zshrc)
+# One CLI flag per line; lines starting with '#' are ignored.
+
+# Never search inside .git directories, even with --hidden / --no-ignore.
+# No leading slash = match the basename at any depth, so this holds regardless
+# of how rg is invoked (cwd, relative arg, or absolute path).
+--glob=!.git
