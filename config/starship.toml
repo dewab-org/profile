@@ -6,7 +6,7 @@ add_newline = false
 
 # Allow longer directory scans before giving up (default 30ms); avoids the
 # "Scanning current directory timed out" warning in busy dirs like /tmp.
-scan_timeout = 50
+scan_timeout = 100
 
 format = """
 [](fg:surface0)\
