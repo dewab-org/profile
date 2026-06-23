@@ -59,15 +59,20 @@ def create_link(source_path, target_path, force, debug=False, dry_run=False):
         if debug:
             print(f"Creating symlink: {source_path} -> {target_path}")
 
-        target_exists = os.path.exists(target_path)
+        target_exists = os.path.exists(target_path) or os.path.islink(target_path)
         will_create = True
 
         if target_exists and force:
             if dry_run:
                 print(f"[dry-run] Would remove existing target: {target_path}")
             else:
-                os.unlink(target_path)
-                print(f"Removed existing symlink: {target_path}")
+                # A real directory must be removed recursively; symlinks (even
+                # to directories) and regular files are removed with unlink.
+                if os.path.isdir(target_path) and not os.path.islink(target_path):
+                    shutil.rmtree(target_path)
+                else:
+                    os.unlink(target_path)
+                print(f"Removed existing target: {target_path}")
         elif target_exists and not force:
             will_create = False
             if dry_run:
