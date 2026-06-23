@@ -134,9 +134,9 @@ Rich native completers are preferred; Carapace fills remaining coverage. Tools
 that ship no completion generator and have no Carapace spec (e.g. Claude Code)
 vendor a static completer under `config/zsh/completions/` instead.
 
-Atuin provides Catppuccin-themed, fully framed interactive history search,
-while Zoxide replaces `cd` with ranked directory navigation. fzf supplies file,
-history, and completion interfaces.
+Atuin provides Catppuccin-themed, framed interactive history search capped at
+10 terminal lines, while Zoxide replaces `cd` with ranked directory navigation.
+fzf supplies file, history, and completion interfaces.
 
 To add an application integration:
 

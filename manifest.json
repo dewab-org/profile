@@ -56,8 +56,8 @@
       "type": "link"
     },
     {
-      "source": "config/atuin/themes",
-      "target": "${XDG_CONFIG_HOME}/atuin/themes",
+      "source": "config/atuin",
+      "target": "${XDG_CONFIG_HOME}/atuin",
       "type": "link"
     },
     {
