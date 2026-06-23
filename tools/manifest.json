@@ -191,6 +191,26 @@
       }
     },
     {
+      "name": "fx",
+      "provider": "github",
+      "repo": "antonmedv/fx",
+      "bin": "fx",
+      "match": {
+        "darwin": "fx_darwin_{arch}",
+        "linux": "fx_linux_{arch}"
+      }
+    },
+    {
+      "name": "xh",
+      "provider": "github",
+      "repo": "ducaale/xh",
+      "bin": "xh",
+      "match": {
+        "darwin": "xh-v.*-(?:x86_64|aarch64)-apple-darwin\\.tar\\.gz",
+        "linux": "xh-v.*-(?:x86_64|aarch64)-unknown-linux-musl\\.tar\\.gz"
+      }
+    },
+    {
       "name": "zoxide",
       "provider": "github",
       "repo": "ajeetdsouza/zoxide",

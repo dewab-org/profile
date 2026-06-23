@@ -81,7 +81,8 @@ installer does not use `GITHUB_TOKEN` or the GitHub CLI.
 The primary manifest includes:
 
 - **Shell:** Starship, Carapace, Atuin, Zoxide, Direnv, and ASSH
-- **Search and files:** fzf, ripgrep, fd, eza, bat, vivid, glow, jless, and gdu
+- **Search and files:** fzf, ripgrep, fd, eza, bat, vivid, glow, jless, fx,
+  xh, and gdu
 - **Git and containers:** gh, delta, lazygit, and lazydocker
 - **Kubernetes:** kubectl, kubecolor, k9s, Helm, Helmfile, kubectx, and kubens
 - **Data and security:** jq, yq, Gitleaks, and Smallstep CLI
@@ -136,7 +137,9 @@ vendor a static completer under `config/zsh/completions/` instead.
 
 Atuin provides Catppuccin-themed, framed interactive history search capped at
 10 terminal lines, while Zoxide replaces `cd` with ranked directory navigation.
-fzf supplies file, history, and completion interfaces.
+fzf supplies file, history, and completion interfaces. fx uses its closest
+purple built-in theme because it does not expose custom Catppuccin themes; xh
+uses its dark `monokai` output style because its supported styles are fixed.
 
 To add an application integration:
 

@@ -96,6 +96,11 @@
       "type": "link"
     },
     {
+      "source": "config/xh",
+      "target": "${XDG_CONFIG_HOME}/xh",
+      "type": "link"
+    },
+    {
       "source": "config/gdu",
       "target": "${XDG_CONFIG_HOME}/gdu",
       "type": "link"
