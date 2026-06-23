@@ -12,18 +12,6 @@ if is-executable nvim; then
     }
 fi
 
-function vim-setup {
-    if [ -d ${XDG_DATA_HOME}/vim/bundle/Vundle.vim ] ; then
-        # Update Vundle
-        print "Ensuring Vundle is latest"
-        (cd ${XDG_DATA_HOME}/vim/bundle/Vundle.vim ; git pull origin HEAD)
-    else
-        # Download Vundle
-        print "Installing Vundle"
-        git clone https://github.com/VundleVim/Vundle.vim.git ${XDG_DATA_HOME}/vim/bundle/Vundle.vim
-    fi
-
-    # Use Vundle to install Plugins
-    print "Using Vundle to install defined Plugins"
-    vim +PluginInstall +qall
-}
+# Vim plugins are installed as native packages by setup.py (see manifest.json),
+# under $XDG_DATA_HOME/vim/pack/plugins/start/*. Run `./setup.py` to install
+# or update them.

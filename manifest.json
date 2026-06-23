@@ -188,6 +188,56 @@
       "depth": 1
     },
     {
+      "source": "https://github.com/tpope/vim-fugitive.git",
+      "target": "${XDG_DATA_HOME}/vim/pack/plugins/start/vim-fugitive",
+      "depth": 1
+    },
+    {
+      "source": "https://github.com/catppuccin/vim.git",
+      "target": "${XDG_DATA_HOME}/vim/pack/plugins/start/catppuccin",
+      "depth": 1
+    },
+    {
+      "source": "https://github.com/itchyny/lightline.vim.git",
+      "target": "${XDG_DATA_HOME}/vim/pack/plugins/start/lightline",
+      "depth": 1
+    },
+    {
+      "source": "https://github.com/dense-analysis/ale.git",
+      "target": "${XDG_DATA_HOME}/vim/pack/plugins/start/ale",
+      "depth": 1
+    },
+    {
+      "source": "https://github.com/junegunn/fzf.git",
+      "target": "${XDG_DATA_HOME}/vim/pack/plugins/start/fzf",
+      "depth": 1
+    },
+    {
+      "source": "https://github.com/junegunn/fzf.vim.git",
+      "target": "${XDG_DATA_HOME}/vim/pack/plugins/start/fzf.vim",
+      "depth": 1
+    },
+    {
+      "source": "https://github.com/tpope/vim-surround.git",
+      "target": "${XDG_DATA_HOME}/vim/pack/plugins/start/vim-surround",
+      "depth": 1
+    },
+    {
+      "source": "https://github.com/tpope/vim-repeat.git",
+      "target": "${XDG_DATA_HOME}/vim/pack/plugins/start/vim-repeat",
+      "depth": 1
+    },
+    {
+      "source": "https://github.com/airblade/vim-gitgutter.git",
+      "target": "${XDG_DATA_HOME}/vim/pack/plugins/start/vim-gitgutter",
+      "depth": 1
+    },
+    {
+      "source": "https://github.com/tpope/vim-sleuth.git",
+      "target": "${XDG_DATA_HOME}/vim/pack/plugins/start/vim-sleuth",
+      "depth": 1
+    },
+    {
       "source": "https://github.com/dewab/brewfile.git",
       "target": "${XDG_CONFIG_HOME}/homebrew"
     }

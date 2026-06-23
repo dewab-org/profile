@@ -18,42 +18,14 @@ set viewdir=$XDG_STATE_HOME/vim/view     | call mkdir(&viewdir,   'p')
 
 if !has('nvim') | set viminfofile=$XDG_STATE_HOME/vim/viminfo | endif
 
-" set the runtime path to include Vundle and initialize
-set rtp+=$XDG_DATA_HOME/vim/bundle/Vundle.vim
-call vundle#begin('$XDG_DATA_HOME/vim/bundle')
-" alternatively, pass a path where Vundle should install plugins
-"call vundle#begin('~/some/path/here')
-
-" let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
-
-" All of your Plugins must be added before the following line
-"
-"
-Plugin 'tpope/vim-fugitive'
-Plugin 'catppuccin/vim', { 'as': 'catppuccin' }
-
-" airline plugin 2019-02-26
-Plugin 'vim-airline/vim-airline'
-Plugin 'vim-airline/vim-airline-themes'
-
-" Enable ALE linting engine
-Plugin 'w0rp/ale'
-
-call vundle#end()            " required
+" Plugins are installed as native packages under
+" $XDG_DATA_HOME/vim/pack/plugins/start/* by setup.py (see manifest.json):
+"   vim-fugitive, catppuccin, lightline, ale, fzf, fzf.vim,
+"   vim-surround, vim-repeat, vim-gitgutter, vim-sleuth
 filetype plugin indent on    " required
 
 " To ignore plugin indent changes, instead use:
 "filetype plugin on
-"
-" Brief help
-" :PluginList       - lists configured plugins
-" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-" :PluginSearch foo - searches for foo; append `!` to refresh local cache
-" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
-"
-" see :h vundle for more details or wiki for FAQ
-" Put your non-Plugin stuff after this line
 
 set t_Co=256
 
@@ -103,8 +75,8 @@ set foldnestmax=10      "deepest fold is 10 levels
 set nofoldenable        "dont fold by default
 set foldlevel=1         "this is just what i use
 
-" Two Spaces replace tab key when editin YAML files
-autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+" Indentation is auto-detected per file by vim-sleuth (and .editorconfig,
+" which Vim 9 supports natively), so no per-filetype tabstop autocmds here.
 
 " Returns true if paste mode is enabled
 function! HasPaste()
@@ -114,27 +86,74 @@ function! HasPaste()
     return ''
 endfunction
 
-" Set Airline Theme
-let g:airline_theme='catppuccin_mocha'
-
-"Fonts for the Status Line
-let g:airline_powerline_fonts = 1
-
-if !exists('g:airline_symbols')
-    let g:airline_symbols = {}
-endif
-
 " Set color scheme
 let g:catppuccin_flavour = 'mocha'
 colorscheme catppuccin_mocha
 
+" Statusline: lightline (catppuccin theme shipped by catppuccin/vim).
+" lightline shows the mode, so we no longer need vim's own -- INSERT --.
+set noshowmode
+set laststatus=2
+" Powerline/NerdFont separators (need a Nerd Font in the terminal; ghostty
+" is configured with FiraCode Nerd Font Mono). This is lightline's equivalent
+" of airline's old g:airline_powerline_fonts=1.
+let g:lightline = {
+\ 'colorscheme': 'catppuccin_mocha',
+\ 'separator':    { 'left': "", 'right': "" },
+\ 'subseparator': { 'left': "", 'right': "" },
+\ 'active': {
+\   'left':  [ [ 'mode', 'paste' ],
+\              [ 'gitbranch', 'readonly', 'filename', 'modified' ] ],
+\   'right': [ [ 'lineinfo' ], [ 'percent' ],
+\              [ 'fileformat', 'fileencoding', 'filetype' ] ]
+\ },
+\ 'component_function': {
+\   'gitbranch': 'LightlineGitbranch'
+\ },
+\ }
+
+" Git branch with a NerdFont branch glyph (); empty outside a repo.
+function! LightlineGitbranch() abort
+    let l:branch = FugitiveHead()
+    return l:branch !=# '' ? " " . l:branch : ''
+endfunction
+
 au BufNewFile,BufRead *.zshrc set filetype=zsh
 
-" Below Added for ALE
+" ----------------------------------------------------------------------------
+" ALE: async linting + fixing. Linters auto-detect, but pin them per filetype
+" to match the toolchain this repo already uses (yamllint, markdownlint,
+" shellcheck/shfmt). Fixers run on save.
+let g:ale_linters_explicit = 1
+let g:ale_linters = {
+\ 'sh':       ['shellcheck'],
+\ 'zsh':      ['shellcheck'],
+\ 'yaml':     ['yamllint'],
+\ 'markdown': ['markdownlint'],
+\ }
+let g:ale_fixers = {
+\ '*':        ['remove_trailing_lines', 'trim_whitespace'],
+\ 'sh':       ['shfmt'],
+\ 'zsh':      ['shfmt'],
+\ }
+let g:ale_fix_on_save = 1
+" shellcheck: treat .zshrc etc. as bash-ish so it doesn't bail on zsh syntax.
+let g:ale_sh_shellcheck_dialect = 'bash'
+" Jump between problems.
+nmap <silent> [d <Plug>(ale_previous_wrap)
+nmap <silent> ]d <Plug>(ale_next_wrap)
+
+" ----------------------------------------------------------------------------
+" fzf.vim: fuzzy finding backed by the fzf/ripgrep/fd already on this system.
+" :Files / :Buffers / :Rg are the workhorses; map the common ones.
+let g:fzf_command_prefix = ''
+nnoremap <silent> <leader>f :Files<CR>
+nnoremap <silent> <leader>b :Buffers<CR>
+nnoremap <silent> <leader>g :Rg<CR>
 
 " Load all plugins now.
 " Plugins need to be added to runtimepath before helptags can be generated.
-"packloadall
+packloadall
 " Load all of the helptags now, after plugins have been loaded.
 " All messages and errors will be ignored.
 silent! helptags ALL
