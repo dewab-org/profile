@@ -42,3 +42,8 @@ confirm-close-surface = false
 # Disabled: the global cmd+` hotkey grabbed the key system-wide and conflicted
 # with Supacode. Rebind to another key (e.g. global:cmd+escape) to re-enable.
 # keybind = global:cmd+grave_accent=toggle_quick_terminal
+
+# ── Tab navigation ──
+# Note: overrides macOS line-start/line-end; use ctrl+a / ctrl+e for those.
+keybind = cmd+left=previous_tab
+keybind = cmd+right=next_tab
