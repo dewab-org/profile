@@ -16,22 +16,25 @@ gv=38;2;203;166;247:\
 gt=38;2;250;179;135"
 
 if is-executable eza; then
-  alias ls='eza --classify --icons --color-scale'
-  alias ll='eza --classify --icons --color-scale --long --all'
-  alias l.='eza --classify --icons --color-scale --list-dirs .* '
-  alias la='eza --classify --icons --color-scale --all'
-  alias lr='eza --classify --icons --color-scale --long --all --sort=newest'  # ls -ltr: newest last
-  alias lR='eza --classify --icons --color-scale --long --all --recurse'      # ls -lR: recursive
-  alias tree='eza --classify --icons --color-scale --tree'
+  # Trailing `--` ends option parsing so eza's optional-value flags
+  # (--color-scale, --icons) don't swallow a path argument. Harmless on
+  # older eza/exa where these flags were boolean.
+  alias ls='eza --classify --icons --color-scale --'
+  alias ll='eza --classify --icons --color-scale --long --all --'
+  alias l.='eza --classify --icons --color-scale --list-dirs -- .*'
+  alias la='eza --classify --icons --color-scale --all --'
+  alias lr='eza --classify --icons --color-scale --long --all --sort=newest --'  # ls -ltr: newest last
+  alias lR='eza --classify --icons --color-scale --long --all --recurse --'      # ls -lR: recursive
+  alias tree='eza --classify --icons --color-scale --tree --'
   return
 fi
 
 if is-executable exa; then
-  alias ls='exa --classify --icons --color-scale'
-  alias ll='exa --classify --icons --color-scale --long --all'
-  alias l.='exa --classify --icons --color-scale --list-dirs .* '
-  alias la='exa --classify --icons --color-scale --all'
-  alias lr='exa --classify --icons --color-scale --long --all --sort=newest'  # ls -ltr: newest last
-  alias lR='exa --classify --icons --color-scale --long --all --recurse'      # ls -lR: recursive
-  alias tree='exa --classify --icons --color-scale --tree'
+  alias ls='exa --classify --icons --color-scale --'
+  alias ll='exa --classify --icons --color-scale --long --all --'
+  alias l.='exa --classify --icons --color-scale --list-dirs -- .*'
+  alias la='exa --classify --icons --color-scale --all --'
+  alias lr='exa --classify --icons --color-scale --long --all --sort=newest --'  # ls -ltr: newest last
+  alias lR='exa --classify --icons --color-scale --long --all --recurse --'      # ls -lR: recursive
+  alias tree='exa --classify --icons --color-scale --tree --'
 fi
