@@ -20,6 +20,9 @@ if is-executable eza; then
   # alias, so completion resolves through eza's completer, and if compinit's daily
   # dump rebuild ever misses eza's #compdef (fpath race), Carapace silently takes
   # over with a completer that doesn't understand eza's flags.
+  # compinit runs before this file's fpath entry (added by 00_brew.zshrc)
+  # exists, so its fpath scan never marks _eza for autoload; do it explicitly.
+  autoload -Uz _eza
   (( ${+_comps} )) || typeset -g -A _comps
   _comps[eza]=_eza
 
