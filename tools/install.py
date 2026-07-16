@@ -28,6 +28,7 @@ import argparse
 import json
 import os
 import platform
+import random
 import re
 import shutil
 import stat
@@ -35,6 +36,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import time
 import urllib.error
 import urllib.request
 import zipfile
@@ -47,6 +49,8 @@ ARCH_ALIASES = {
 ARCHIVE_SUFFIXES = (".tar.gz", ".tgz", ".tar.xz", ".txz", ".tar.bz2", ".zip")
 STATE_FILE = ".tools-installed.json"
 UA = "profile.d-tools-installer"
+MAX_RETRIES = 5
+RETRY_BASE_DELAY = 2.0  # seconds, doubles each attempt
 
 
 # ── platform ────────────────────────────────────────────────────────────────
@@ -69,13 +73,50 @@ def arch_regex(arch: str) -> str:
 
 
 # ── http ─────────────────────────────────────────────────────────────────────
+def _is_rate_limited(e: urllib.error.HTTPError) -> bool:
+    if e.code == 429:
+        return True
+    # GitHub's primary rate limit is sometimes reported as a 403 with
+    # X-RateLimit-Remaining: 0 rather than a 429.
+    return e.code == 403 and e.headers.get("X-RateLimit-Remaining") == "0"
+
+
+def _retry_delay(e: urllib.error.HTTPError, attempt: int) -> float:
+    retry_after = e.headers.get("Retry-After")
+    if retry_after:
+        try:
+            return float(retry_after)
+        except ValueError:
+            pass
+    reset = e.headers.get("X-RateLimit-Reset")
+    if reset:
+        try:
+            return max(0.0, float(reset) - time.time())
+        except ValueError:
+            pass
+    return RETRY_BASE_DELAY * (2**attempt) + random.uniform(0, 1)
+
+
 def _request(url: str, accept: str | None = None) -> bytes:
     headers = {"User-Agent": UA}
     if accept:
         headers["Accept"] = accept
     req = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(req, timeout=60) as resp:
-        return resp.read()
+    for attempt in range(MAX_RETRIES + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                return resp.read()
+        except urllib.error.HTTPError as e:
+            if attempt == MAX_RETRIES or not _is_rate_limited(e):
+                raise
+            delay = _retry_delay(e, attempt)
+            print(
+                f"  … {e.code} from {url}, retrying in {delay:.0f}s "
+                f"({attempt + 1}/{MAX_RETRIES})",
+                file=sys.stderr,
+            )
+            time.sleep(delay)
+    raise AssertionError("unreachable")  # loop always returns or raises
 
 
 def get_json(url: str) -> dict:
@@ -228,21 +269,18 @@ def install_binary(src: Path, dest_dir: Path, final_name: str) -> None:
 
 
 # ── state ────────────────────────────────────────────────────────────────────
-def load_state(dest_dir: Path) -> dict:
-    f = dest_dir / STATE_FILE
-    if f.exists():
+def load_state(path: Path) -> dict:
+    if path.exists():
         try:
-            return json.loads(f.read_text())
+            return json.loads(path.read_text())
         except json.JSONDecodeError:
             pass
     return {}
 
 
-def save_state(dest_dir: Path, state: dict) -> None:
-    dest_dir.mkdir(parents=True, exist_ok=True)
-    (dest_dir / STATE_FILE).write_text(
-        json.dumps(state, indent=2, sort_keys=True) + "\n"
-    )
+def save_state(path: Path, state: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n")
 
 
 # ── main ─────────────────────────────────────────────────────────────────────
@@ -292,6 +330,83 @@ def process_binary(tool, osname, arch, dest_dir, state, args):
     return "ok", f"installed {version} -> {tool['bin']}"
 
 
+def _select_tools(manifest: dict, only: list[str] | None) -> list:
+    tools = manifest["tools"]
+    if only:
+        wanted = set(only)
+        tools = [t for t in tools if t["name"] in wanted]
+        missing = wanted - {t["name"] for t in tools}
+        if missing:
+            sys.exit(f"unknown tool(s): {', '.join(sorted(missing))}")
+    return tools
+
+
+def _run_tools(tools, process_one) -> dict:
+    """Run process_one(tool) -> (status, msg) over tools, printing progress."""
+    counts = {"ok": 0, "skip": 0, "plan": 0, "skip-platform": 0, "fail": 0}
+    for tool in tools:
+        try:
+            status, msg = process_one(tool)
+        except Skip as e:
+            status, msg = "skip-platform", str(e)
+        except (urllib.error.HTTPError, urllib.error.URLError) as e:
+            status, msg = "fail", f"download error: {e}"
+        except Exception as e:  # noqa: BLE001 - report and continue
+            status, msg = "fail", f"{type(e).__name__}: {e}"
+        counts[status] = counts.get(status, 0) + 1
+        glyph = {
+            "ok": "✓",
+            "skip": "=",
+            "plan": "·",
+            "skip-platform": "–",
+            "fail": "✗",
+        }[status]
+        print(f"  {glyph} {tool['name']:<12} {msg}")
+    return counts
+
+
+# ── controller-side caching ───────────────────────────────────────────────────
+def parse_platform(spec: str) -> tuple[str, str]:
+    osname, _, arch = spec.partition("/")
+    osname, arch = osname.lower(), arch.lower()
+    if osname not in ("darwin", "linux"):
+        sys.exit(f"invalid --for {spec!r}: unsupported OS {osname!r}")
+    if arch not in ARCH_ALIASES:
+        sys.exit(f"invalid --for {spec!r}: unsupported architecture {arch!r}")
+    return osname, arch
+
+
+def cache_main(args) -> int:
+    """Resolve/download/extract binaries for one or more platforms into
+    --cache-dir, without installing anywhere. Always binary-only (no brew,
+    since a brew install isn't portable to another host/arch). Intended to
+    run once on the Ansible controller; the caller then copies
+    <cache-dir>/<os>-<arch>/ to each target host's install dir.
+    """
+    manifest = json.loads(args.manifest.read_text())
+    tools = _select_tools(manifest, args.only)
+    targets = [parse_platform(p) for p in args.targets]
+
+    total_fail = 0
+    for osname, arch in targets:
+        dest_dir = args.cache_dir / f"{osname}-{arch}"
+        state_path = args.cache_dir / ".state" / f"{osname}-{arch}.json"
+        state = load_state(state_path)
+        print(f"\ncaching {osname}/{arch} -> {dest_dir}")
+        counts = _run_tools(
+            tools,
+            lambda tool: process_binary(tool, osname, arch, dest_dir, state, args),
+        )
+        if not (args.list or args.dry_run):
+            save_state(state_path, state)
+        print(
+            f"  {counts['ok']} cached, {counts['skip']} up-to-date, "
+            f"{counts['skip-platform']} n/a, {counts['fail']} failed"
+        )
+        total_fail += counts["fail"]
+    return 1 if total_fail else 0
+
+
 def main(argv=None):
     here = Path(__file__).resolve().parent
     ap = argparse.ArgumentParser(
@@ -321,7 +436,29 @@ def main(argv=None):
         action="store_true",
         help="prefer downloaded binaries over brew, falling back to brew only when no binary exists for this platform",
     )
+    ap.add_argument(
+        "--cache-dir",
+        type=Path,
+        default=None,
+        help=(
+            "controller-side mode: resolve/download/extract binaries into "
+            "<cache-dir>/<os>-<arch> for each --for platform instead of "
+            "installing to --dest. Requires --for."
+        ),
+    )
+    ap.add_argument(
+        "--for",
+        dest="targets",
+        nargs="+",
+        metavar="OS/ARCH",
+        help="with --cache-dir: platform(s) to cache, e.g. linux/amd64 darwin/arm64",
+    )
     args = ap.parse_args(argv)
+
+    if args.cache_dir:
+        if not args.targets:
+            sys.exit("--cache-dir requires --for OS/ARCH [OS/ARCH ...]")
+        return cache_main(args)
 
     manifest = json.loads(args.manifest.read_text())
     dest_dir = (
@@ -340,39 +477,16 @@ def main(argv=None):
         method = f"brew @ {brew_prefix} (binary fallback)"
     print(f"platform: {osname}/{arch}   dest: {dest_dir}   method: {method}\n")
 
-    tools = manifest["tools"]
-    if args.only:
-        wanted = set(args.only)
-        tools = [t for t in tools if t["name"] in wanted]
-        missing = wanted - {t["name"] for t in tools}
-        if missing:
-            sys.exit(f"unknown tool(s): {', '.join(sorted(missing))}")
-
-    state = load_state(dest_dir)
-    counts = {"ok": 0, "skip": 0, "plan": 0, "skip-platform": 0, "fail": 0}
-    for tool in tools:
-        try:
-            status, msg = process(
-                tool, osname, arch, dest_dir, state, args, brew_prefix
-            )
-        except Skip as e:
-            status, msg = "skip-platform", str(e)
-        except (urllib.error.HTTPError, urllib.error.URLError) as e:
-            status, msg = "fail", f"download error: {e}"
-        except Exception as e:  # noqa: BLE001 - report and continue
-            status, msg = "fail", f"{type(e).__name__}: {e}"
-        counts[status] = counts.get(status, 0) + 1
-        glyph = {
-            "ok": "✓",
-            "skip": "=",
-            "plan": "·",
-            "skip-platform": "–",
-            "fail": "✗",
-        }[status]
-        print(f"  {glyph} {tool['name']:<12} {msg}")
+    tools = _select_tools(manifest, args.only)
+    state_path = dest_dir / STATE_FILE
+    state = load_state(state_path)
+    counts = _run_tools(
+        tools,
+        lambda tool: process(tool, osname, arch, dest_dir, state, args, brew_prefix),
+    )
 
     if not (args.list or args.dry_run):
-        save_state(dest_dir, state)
+        save_state(state_path, state)
 
     print(
         f"\n{counts['ok']} installed, {counts['skip']} up-to-date, "
