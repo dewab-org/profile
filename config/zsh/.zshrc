@@ -90,6 +90,9 @@ autoload -Uz is-at-least
 # autoload -U compinit # && compinit
 autoload -Uz compinit # && compinit -C -d "${XDG_CACHE_HOME}/zsh/zcompdump-${ZSH_VERSION}"
 
+# Enable zmv file renaming utility
+autoload -Uz zmv
+
 # Enable strftime for date formatting and stat for file status
 zmodload zsh/datetime
 zmodload zsh/stat
