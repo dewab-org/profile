@@ -40,6 +40,14 @@ excel()      { open -a 'Microsoft Excel' "$@" }
 word()       { open -a 'Microsoft Word' "$@" }
 powerpoint() { open -a 'Microsoft PowerPoint' "$@" }
 
+# Suffix aliases to open the appropriate Microsoft Office application based on file extension
+# by typing just the filename
+alias -s docx="open -a 'Microsoft Word'"
+alias -s xlsx="open -a 'Microsoft Excel'"
+alias -s pptx="open -a 'Microsoft PowerPoint'"
+
+alias -s pdf='open -a "Preview"'
+
 # Tab-complete the Office launchers on appropriate document types (plus dirs to
 # descend into). nocaseglob makes the extension match case-insensitive (e.g.
 # REPORT.DOCX) without depending on EXTENDED_GLOB being set.

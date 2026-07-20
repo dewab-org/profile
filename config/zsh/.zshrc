@@ -265,6 +265,9 @@ autoload edit-command-line
 zle -N edit-command-line
 bindkey '^Xe' edit-command-line
 
+# Magic-Space: Trigger autocompletion with the space key (sudo !! expands to sudo <previous command> on space)
+bindkey ' ' magic-space
+
 # Create socket directory for SSH ControlPath
 # [ -d ~/.ssh/cm_socket ] || mkdir -m 0700 -p ~/.ssh/cm_socket
 is-directory ~/.ssh/cm_socket || mkdir -m 0700 -p ~/.ssh/cm_socket
