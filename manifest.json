@@ -81,6 +81,11 @@
       "type": "link"
     },
     {
+      "source": "config/topgrade.toml",
+      "target": "${XDG_CONFIG_HOME}/topgrade.toml",
+      "type": "link"
+    },
+    {
       "source": "config/ghostty",
       "target": "${XDG_CONFIG_HOME}/ghostty",
       "type": "link"
