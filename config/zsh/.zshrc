@@ -236,6 +236,7 @@ alias mailgrep="grep -Eo '\b[a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+\b'"
 alias sortcount="sort | uniq -c | sort -n"
 alias sudo='sudo ' # If the last character of the alias value is a blank, then the next command word following the alias is also checked for alias expansion.
 alias whatismyip='dig +short myip.opendns.com @resolver1.opendns.com'
+alias ansible-venv='source ${HOME}/venvs/ansible/bin/activate'
 
 # Run all application global zshrc scripts from $HOME/.zshrc.d/global/ (ex: prompt, colors, etc.)
 for globalscript in ${ZDOTDIR}/zshrc.d/global/*.zshrc ; do

@@ -32,6 +32,7 @@
 	dump = cat-file -p
 	aa = add .
 	p = push
+	origin = remote get-url origin
 	pt = push origin --tag
 	url = remote get-url --push --all origin
 
