@@ -60,3 +60,4 @@ autoload -Uz macmodel
 autoload -Uz location
 autoload -Uz pman
 autoload -Uz f
+autoload -Uz mdopen

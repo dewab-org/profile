@@ -1,0 +1,79 @@
+# Convert a markdown file with pandoc and open the result in Preview (PDF) or Safari (HTML),
+# or save it to a file with -o/--output instead of opening it
+function mdopen() {
+    local flag_pdf flag_html flag_output
+    local usage=(
+        "mdopen [-p|--pdf] [-h|--html] [-o|--output <filename>] <file.md>"
+    )
+
+    zparseopts -D -E -F -- \
+        {p,-pdf}=flag_pdf \
+        {h,-html}=flag_html \
+        {o,-output}:=flag_output ||
+        { print -l $usage >&2; return 1 }
+
+    if [[ -n "$flag_pdf" && -n "$flag_html" ]]; then
+        echo "mdopen: choose only one of --pdf or --html" >&2
+        return 1
+    fi
+
+    if [[ $# -ne 1 ]]; then
+        print -l $usage >&2
+        return 1
+    fi
+
+    local infile=$1
+    if [[ ! -r "$infile" || ! -f "$infile" ]]; then
+        echo "mdopen: '$infile' is not a readable file" >&2
+        return 1
+    fi
+
+    is-executable pandoc || { echo "mdopen: pandoc not found" >&2; return 1 }
+
+    local format=pdf
+    [[ -n "$flag_html" ]] && format=html
+
+    local outfile="${flag_output[2]}"
+
+    local tmpdir
+    tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/mdopen.XXXXXX") || return 1
+    local tmpfile="${tmpdir}/$(basename "${infile%.*}").${format}"
+    local pandoc_conf="${XDG_CONFIG_HOME:-$HOME/.config}/pandoc"
+
+    if [[ "$format" == pdf ]]; then
+        # Render through the same CSS as --html via weasyprint (an HTML/CSS
+        # engine) so emoji/unicode and styling stay consistent; LaTeX engines
+        # choke on characters like checkmarks that aren't in their fonts.
+        local pdf_opts
+        if is-executable weasyprint; then
+            pdf_opts=(--pdf-engine=weasyprint --css="${pandoc_conf}/mdopen.css")
+        else
+            pdf_opts=(--variable=fontsize:11pt --variable=geometry:margin=1in \
+                --variable=colorlinks:true --variable=linkcolor:NavyBlue --variable=urlcolor:NavyBlue)
+            is-executable xelatex && pdf_opts+=(--pdf-engine=xelatex --variable=mainfont:"Helvetica Neue" --variable=monofont:Menlo)
+        fi
+        local errfile="${tmpdir}/stderr.log"
+        if ! pandoc -s "$infile" "${pdf_opts[@]}" -o "$tmpfile" 2>"$errfile"; then
+            cat "$errfile" >&2
+            rm -rf "$tmpdir"
+            return 1
+        fi
+        # weasyprint's CSS-parser warnings (unsupported properties like
+        # prefers-color-scheme/overflow-x that only matter for screen/HTML) are noise
+        grep -v '^WARNING:' "$errfile" >&2
+        if [[ -n "$outfile" ]]; then
+            cp -- "$tmpfile" "$outfile" || { rm -rf "$tmpdir"; return 1 }
+            rm -rf "$tmpdir"
+        else
+            open -a Preview -- "$tmpfile"
+        fi
+    else
+        pandoc -s --css="${pandoc_conf}/mdopen.css" "$infile" -o "$tmpfile" || { rm -rf "$tmpdir"; return 1 }
+        if [[ -n "$outfile" ]]; then
+            cp -- "$tmpfile" "$outfile" || { rm -rf "$tmpdir"; return 1 }
+            rm -rf "$tmpdir"
+        else
+            open -a Safari -- "$tmpfile"
+        fi
+    fi
+}
