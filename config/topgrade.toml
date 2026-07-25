@@ -3,7 +3,7 @@
 assume_yes = true
 
 # Disable specific steps - same options as the command line flag
-disable = ["tmux","containers","ruby_gems","vagrant","pnpm","powershell","remotes"]
+disable = ["tmux","containers","gem","ruby_gems","vagrant","pnpm","powershell","remotes","system","tlmgr"]
 
 # Ignore failures for these steps
 #ignore_failures = ["powershell"]
