@@ -76,6 +76,11 @@
       "type": "link"
     },
     {
+      "source": "config/pandoc",
+      "target": "${XDG_CONFIG_HOME}/pandoc",
+      "type": "link"
+    },
+    {
       "source": "config/ghostty",
       "target": "${XDG_CONFIG_HOME}/ghostty",
       "type": "link"
@@ -128,6 +133,11 @@
     {
       "source": "config/tmux",
       "target": "${XDG_CONFIG_HOME}/tmux",
+      "type": "link"
+    },
+    {
+      "source": "bin/repo-status",
+      "target": ".local/bin/repo-status",
       "type": "link"
     }
   ],

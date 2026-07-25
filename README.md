@@ -113,7 +113,9 @@ tools/install.py --manifest tools/manifest-tanzu.json
 │           └── platform/      OS-specific configuration
 ├── manifest.json              Dotfile and plugin bootstrap manifest
 ├── setup.py                   Profile bootstrap
-└── tools/
+├── bin/                       First-party scripts linked into ~/.local/bin
+    │   └── repo-status            One-line git status for repos under CWD (-r recursive)
+    └── tools/
     ├── install.py             Release binary installer
     ├── manifest.json          Primary tool manifest
     └── manifest-tanzu.json    Optional Tanzu/Carvel manifest

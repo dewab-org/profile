@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+# repo-status — one-line git status for every repo below the current directory.
+#
+#   repo-status            status of repos in immediate subdirectories
+#   repo-status -r         recurse into subdirectories to find nested repos
+#   repo-status -h         help
+#
+# Ahead/behind counts use the locally cached upstream refs; run `git fetch`
+# per repo (or `repo-status` after a fetch sweep) for fresh numbers.
+# Requires a Nerd Font for the glyphs.
+set -euo pipefail
+
+# ---------- glyphs: Nerd Font on a tty, plain ASCII when piped ----------
+if [[ -t 1 ]]; then
+  G_REPO=$' '        #  folder
+  G_BRANCH=$''       #  branch
+  G_AHEAD=$''        #  up arrow
+  G_BEHIND=$''       #  down arrow
+  G_STAGED=$''       #  plus
+  G_UNSTAGED=$''     #  pencil
+  G_UNTRACKED=$''    #  question
+  G_STASH=$''        #  archive box
+  G_CLEAN=$''        #  check
+  G_CONFLICT=$''     #  warning triangle
+  G_DETACHED=$''     #  eye (detached HEAD)
+  G_NOUPSTREAM=$''   #  broken link (no upstream)
+else
+  # Plain fallbacks for pipes/pagers (PUA glyphs render as <U+F07B> etc.)
+  G_REPO=''
+  G_BRANCH=''
+  G_AHEAD='^'
+  G_BEHIND='v'
+  G_STAGED='+'
+  G_UNSTAGED='~'
+  G_UNTRACKED='?'
+  G_STASH='*'
+  G_CLEAN='ok'
+  G_CONFLICT='CONFLICT:'
+  G_DETACHED='@'
+  G_NOUPSTREAM='no-upstream'
+fi
+
+# ---------- colors ----------
+if [[ -t 1 ]]; then
+  C_RESET=$'\e[0m';  C_DIM=$'\e[2m'
+  C_NAME=$'\e[1;36m';  C_BRANCH=$'\e[35m'
+  C_AHEAD=$'\e[1;32m'; C_BEHIND=$'\e[1;31m'
+  C_STAGED=$'\e[32m';  C_UNSTAGED=$'\e[33m'
+  C_UNTRACKED=$'\e[34m'; C_STASH=$'\e[36m'
+  C_CLEAN=$'\e[1;32m'; C_CONFLICT=$'\e[1;31m'
+  C_WARN=$'\e[33m'
+else
+  C_RESET='' C_DIM='' C_NAME='' C_BRANCH='' C_AHEAD='' C_BEHIND=''
+  C_STAGED='' C_UNSTAGED='' C_UNTRACKED='' C_STASH='' C_CLEAN='' C_CONFLICT='' C_WARN=''
+fi
+
+recursive=0
+case "${1:-}" in
+  -r|--recursive) recursive=1 ;;
+  -h|--help) sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+  '') ;;
+  *) echo "unknown option: $1 (try --help)" >&2; exit 2 ;;
+esac
+
+# ---------- find repos ----------
+repos=()
+if (( recursive )); then
+  # every dir containing .git; skip hidden dirs (.venv, .claude worktree
+  # remnants, caches) and do not descend past a .git entry itself
+  while IFS= read -r gitdir; do
+    dir="$(dirname "$gitdir")"
+    # ignore broken pointers (e.g. stale worktree .git files)
+    git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1 && repos+=("$dir")
+  done < <(find . \( -type d -name '.?*' ! -name '.git' \) -prune -o -name '.git' -prune -print 2>/dev/null | sort)
+else
+  for d in */; do
+    [[ -e "$d/.git" ]] && git -C "$d" rev-parse --is-inside-work-tree >/dev/null 2>&1 && repos+=("${d%/}")
+  done
+fi
+
+if (( ${#repos[@]} == 0 )); then
+  echo "${C_DIM}no git repositories found$( ((recursive)) || printf ' (try -r)')${C_RESET}"
+  exit 0
+fi
+
+# ---------- longest name for alignment ----------
+width=0
+for r in "${repos[@]}"; do
+  name="${r#./}"
+  (( ${#name} > width )) && width=${#name}
+done
+
+# ---------- per-repo status ----------
+for r in "${repos[@]}"; do
+  name="${r#./}"
+
+  # branch (or detached short sha)
+  if branch=$(git -C "$r" symbolic-ref --short -q HEAD 2>/dev/null); then
+    branch_seg="${C_BRANCH}${G_BRANCH} ${branch}${C_RESET}"
+  elif sha=$(git -C "$r" rev-parse --short HEAD 2>/dev/null); then
+    branch_seg="${C_WARN}${G_DETACHED} ${sha}${C_RESET}"
+  else
+    branch_seg="${C_DIM}${G_BRANCH} (no commits)${C_RESET}"
+  fi
+
+  # ahead/behind vs upstream
+  sync_seg=''
+  if git -C "$r" rev-parse --abbrev-ref '@{upstream}' >/dev/null 2>&1; then
+    read -r behind ahead < <(git -C "$r" rev-list --left-right --count '@{upstream}...HEAD' 2>/dev/null || echo "0 0")
+    (( ahead ))  && sync_seg+=" ${C_AHEAD}${G_AHEAD}${ahead}${C_RESET}"
+    (( behind )) && sync_seg+=" ${C_BEHIND}${G_BEHIND}${behind}${C_RESET}"
+  else
+    sync_seg=" ${C_WARN}${G_NOUPSTREAM}${C_RESET}"
+  fi
+
+  # working tree counts from porcelain
+  staged=0 unstaged=0 untracked=0 conflicts=0
+  while IFS= read -r line; do
+    [[ -z "$line" ]] && continue
+    x="${line:0:1}" y="${line:1:1}"
+    if [[ "$x$y" == '??' ]]; then
+      (( ++untracked ))
+    elif [[ "$x$y" == 'UU' || "$x$y" == 'AA' || "$x$y" == 'DD' || "$x" == 'U' || "$y" == 'U' ]]; then
+      (( ++conflicts ))
+    else
+      [[ "$x" != ' ' ]] && (( ++staged ))
+      [[ "$y" != ' ' ]] && (( ++unstaged ))
+    fi
+  done < <(git -C "$r" status --porcelain 2>/dev/null)
+
+  stashes=$(git -C "$r" stash list 2>/dev/null | wc -l | tr -d ' ')
+
+  work_seg=''
+  (( conflicts )) && work_seg+=" ${C_CONFLICT}${G_CONFLICT}${conflicts}${C_RESET}"
+  (( staged ))    && work_seg+=" ${C_STAGED}${G_STAGED}${staged}${C_RESET}"
+  (( unstaged ))  && work_seg+=" ${C_UNSTAGED}${G_UNSTAGED}${unstaged}${C_RESET}"
+  (( untracked )) && work_seg+=" ${C_UNTRACKED}${G_UNTRACKED}${untracked}${C_RESET}"
+  (( stashes ))   && work_seg+=" ${C_STASH}${G_STASH}${stashes}${C_RESET}"
+  [[ -z "$work_seg" ]] && work_seg=" ${C_CLEAN}${G_CLEAN}${C_RESET}"
+
+  printf "%s%b%-*s%b %b%b%b\n" \
+    "${C_NAME}${G_REPO}" '' "$width" "$name" "$C_RESET" \
+    "$branch_seg" "$sync_seg" "$work_seg"
+done
