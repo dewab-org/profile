@@ -1,0 +1,38 @@
+# Toggle a repository's `origin` remote between SSH and HTTPS URL forms.
+# Convention: HTTPS = read-only clones, SSH = read-write. Defaults to the
+# repo in $PWD; optionally pass a path (e.g. `git-remote-toggle ~/.profile.d`).
+function git-remote-toggle() {
+    emulate -L zsh
+    local dir=${1:-$PWD} remote=origin url new mode
+
+    url=$(git -C "$dir" remote get-url "$remote" 2>/dev/null) || {
+        print -u2 "git-remote-toggle: no '$remote' remote at ${dir}"
+        return 1
+    }
+
+    case "$url" in
+        (https://*|http://*)
+            # HTTPS (read-only) -> SSH (read-write)
+            new=$(print -r -- "$url" | sed -E 's#^https?://([^/]+)/#git@\1:#')
+            mode='SSH (read-write)'
+            ;;
+        (git@*:*)
+            # SSH scp-form (read-write) -> HTTPS (read-only)
+            new=$(print -r -- "$url" | sed -E 's#^git@([^:]+):#https://\1/#')
+            mode='HTTPS (read-only)'
+            ;;
+        (ssh://*)
+            # SSH url-form (read-write) -> HTTPS (read-only)
+            new=$(print -r -- "$url" | sed -E 's#^ssh://(git@)?([^/]+)/#https://\2/#')
+            mode='HTTPS (read-only)'
+            ;;
+        (*)
+            print -u2 "git-remote-toggle: don't know how to convert: $url"
+            return 1
+            ;;
+    esac
+
+    git -C "$dir" remote set-url "$remote" "$new" || return 1
+    print -r -- "${remote}  $url"
+    print -r -- "      → $new  [$mode]"
+}

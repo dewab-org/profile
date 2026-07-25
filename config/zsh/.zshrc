@@ -164,6 +164,7 @@ autoload -Uz convert_seconds_human_readable
 autoload -Uz rules && rules
 autoload -Uz lsz
 autoload -Uz ips   # cross-platform (macOS + Linux); must load on all hosts
+autoload -Uz git-remote-toggle
 
 # Enable completion list menu
 zstyle ':completion:*' menu select
@@ -237,6 +238,7 @@ alias sortcount="sort | uniq -c | sort -n"
 alias sudo='sudo ' # If the last character of the alias value is a blank, then the next command word following the alias is also checked for alias expansion.
 alias whatismyip='dig +short myip.opendns.com @resolver1.opendns.com'
 alias ansible-venv='source ${HOME}/venvs/ansible/bin/activate'
+alias profile-remote='git-remote-toggle ${HOME}/.profile.d'   # toggle origin SSH↔HTTPS
 
 # Run all application global zshrc scripts from $HOME/.zshrc.d/global/ (ex: prompt, colors, etc.)
 for globalscript in ${ZDOTDIR}/zshrc.d/global/*.zshrc ; do
