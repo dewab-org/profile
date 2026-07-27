@@ -113,7 +113,14 @@
     {
       "source": "config/tealdeer",
       "target": "${XDG_CONFIG_HOME}/tealdeer",
-      "type": "link"
+      "type": "link",
+      "os": "linux"
+    },
+    {
+      "source": "config/tlrc",
+      "target": "~/Library/Application Support/tlrc",
+      "type": "link",
+      "os": "darwin"
     },
     {
       "source": "config/gdu",

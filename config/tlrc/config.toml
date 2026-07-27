@@ -1,0 +1,21 @@
+# tlrc (Rust tldr client) configuration — this is the `tldr` on macOS, installed
+# as the Homebrew `tlrc` formula. It is a DIFFERENT client from tealdeer and uses
+# a different config schema, so the two configs are kept separate:
+#   - macOS / tlrc:     this file
+#   - Linux / tealdeer: ../tealdeer/config.toml
+#
+# Docs: https://tldr.sh/tlrc  |  print the full annotated default: `tldr --gen-config`
+# The repo manifest symlinks this dir to "~/Library/Application Support/tlrc"
+# (tlrc's config location on macOS). Only values that differ from tlrc's built-in
+# defaults are set here; everything else falls back to those defaults.
+
+[cache]
+# Download the page cache automatically when it is missing or older than max_age,
+# so a fresh host never greets you with a cache-not-found error.
+auto_update = true
+# Refresh at most this often (hours); 720 = 30 days.
+max_age = 720
+
+[output]
+# Keep the blank lines between a command and its examples for readability.
+compact = false

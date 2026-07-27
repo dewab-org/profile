@@ -184,8 +184,8 @@
       "provider": "github",
       "repo": "tealdeer-rs/tealdeer",
       "bin": "tldr",
-      "brew": "tealdeer",
-      "note": "tealdeer (Rust tldr client); ships raw binaries installed as 'tldr'. On macOS the brew formula is 'tealdeer', not 'tldr' (a different client).",
+      "brew": "tlrc",
+      "note": "The `tldr` command comes from two different clients by platform: Linux installs tealdeer raw binaries (github match below); macOS installs the Homebrew `tlrc` formula (a separate client, also named `tldr`). Configs are per-client: config/tealdeer (Linux) and config/tlrc (macOS).",
       "match": {
         "darwin": "tealdeer-macos-{arch}",
         "linux": "tealdeer-linux-{arch}-musl"

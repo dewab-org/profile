@@ -2,11 +2,29 @@
 
 import argparse
 import os
+import platform
 import shutil
 import json
 import subprocess
 import re
 from string import Template
+
+
+def entry_matches_os(entry):
+    """
+    Returns True if an entry applies to the current platform.
+
+    An entry may carry an optional "os" key (a string or list of strings, e.g.
+    "darwin" or ["darwin", "linux"]) to restrict it to matching platforms.
+    Entries without an "os" key apply everywhere.
+    """
+    wanted = entry.get("os")
+    if not wanted:
+        return True
+    if isinstance(wanted, str):
+        wanted = [wanted]
+    current = platform.system().lower()  # e.g. "darwin", "linux"
+    return current in [w.lower() for w in wanted]
 
 
 def create_directory(target_path, mode, debug=False, dry_run=False):
@@ -319,6 +337,8 @@ def process_files(
     # Process directories
     if directories:
         for directory in directories:
+            if not entry_matches_os(directory):
+                continue
             dir_target = resolve_target_path(directory["target"], base_home)
             if dir_target:
                 create_directory(
@@ -330,6 +350,8 @@ def process_files(
 
     # Process regular files
     for file in files:
+        if not entry_matches_os(file):
+            continue
         target_path = resolve_target_path(file["target"], base_home)
         if not target_path:
             continue
@@ -351,6 +373,8 @@ def process_files(
     # Process git repositories
     if gitrepos:
         for repo in gitrepos:
+            if not entry_matches_os(repo):
+                continue
             repo_target = resolve_target_path(repo["target"], base_home)
             if not repo_target:
                 continue
@@ -384,6 +408,9 @@ def main():
         - "source": The source path (for "link" and "copy" operations).
         - "target": The target path where the file or directory should be created.
         - "mode": (Optional) The permissions mode for directories (default: "0700").
+        - "os": (Optional) Restrict the entry to matching platforms; a string or
+          list of strings matched against platform.system().lower() (e.g.
+          "darwin", ["darwin", "linux"]). Omit to apply on every platform.
     """
     parser = argparse.ArgumentParser(
         description="Process files according to a manifest JSON file."
