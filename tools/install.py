@@ -238,25 +238,63 @@ def is_archive(name: str) -> bool:
     return name.endswith(ARCHIVE_SUFFIXES)
 
 
-def extract_binary(archive: Path, workdir: Path, tool) -> Path:
+def unpack_archive(archive: Path, workdir: Path) -> Path:
+    """Extract an archive into a fresh dir and return its root."""
     out = workdir / "x"
     out.mkdir()
-    name = archive.name
-    if name.endswith(".zip"):
+    if archive.name.endswith(".zip"):
         with zipfile.ZipFile(archive) as z:
             z.extractall(out)
     else:
         with tarfile.open(archive) as t:
             t.extractall(out)
+    return out
+
+
+def find_binary(root: Path, tool) -> Path:
     if tool.get("archive_bin"):
         wanted = re.compile(tool["archive_bin"])
     else:
         wanted = re.compile(re.escape(tool["bin"]))
-    matches = [p for p in out.rglob("*") if p.is_file() and wanted.fullmatch(p.name)]
+    matches = [p for p in root.rglob("*") if p.is_file() and wanted.fullmatch(p.name)]
     if not matches:
-        raise RuntimeError(f"binary not found inside {name}")
+        raise RuntimeError(f"binary not found inside {root.name}")
     # Prefer the shallowest match (avoids picking docs/aux files in deep dirs).
     return min(matches, key=lambda p: len(p.parts))
+
+
+# man page filenames: foo.1, foo.8, foo.1.gz, foo.1.zst, ...
+MAN_RE = re.compile(r"\.([1-8])(?:\.(?:gz|bz2|xz|zst))?$")
+_MAN_COMPRESSED = (".gz", ".bz2", ".xz", ".zst")
+
+
+def install_manpages(root: Path, man_root: Path) -> int:
+    """Copy any man pages bundled in the extracted archive into
+    <man_root>/man<section>/. Returns the number installed.
+
+    A '.TH' sniff on uncompressed files guards against picking up unrelated
+    files that merely end in a digit; compressed pages are trusted as-is.
+    """
+    count = 0
+    for p in root.rglob("*"):
+        if not p.is_file():
+            continue
+        m = MAN_RE.search(p.name)
+        if not m:
+            continue
+        if not p.name.endswith(_MAN_COMPRESSED):
+            try:
+                if b".TH" not in p.read_bytes()[:4096]:
+                    continue
+            except OSError:
+                continue
+        dst_dir = man_root / f"man{m.group(1)}"
+        dst_dir.mkdir(parents=True, exist_ok=True)
+        tmp = dst_dir / (p.name + ".new")
+        shutil.copy2(p, tmp)
+        os.replace(tmp, dst_dir / p.name)
+        count += 1
+    return count
 
 
 def install_binary(src: Path, dest_dir: Path, final_name: str) -> None:
@@ -305,7 +343,7 @@ def process(tool, osname, arch, dest_dir, state, args, brew_prefix):
     return process_binary(tool, osname, arch, dest_dir, state, args)
 
 
-def process_binary(tool, osname, arch, dest_dir, state, args):
+def process_binary(tool, osname, arch, dest_dir, state, args, install_man=True):
     name = tool["name"]
     resolver = RESOLVERS.get(tool["provider"])
     if not resolver:
@@ -320,14 +358,28 @@ def process_binary(tool, osname, arch, dest_dir, state, args):
     if installed == version and present and not args.force:
         return "skip", f"up to date ({version})"
 
+    # Man pages install as a sibling of the bin dir (~/.local/bin ->
+    # ~/.local/share/man), which man-db and macOS man auto-discover because the
+    # bin dir is on PATH. No MANPATH configuration required.
+    man_root = dest_dir.parent / "share" / "man"
+    man_added = 0
     with tempfile.TemporaryDirectory() as td:
         tmp = Path(td)
         blob = tmp / asset_name
         download(url, blob)
-        binpath = extract_binary(blob, tmp, tool) if is_archive(asset_name) else blob
+        if is_archive(asset_name):
+            root = unpack_archive(blob, tmp)
+            binpath = find_binary(root, tool)
+            if install_man:
+                man_added = install_manpages(root, man_root)
+        else:
+            binpath = blob
         install_binary(binpath, dest_dir, tool["bin"])
     state[name] = version
-    return "ok", f"installed {version} -> {tool['bin']}"
+    msg = f"installed {version} -> {tool['bin']}"
+    if man_added:
+        msg += f" (+{man_added} man)"
+    return "ok", msg
 
 
 def _select_tools(manifest: dict, only: list[str] | None) -> list:
@@ -395,7 +447,11 @@ def cache_main(args) -> int:
         print(f"\ncaching {osname}/{arch} -> {dest_dir}")
         counts = _run_tools(
             tools,
-            lambda tool: process_binary(tool, osname, arch, dest_dir, state, args),
+            # Cache slices map directly onto the target's bin dir, so they carry
+            # no share/man sibling; man pages are installed by the on-host run.
+            lambda tool: process_binary(
+                tool, osname, arch, dest_dir, state, args, install_man=False
+            ),
         )
         if not (args.list or args.dry_run):
             save_state(state_path, state)
