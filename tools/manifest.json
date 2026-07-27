@@ -180,6 +180,18 @@
       }
     },
     {
+      "name": "tldr",
+      "provider": "github",
+      "repo": "tealdeer-rs/tealdeer",
+      "bin": "tldr",
+      "brew": "tealdeer",
+      "note": "tealdeer (Rust tldr client); ships raw binaries installed as 'tldr'. On macOS the brew formula is 'tealdeer', not 'tldr' (a different client).",
+      "match": {
+        "darwin": "tealdeer-macos-{arch}",
+        "linux": "tealdeer-linux-{arch}-musl"
+      }
+    },
+    {
       "name": "jless",
       "provider": "github",
       "repo": "PaulJuliusMartinez/jless",
