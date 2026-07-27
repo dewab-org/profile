@@ -1,0 +1,18 @@
+# tealdeer (tldr) configuration
+# Docs: https://tealdeer-rs.github.io/tealdeer/config_updates.html
+#
+# This dir is symlinked to $XDG_CONFIG_HOME/tealdeer by the repo manifest, and
+# tldr.zshrc points TEALDEER_CONFIG_DIR here so macOS finds it too.
+
+[updates]
+# Download the page cache automatically when it is missing or stale, so a fresh
+# host never greets you with "Page cache not found".
+auto_update = true
+# Refresh at most this often (hours); 720 = 30 days.
+auto_update_interval_hours = 720
+
+[display]
+# Render inside the terminal rather than paging; leave the blank line between
+# the command name and its examples for readability.
+use_pager = false
+compact = false

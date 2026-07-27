@@ -111,6 +111,11 @@
       "type": "link"
     },
     {
+      "source": "config/tealdeer",
+      "target": "${XDG_CONFIG_HOME}/tealdeer",
+      "type": "link"
+    },
+    {
       "source": "config/gdu",
       "target": "${XDG_CONFIG_HOME}/gdu",
       "type": "link"
