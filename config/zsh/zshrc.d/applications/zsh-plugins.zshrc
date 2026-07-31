@@ -34,7 +34,7 @@ function _load_zsh_plugins() {
       for root in "${plugin_roots[@]}"; do
         plugin_path="${root}/${relative_path}"
         if [[ -r "${plugin_path}" ]]; then
-          source "${plugin_path}"
+          "${_plugin_source_cmd[@]}" "${plugin_path}"
           return 0
         fi
       done
@@ -42,6 +42,13 @@ function _load_zsh_plugins() {
 
     return 1
   }
+
+  # zsh-defer postpones sourcing until after the first prompt renders, cutting
+  # first-prompt lag. It must itself load synchronously; the plugins below are
+  # then deferred (in order) when it is available, sourced directly otherwise.
+  local -a _plugin_source_cmd=(source)
+  _source_first_zsh_plugin zsh-defer/zsh-defer.plugin.zsh &&
+    _plugin_source_cmd=(zsh-defer source)
 
   # Remind when a typed command already has a shorter alias defined.
   _source_first_zsh_plugin \

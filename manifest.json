@@ -169,6 +169,11 @@
       "depth": 1
     },
     {
+      "source": "https://github.com/romkatv/zsh-defer.git",
+      "target": "${XDG_DATA_HOME}/zsh/plugins/zsh-defer",
+      "depth": 1
+    },
+    {
       "source": "https://github.com/romkatv/powerlevel10k.git",
       "target": "${XDG_DATA_HOME}/zsh/plugins/powerlevel10k",
       "depth": 1
