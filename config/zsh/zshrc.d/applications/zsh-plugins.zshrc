@@ -43,6 +43,10 @@ function _load_zsh_plugins() {
     return 1
   }
 
+  # Remind when a typed command already has a shorter alias defined.
+  _source_first_zsh_plugin \
+    zsh-you-should-use/you-should-use.plugin.zsh
+
   _source_first_zsh_plugin \
     zsh-autosuggestions/zsh-autosuggestions.zsh
 
