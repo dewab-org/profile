@@ -1,6 +1,17 @@
 is-executable starship || return
 
 export STARSHIP_CONFIG="${XDG_CONFIG_HOME:-${HOME}/.config}/starship.toml"
+
+# Short hostname for the prompt via env_var modules (rendered in-process by
+# starship) instead of custom modules spawning `sh -c hostname` every prompt.
+# SSH-ness and hostname are constant for the life of the shell, so exporting
+# once is exact; the two variables let the config style local vs ssh distinctly.
+if [[ -n "${SSH_CONNECTION}${SSH_CLIENT}${SSH_TTY}" ]]; then
+  export STARSHIP_HOST_SSH="${HOST%%.*}"
+else
+  export STARSHIP_HOST_LOCAL="${HOST%%.*}"
+fi
+
 eval "$(starship init zsh)"
 
 # Show Kubernetes context only while entering a Kubernetes-related command.

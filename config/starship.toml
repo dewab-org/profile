@@ -12,8 +12,8 @@ format = """
 [](fg:surface0)\
 $os\
 $username\
-${custom.local_hostname}\
-${custom.ssh_hostname}\
+${env_var.STARSHIP_HOST_LOCAL}\
+${env_var.STARSHIP_HOST_SSH}\
 ${custom.directory_icon}\
 $directory\
 ${custom.git_provider}\
@@ -103,19 +103,19 @@ style_user = "bg:surface0 fg:overlay1"
 style_root = "bold bg:surface0 fg:red"
 format = '[ ](fg:overlay0 bg:surface0)[ $user]($style)'
 
-[custom.local_hostname]
-command = "hostname -s"
-when = '[ -z "${SSH_CONNECTION}${SSH_CLIENT}${SSH_TTY}" ]'
-shell = ["sh"]
+# Hostname via env_var modules (exported once by starship.prompt) rather than
+# custom modules: env_var renders in-process, custom spawned `sh -c hostname`
+# every prompt. STARSHIP_HOST_LOCAL is set for local shells, STARSHIP_HOST_SSH
+# inside ssh sessions — same conditionality as the old `when` clauses.
+[env_var.STARSHIP_HOST_LOCAL]
+variable = "STARSHIP_HOST_LOCAL"
 style = "bg:surface0 fg:overlay1"
-format = '[ ](fg:overlay0 bg:surface0)[ $output]($style)'
+format = '[ ](fg:overlay0 bg:surface0)[ $env_value]($style)'
 
-[custom.ssh_hostname]
-command = "hostname -s"
-when = '[ -n "${SSH_CONNECTION}${SSH_CLIENT}${SSH_TTY}" ]'
-shell = ["sh"]
+[env_var.STARSHIP_HOST_SSH]
+variable = "STARSHIP_HOST_SSH"
 style = "bold bg:surface0 fg:red"
-format = '[ ](fg:overlay0 bg:surface0)[  $output]($style)'
+format = '[ ](fg:overlay0 bg:surface0)[  $env_value]($style)'
 
 [directory]
 style = "bold bg:surface0 fg:blue"
