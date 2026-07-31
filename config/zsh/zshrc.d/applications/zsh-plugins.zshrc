@@ -4,6 +4,13 @@
 # Catppuccin Mocha: dim the autosuggestion to overlay0 (read at suggestion time).
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#6c7086'
 
+# Bind widgets once at startup instead of re-wrapping every ZLE widget on each
+# precmd. Without this, zsh-autosuggestions rewraps all widgets every prompt;
+# with atuin + fast-syntax-highlighting also wrapping widgets, that compounds
+# in long-lived shells and surfaces as multi-second history-recall stalls.
+# Must be set before zsh-autosuggestions is sourced (below).
+ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+
 function _load_zsh_plugins() {
   local root plugin_path
   local -a plugin_roots
