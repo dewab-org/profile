@@ -13,6 +13,13 @@ ITERM_INTEGRATION="${ZDOTDIR}/zshrc.d/scripts/iterm_integration.sh"
 # Check if running inside of a tmux session, and if so skip iterm checking as it doesn't like tmux start scripts
 [ -n "${TMUX}" ] && return
 
+# Only probe when the terminal claims to be iTerm2 (TERM_PROGRAM locally,
+# LC_TERMINAL over iTerm's ssh integration). it2check does a raw-mode tty
+# round-trip that blocks forever under terminals/ptys that never respond
+# (the WSL lockup above is the same failure), and costs a synchronous
+# round-trip in every other terminal.
+[[ "${TERM_PROGRAM}" == "iTerm.app" || "${LC_TERMINAL}" == "iTerm2" ]] || return
+
 # Bail unless both helper scripts are present.
 [ -x "${IT2CHECK}" ] && [ -x "${ITERM_INTEGRATION}" ] || return
 
