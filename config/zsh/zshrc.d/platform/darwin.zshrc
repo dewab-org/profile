@@ -28,7 +28,7 @@ alias hibernateoff="sudo pmset -a hibernatemode 0"
 alias caff="caffeinate -disut 3600"
 alias mdns-on='sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist'
 alias mdns-off='sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist'
-alias cpwd='pwd|tr -d "\n"|pbcopy'
+alias cpwd='print -rn -- "$PWD" | pbcopy'   # copy cwd to clipboard, no trailing newline
 alias ql="qlmanage -p &>/dev/null" # QuickLook a file
 
 # Microsoft Office launchers. These are functions rather than aliases so that
