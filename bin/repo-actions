@@ -89,6 +89,10 @@ if (( recursive )); then
     git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1 && repos+=("$dir")
   done < <(find . \( -type d -name '.?*' ! -name '.git' \) -prune -o -name '.git' -prune -print 2>/dev/null | sort)
 else
+  # If the current directory is itself inside a repo, report that repo first.
+  if top=$(git rev-parse --show-toplevel 2>/dev/null); then
+    repos+=("$top")
+  fi
   for d in */; do
     [[ -e "$d/.git" ]] && git -C "$d" rev-parse --is-inside-work-tree >/dev/null 2>&1 && repos+=("${d%/}")
   done
@@ -99,10 +103,15 @@ if (( ${#repos[@]} == 0 )); then
   exit 0
 fi
 
+# Display name: basename for the absolute-path cwd repo, relative path otherwise.
+repo_name() {
+  if [[ "$1" == /* ]]; then printf '%s' "${1##*/}"; else printf '%s' "${1#./}"; fi
+}
+
 # ---------- longest name for alignment ----------
 width=0
 for r in "${repos[@]}"; do
-  name="${r#./}"
+  name=$(repo_name "$r")
   (( ${#name} > width )) && width=${#name}
 done
 
@@ -129,7 +138,7 @@ run_segment() {
 
 # ---------- per-repo status ----------
 for r in "${repos[@]}"; do
-  name="${r#./}"
+  name=$(repo_name "$r")
   printf "%s%b%-*s%b" "${C_NAME}${G_REPO}" '' "$width" "$name" "$C_RESET"
 
   # GitHub slug from the origin (or first) remote; scp, ssh:// and https forms.
