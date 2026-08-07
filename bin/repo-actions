@@ -3,6 +3,7 @@
 #
 #   repo-actions           status of repos in immediate subdirectories
 #   repo-actions -r        recurse into subdirectories to find nested repos
+#   repo-actions --legend  explain the status glyphs
 #   repo-actions -h        help
 #
 # Shows the most recent run of each workflow (one line per repo). Repos without
@@ -48,10 +49,30 @@ else
   C_RESET='' C_DIM='' C_NAME='' C_PASS='' C_FAIL='' C_RUN='' C_QUEUE='' C_WARN=''
 fi
 
+show_legend() {
+  printf "%s\n" "${C_NAME}${G_REPO}${C_RESET} repository"
+  printf "  %s  %s\n" \
+    "${C_PASS}${G_PASS}${C_RESET}"     "success" \
+    "${C_FAIL}${G_FAIL}${C_RESET}"     "failure / startup failure / timed out" \
+    "${C_RUN}${G_RUN}${C_RESET}"       "in progress" \
+    "${C_QUEUE}${G_QUEUE}${C_RESET}"   "queued / waiting / pending" \
+    "${C_WARN}${G_ACTREQ}${C_RESET}"   "action required" \
+    "${C_DIM}${G_CANCEL}${C_RESET}"    "cancelled" \
+    "${C_DIM}${G_SKIP}${C_RESET}"      "skipped / neutral" \
+    "${C_DIM}${G_NEVER}${C_RESET}"     "workflow has never run" \
+    "${C_DIM}${G_PAUSED}${C_RESET}"    "workflow disabled" \
+    "${C_WARN}${G_WARN}${C_RESET}"     "api error (missing repo, no access, rate limit)"
+  printf "  %s\n" \
+    "${C_DIM}no actions${C_RESET}  repo has no workflows defined" \
+    "${C_DIM}not github${C_RESET}  remote is not github.com" \
+    "${C_DIM}no remote${C_RESET}   repo has no git remote"
+}
+
 recursive=0
 case "${1:-}" in
   -r|--recursive) recursive=1 ;;
-  -h|--help) sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+  -l|--legend) show_legend; exit 0 ;;
+  -h|--help) sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
   '') ;;
   *) echo "unknown option: $1 (try --help)" >&2; exit 2 ;;
 esac
