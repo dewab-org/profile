@@ -12,17 +12,17 @@ set -euo pipefail
 
 # ---------- glyphs: Nerd Font on a tty, plain ASCII when piped ----------
 if [[ -t 1 ]]; then
-  G_REPO=$' '        #  folder
-  G_PASS=$''         #  check
-  G_FAIL=$''         #  x
-  G_RUN=$''          #  refresh (in progress)
-  G_QUEUE=$''        #  clock (queued/waiting)
-  G_CANCEL=$''       #  ban (cancelled)
-  G_SKIP=$''         #  minus (skipped/neutral)
-  G_ACTREQ=$''       #  warning (action required)
-  G_NEVER=$''        #  question (workflow never run)
-  G_PAUSED=$''       #  pause (workflow disabled)
-  G_WARN=$''         #  warning (api error)
+  G_REPO=$' '      #  folder
+  G_PASS=$''      #  check
+  G_FAIL=$''      #  x
+  G_RUN=$''       #  refresh (in progress)
+  G_QUEUE=$''     #  clock (queued/waiting)
+  G_CANCEL=$''    #  ban (cancelled)
+  G_SKIP=$''      #  minus (skipped/neutral)
+  G_ACTREQ=$''    #  warning (action required)
+  G_NEVER=$''     #  question (workflow never run)
+  G_PAUSED=$''    #  pause (workflow disabled)
+  G_WARN=$''      #  warning (api error)
 else
   G_REPO=''
   G_PASS='ok'
