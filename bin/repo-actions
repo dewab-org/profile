@@ -1,0 +1,173 @@
+#!/usr/bin/env bash
+# repo-actions — latest GitHub Actions status for every repo below the current directory.
+#
+#   repo-actions           status of repos in immediate subdirectories
+#   repo-actions -r        recurse into subdirectories to find nested repos
+#   repo-actions -h        help
+#
+# Shows the most recent run of each workflow (one line per repo). Repos without
+# workflows, without a GitHub remote, or without any remote are still listed.
+# Requires gh (authenticated) and jq. Requires a Nerd Font for the glyphs.
+set -euo pipefail
+
+# ---------- glyphs: Nerd Font on a tty, plain ASCII when piped ----------
+if [[ -t 1 ]]; then
+  G_REPO=$' '        #  folder
+  G_PASS=$''         #  check
+  G_FAIL=$''         #  x
+  G_RUN=$''          #  refresh (in progress)
+  G_QUEUE=$''        #  clock (queued/waiting)
+  G_CANCEL=$''       #  ban (cancelled)
+  G_SKIP=$''         #  minus (skipped/neutral)
+  G_ACTREQ=$''       #  warning (action required)
+  G_NEVER=$''        #  question (workflow never run)
+  G_PAUSED=$''       #  pause (workflow disabled)
+  G_WARN=$''         #  warning (api error)
+else
+  G_REPO=''
+  G_PASS='ok'
+  G_FAIL='FAIL'
+  G_RUN='run'
+  G_QUEUE='queued'
+  G_CANCEL='cancelled'
+  G_SKIP='skipped'
+  G_ACTREQ='ACTION-REQ'
+  G_NEVER='never-run'
+  G_PAUSED='paused'
+  G_WARN='!'
+fi
+
+# ---------- colors ----------
+if [[ -t 1 ]]; then
+  C_RESET=$'\e[0m';  C_DIM=$'\e[2m'
+  C_NAME=$'\e[1;36m'
+  C_PASS=$'\e[1;32m'; C_FAIL=$'\e[1;31m'
+  C_RUN=$'\e[33m';    C_QUEUE=$'\e[36m'
+  C_WARN=$'\e[33m'
+else
+  C_RESET='' C_DIM='' C_NAME='' C_PASS='' C_FAIL='' C_RUN='' C_QUEUE='' C_WARN=''
+fi
+
+recursive=0
+case "${1:-}" in
+  -r|--recursive) recursive=1 ;;
+  -h|--help) sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+  '') ;;
+  *) echo "unknown option: $1 (try --help)" >&2; exit 2 ;;
+esac
+
+command -v gh >/dev/null 2>&1 || { echo "repo-actions: gh not found" >&2; exit 1; }
+command -v jq >/dev/null 2>&1 || { echo "repo-actions: jq not found" >&2; exit 1; }
+gh auth status >/dev/null 2>&1 || { echo "repo-actions: gh is not authenticated (run: gh auth login)" >&2; exit 1; }
+
+# ---------- find repos (same discovery as repo-status) ----------
+repos=()
+if (( recursive )); then
+  while IFS= read -r gitdir; do
+    dir="$(dirname "$gitdir")"
+    git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1 && repos+=("$dir")
+  done < <(find . \( -type d -name '.?*' ! -name '.git' \) -prune -o -name '.git' -prune -print 2>/dev/null | sort)
+else
+  for d in */; do
+    [[ -e "$d/.git" ]] && git -C "$d" rev-parse --is-inside-work-tree >/dev/null 2>&1 && repos+=("${d%/}")
+  done
+fi
+
+if (( ${#repos[@]} == 0 )); then
+  echo "${C_DIM}no git repositories found$( ((recursive)) || printf ' (try -r)')${C_RESET}"
+  exit 0
+fi
+
+# ---------- longest name for alignment ----------
+width=0
+for r in "${repos[@]}"; do
+  name="${r#./}"
+  (( ${#name} > width )) && width=${#name}
+done
+
+# Map one run (status, conclusion) to a colored glyph segment.
+run_segment() {
+  local status=$1 conclusion=$2
+  case "$status" in
+    completed)
+      case "$conclusion" in
+        success)                     printf '%s' "${C_PASS}${G_PASS}${C_RESET}" ;;
+        failure|startup_failure|timed_out)
+                                     printf '%s' "${C_FAIL}${G_FAIL}${C_RESET}" ;;
+        cancelled)                   printf '%s' "${C_DIM}${G_CANCEL}${C_RESET}" ;;
+        skipped|neutral)             printf '%s' "${C_DIM}${G_SKIP}${C_RESET}" ;;
+        action_required)             printf '%s' "${C_WARN}${G_ACTREQ}${C_RESET}" ;;
+        *)                           printf '%s' "${C_DIM}${conclusion}${C_RESET}" ;;
+      esac ;;
+    in_progress)                     printf '%s' "${C_RUN}${G_RUN}${C_RESET}" ;;
+    queued|waiting|pending|requested)
+                                     printf '%s' "${C_QUEUE}${G_QUEUE}${C_RESET}" ;;
+    *)                               printf '%s' "${C_DIM}${status}${C_RESET}" ;;
+  esac
+}
+
+# ---------- per-repo status ----------
+for r in "${repos[@]}"; do
+  name="${r#./}"
+  printf "%s%b%-*s%b" "${C_NAME}${G_REPO}" '' "$width" "$name" "$C_RESET"
+
+  # GitHub slug from the origin (or first) remote; scp, ssh:// and https forms.
+  remote=$(git -C "$r" remote get-url origin 2>/dev/null) ||
+    remote=$(git -C "$r" remote 2>/dev/null | head -n1 | xargs -I{} git -C "$r" remote get-url {} 2>/dev/null) || remote=''
+  if [[ -z "$remote" ]]; then
+    printf " %s\n" "${C_DIM}no remote${C_RESET}"
+    continue
+  fi
+  slug=''
+  case "$remote" in
+    git@github.com:*)       slug="${remote#git@github.com:}" ;;
+    ssh://git@github.com/*) slug="${remote#ssh://git@github.com/}" ;;
+    https://github.com/*)   slug="${remote#https://github.com/}" ;;
+    http://github.com/*)    slug="${remote#http://github.com/}" ;;
+  esac
+  if [[ -z "$slug" ]]; then
+    printf " %s\n" "${C_DIM}not github${C_RESET}"
+    continue
+  fi
+  slug="${slug%.git}"; slug="${slug%/}"
+
+  # Workflows defined in the repo (id <tab> state <tab> name).
+  if ! workflows=$(gh api "repos/${slug}/actions/workflows?per_page=100" \
+        --jq '.workflows[] | [.id, .state, .name] | @tsv' 2>/dev/null); then
+    printf " %s\n" "${C_WARN}${G_WARN} api error${C_RESET}"
+    continue
+  fi
+  if [[ -z "$workflows" ]]; then
+    printf " %s\n" "${C_DIM}no actions${C_RESET}"
+    continue
+  fi
+
+  # Latest run per workflow_id: runs come newest-first, first hit wins.
+  # Parallel indexed arrays keep this bash-3.2 clean (macOS /bin/bash).
+  seen_ids=() seen_status=() seen_conc=()
+  while IFS=$'\t' read -r wid status conclusion; do
+    [[ -z "$wid" ]] && continue
+    for id in "${seen_ids[@]:-}"; do [[ "$id" == "$wid" ]] && continue 2; done
+    seen_ids+=("$wid"); seen_status+=("$status"); seen_conc+=("$conclusion")
+  done < <(gh api "repos/${slug}/actions/runs?per_page=100" \
+             --jq '.workflow_runs[] | [.workflow_id, .status, .conclusion // "-"] | @tsv' 2>/dev/null)
+
+  line=''
+  while IFS=$'\t' read -r wid wstate wname; do
+    [[ -z "$wid" ]] && continue
+    if [[ "$wstate" != "active" ]]; then
+      line+=" ${C_DIM}${G_PAUSED} ${wname}${C_RESET}"
+      continue
+    fi
+    seg="${C_DIM}${G_NEVER}${C_RESET}"
+    for i in "${!seen_ids[@]}"; do
+      if [[ "${seen_ids[$i]}" == "$wid" ]]; then
+        seg=$(run_segment "${seen_status[$i]}" "${seen_conc[$i]}")
+        break
+      fi
+    done
+    line+=" ${seg} ${C_DIM}${wname}${C_RESET}"
+  done <<< "$workflows"
+
+  printf "%s\n" "$line"
+done

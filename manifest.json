@@ -156,6 +156,11 @@
       "source": "bin/repo-status",
       "target": ".local/bin/repo-status",
       "type": "link"
+    },
+    {
+      "source": "bin/repo-actions",
+      "target": ".local/bin/repo-actions",
+      "type": "link"
     }
   ],
   "gitrepos": [
