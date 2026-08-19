@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+# repo-branches — local branch audit for every repo below the current
+# directory: branches whose upstream is gone, and local-only branches.
+#
+#   repo-branches               audit repos in immediate subdirectories (and
+#                               the repo containing the current directory)
+#   repo-branches -r            recurse into subdirectories for nested repos
+#   repo-branches --prune-gone  delete fully-merged branches whose upstream
+#                               is gone (git branch -d; never -D, never the
+#                               checked-out branch; unmerged ones are kept
+#                               and reported)
+#   repo-branches -h            help
+#
+# Gone detection reflects the last fetch; run repo-fetch first (it prunes
+# stale remote-tracking refs). Requires a Nerd Font for the glyphs.
+set -euo pipefail
+
+# Shared plumbing (glyph/color base, repo discovery, alignment) lives in
+# repo-lib next to the real script; resolve the ~/.local/bin symlink first.
+_self=$0
+if [[ -L "$_self" ]]; then
+  _target=$(readlink "$_self")
+  [[ "$_target" == /* ]] || _target="$(dirname "$_self")/$_target"
+  _self=$_target
+fi
+# shellcheck source=bin/repo-lib
+source "$(cd "$(dirname "$_self")" && pwd)/repo-lib"
+unset _self _target
+
+# ---------- glyphs: Nerd Font on a tty, plain ASCII when piped ----------
+if [[ -t 1 ]]; then
+  G_BRANCH=''    # branch
+  G_TIDY=''       # check (every branch tracks a live upstream)
+  G_GONE=''    # warning (upstream deleted on the remote)
+else
+  G_BRANCH='br'
+  G_TIDY='ok'
+  G_GONE='!'
+fi
+
+# ---------- colors ----------
+if [[ -t 1 ]]; then
+  C_TIDY=$'\e[1;32m'; C_PRUNED=$'\e[36m'
+else
+  C_TIDY='' C_PRUNED=''
+fi
+
+recursive=0
+prune=0
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -r|--recursive) recursive=1 ;;
+    -p|--prune-gone) prune=1 ;;
+    -h|--help) sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) echo "unknown option: $1 (try --help)" >&2; exit 2 ;;
+  esac
+  shift
+done
+
+discover_repos "$recursive" 1
+
+if (( ${#repos[@]} == 0 )); then
+  report_no_repos "$recursive"
+  exit 0
+fi
+
+compute_width
+
+# List up to four names, then "+N more".
+name_list() {
+  local -a names=("$@")
+  local shown
+  if (( ${#names[@]} > 4 )); then
+    shown="${names[0]} ${names[1]} ${names[2]} ${names[3]} +$(( ${#names[@]} - 4 )) more"
+  else
+    shown="${names[*]}"
+  fi
+  printf '%s' "$shown"
+}
+
+for r in "${repos[@]}"; do
+  name=$(repo_name "$r")
+  printf "%s%b%-*s%b" "${C_NAME}${G_REPO}" '' "$width" "$name" "$C_RESET"
+
+  total=0 current_gone=0
+  gone=() localonly=() pruned=() kept=()
+  while IFS=$'\t' read -r head branch upstream track; do
+    [[ -z "$branch" ]] && continue
+    total=$(( total + 1 ))
+    if [[ -n "$upstream" && "$track" == '[gone]' ]]; then
+      if [[ "$head" == '*' ]]; then
+        current_gone=1
+      elif (( prune )); then
+        if git -C "$r" branch -d "$branch" >/dev/null 2>&1; then
+          pruned+=("$branch")
+        else
+          kept+=("$branch")
+        fi
+      else
+        gone+=("$branch")
+      fi
+    elif [[ -z "$upstream" ]]; then
+      localonly+=("$branch")
+    fi
+  done < <(git -C "$r" for-each-ref refs/heads \
+             --format='%(HEAD)%09%(refname:short)%09%(upstream:short)%09%(upstream:track)' 2>/dev/null)
+
+  branches='branches'; (( total == 1 )) && branches='branch'
+  line=" ${C_DIM}${G_BRANCH} ${total} ${branches}${C_RESET}"
+  (( current_gone ))       && line+=" ${C_WARN}${G_GONE} current branch upstream gone${C_RESET}"
+  (( ${#gone[@]} ))        && line+=" ${C_WARN}${G_GONE} gone: $(name_list "${gone[@]}")${C_RESET}"
+  (( ${#pruned[@]} ))      && line+=" ${C_PRUNED}pruned: $(name_list "${pruned[@]}")${C_RESET}"
+  (( ${#kept[@]} ))        && line+=" ${C_WARN}${G_GONE} unmerged, kept: $(name_list "${kept[@]}")${C_RESET}"
+  (( ${#localonly[@]} ))   && line+=" ${C_DIM}local: $(name_list "${localonly[@]}")${C_RESET}"
+  if (( ! current_gone && ${#gone[@]} == 0 && ${#kept[@]} == 0 && ${#localonly[@]} == 0 && ${#pruned[@]} == 0 )); then
+    line+=" ${C_TIDY}${G_TIDY}${C_RESET}"
+  fi
+  printf "%s\n" "$line"
+done

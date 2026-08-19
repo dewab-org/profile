@@ -83,7 +83,7 @@ pull_one() {
   if [[ -z "$(git -C "$r" remote 2>/dev/null)" ]]; then
     printf 'none\t\n' > "$out"; return 0
   fi
-  if ! lines=$(git -C "$r" fetch --no-progress 2>&1); then
+  if ! lines=$(git -C "$r" fetch --prune --no-progress 2>&1); then
     printf 'fail\t%s\n' "$(printf '%s\n' "$lines" | sed -n '1p')" > "$out"; return 0
   fi
   if ! git -C "$r" symbolic-ref -q HEAD >/dev/null; then

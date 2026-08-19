@@ -176,6 +176,11 @@
       "source": "bin/repo-pull",
       "target": ".local/bin/repo-pull",
       "type": "link"
+    },
+    {
+      "source": "bin/repo-branches",
+      "target": ".local/bin/repo-branches",
+      "type": "link"
     }
   ],
   "gitrepos": [
