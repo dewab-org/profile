@@ -1,4 +1,9 @@
 # typos (crate-ci/typos) configuration.
+[files]
+# Terminfo sources use capability names (kHOM, kRIT, ...) that typos
+# "corrects" into invalid capnames, breaking the compiled entry.
+extend-exclude = ["config/zsh/zshrc.d/terminfo/"]
+
 [default.extend-words]
 # "iTerm2" product name; its shell-integration scripts (iterm.zshrc,
 # iterm_integration.sh, it2check) use many ITERM/iterm/iterm2 identifiers.
