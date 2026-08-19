@@ -1,5 +1,3 @@
-#! /bin/zsh
-#
 # command-completion <target> <generator command...>
 # - Regenerates the completion file when missing or older than COMMAND_COMPLETION_MAX_AGE_DAYS (default: 1).
 # - Compiles to <target>.zwc when present and size meets COMMAND_COMPLETION_COMPILE_THRESHOLD_BYTES (default: 10240).

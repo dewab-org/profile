@@ -117,7 +117,8 @@ tools/install.py --manifest tools/manifest-tanzu.json
 │           └── platform/      OS-specific configuration
 ├── bin/                       First-party scripts linked into ~/.local/bin
 │   ├── repo-status            One-line git status for repos under CWD (-r recursive)
-│   └── repo-actions           Latest GitHub Actions status per repo (--legend)
+│   ├── repo-actions           Latest GitHub Actions status per repo (--legend)
+│   └── repo-lib               Shared plumbing sourced by the repo-* scripts
 ├── manifest.json              Dotfile and plugin bootstrap manifest
 ├── setup.py                   Profile bootstrap
 └── tools/

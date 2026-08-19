@@ -11,9 +11,20 @@
 # Requires gh (authenticated) and jq. Requires a Nerd Font for the glyphs.
 set -euo pipefail
 
+# Shared plumbing (glyph/color base, repo discovery, alignment) lives in
+# repo-lib next to the real script; resolve the ~/.local/bin symlink first.
+_self=$0
+if [[ -L "$_self" ]]; then
+  _target=$(readlink "$_self")
+  [[ "$_target" == /* ]] || _target="$(dirname "$_self")/$_target"
+  _self=$_target
+fi
+# shellcheck source=bin/repo-lib
+source "$(cd "$(dirname "$_self")" && pwd)/repo-lib"
+unset _self _target
+
 # ---------- glyphs: Nerd Font on a tty, plain ASCII when piped ----------
 if [[ -t 1 ]]; then
-  G_REPO=$' '      #  folder
   G_PASS=$''      #  check
   G_FAIL=$''      #  x
   G_RUN=$''       #  refresh (in progress)
@@ -25,7 +36,6 @@ if [[ -t 1 ]]; then
   G_PAUSED=$''    #  pause (workflow disabled)
   G_WARN=$''      #  warning (api error)
 else
-  G_REPO=''
   G_PASS='ok'
   G_FAIL='FAIL'
   G_RUN='run'
@@ -40,13 +50,10 @@ fi
 
 # ---------- colors ----------
 if [[ -t 1 ]]; then
-  C_RESET=$'\e[0m';  C_DIM=$'\e[2m'
-  C_NAME=$'\e[1;36m'
   C_PASS=$'\e[1;32m'; C_FAIL=$'\e[1;31m'
   C_RUN=$'\e[33m';    C_QUEUE=$'\e[36m'
-  C_WARN=$'\e[33m'
 else
-  C_RESET='' C_DIM='' C_NAME='' C_PASS='' C_FAIL='' C_RUN='' C_QUEUE='' C_WARN=''
+  C_PASS='' C_FAIL='' C_RUN='' C_QUEUE=''
 fi
 
 show_legend() {
@@ -82,38 +89,14 @@ command -v jq >/dev/null 2>&1 || { echo "repo-actions: jq not found" >&2; exit 1
 gh auth status >/dev/null 2>&1 || { echo "repo-actions: gh is not authenticated (run: gh auth login)" >&2; exit 1; }
 
 # ---------- find repos (same discovery as repo-status) ----------
-repos=()
-if (( recursive )); then
-  while IFS= read -r gitdir; do
-    dir="$(dirname "$gitdir")"
-    git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1 && repos+=("$dir")
-  done < <(find . \( -type d -name '.?*' ! -name '.git' \) -prune -o -name '.git' -prune -print 2>/dev/null | sort)
-else
-  # If the current directory is itself inside a repo, report that repo first.
-  if top=$(git rev-parse --show-toplevel 2>/dev/null); then
-    repos+=("$top")
-  fi
-  for d in */; do
-    [[ -e "$d/.git" ]] && git -C "$d" rev-parse --is-inside-work-tree >/dev/null 2>&1 && repos+=("${d%/}")
-  done
-fi
+discover_repos "$recursive" 1
 
 if (( ${#repos[@]} == 0 )); then
-  echo "${C_DIM}no git repositories found$( ((recursive)) || printf ' (try -r)')${C_RESET}"
+  report_no_repos "$recursive"
   exit 0
 fi
 
-# Display name: basename for the absolute-path cwd repo, relative path otherwise.
-repo_name() {
-  if [[ "$1" == /* ]]; then printf '%s' "${1##*/}"; else printf '%s' "${1#./}"; fi
-}
-
-# ---------- longest name for alignment ----------
-width=0
-for r in "${repos[@]}"; do
-  name=$(repo_name "$r")
-  (( ${#name} > width )) && width=${#name}
-done
+compute_width
 
 # Map one run (status, conclusion) to a colored glyph segment.
 run_segment() {

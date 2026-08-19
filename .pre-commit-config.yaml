@@ -37,6 +37,9 @@ repos:
      hooks:
        - id: shellcheck
          exclude: ^config/zsh/
+         # -x follows sourced files (bin/repo-* source bin/repo-lib via a
+         # "shellcheck source=" directive), so lib-provided vars resolve.
+         args: [-x]
    - repo: https://github.com/crate-ci/typos
      rev: v1.28.0
      hooks:

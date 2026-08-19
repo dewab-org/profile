@@ -10,9 +10,20 @@
 # Requires a Nerd Font for the glyphs.
 set -euo pipefail
 
+# Shared plumbing (glyph/color base, repo discovery, alignment) lives in
+# repo-lib next to the real script; resolve the ~/.local/bin symlink first.
+_self=$0
+if [[ -L "$_self" ]]; then
+  _target=$(readlink "$_self")
+  [[ "$_target" == /* ]] || _target="$(dirname "$_self")/$_target"
+  _self=$_target
+fi
+# shellcheck source=bin/repo-lib
+source "$(cd "$(dirname "$_self")" && pwd)/repo-lib"
+unset _self _target
+
 # ---------- glyphs: Nerd Font on a tty, plain ASCII when piped ----------
 if [[ -t 1 ]]; then
-  G_REPO=$' '        #  folder
   G_BRANCH=$''       #  branch
   G_AHEAD=$''        #  up arrow
   G_BEHIND=$''       #  down arrow
@@ -26,7 +37,6 @@ if [[ -t 1 ]]; then
   G_NOUPSTREAM=$''   #  broken link (no upstream)
 else
   # Plain fallbacks for pipes/pagers (PUA glyphs render as <U+F07B> etc.)
-  G_REPO=''
   G_BRANCH=''
   G_AHEAD='^'
   G_BEHIND='v'
@@ -42,16 +52,14 @@ fi
 
 # ---------- colors ----------
 if [[ -t 1 ]]; then
-  C_RESET=$'\e[0m';  C_DIM=$'\e[2m'
-  C_NAME=$'\e[1;36m';  C_BRANCH=$'\e[35m'
+  C_BRANCH=$'\e[35m'
   C_AHEAD=$'\e[1;32m'; C_BEHIND=$'\e[1;31m'
   C_STAGED=$'\e[32m';  C_UNSTAGED=$'\e[33m'
   C_UNTRACKED=$'\e[34m'; C_STASH=$'\e[36m'
   C_CLEAN=$'\e[1;32m'; C_CONFLICT=$'\e[1;31m'
-  C_WARN=$'\e[33m'
 else
-  C_RESET='' C_DIM='' C_NAME='' C_BRANCH='' C_AHEAD='' C_BEHIND=''
-  C_STAGED='' C_UNSTAGED='' C_UNTRACKED='' C_STASH='' C_CLEAN='' C_CONFLICT='' C_WARN=''
+  C_BRANCH='' C_AHEAD='' C_BEHIND=''
+  C_STAGED='' C_UNSTAGED='' C_UNTRACKED='' C_STASH='' C_CLEAN='' C_CONFLICT=''
 fi
 
 recursive=0
@@ -63,36 +71,18 @@ case "${1:-}" in
 esac
 
 # ---------- find repos ----------
-repos=()
-if (( recursive )); then
-  # every dir containing .git; skip hidden dirs (.venv, .claude worktree
-  # remnants, caches) and do not descend past a .git entry itself
-  while IFS= read -r gitdir; do
-    dir="$(dirname "$gitdir")"
-    # ignore broken pointers (e.g. stale worktree .git files)
-    git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1 && repos+=("$dir")
-  done < <(find . \( -type d -name '.?*' ! -name '.git' \) -prune -o -name '.git' -prune -print 2>/dev/null | sort)
-else
-  for d in */; do
-    [[ -e "$d/.git" ]] && git -C "$d" rev-parse --is-inside-work-tree >/dev/null 2>&1 && repos+=("${d%/}")
-  done
-fi
+discover_repos "$recursive"
 
 if (( ${#repos[@]} == 0 )); then
-  echo "${C_DIM}no git repositories found$( ((recursive)) || printf ' (try -r)')${C_RESET}"
+  report_no_repos "$recursive"
   exit 0
 fi
 
-# ---------- longest name for alignment ----------
-width=0
-for r in "${repos[@]}"; do
-  name="${r#./}"
-  (( ${#name} > width )) && width=${#name}
-done
+compute_width
 
 # ---------- per-repo status ----------
 for r in "${repos[@]}"; do
-  name="${r#./}"
+  name=$(repo_name "$r")
 
   # branch (or detached short sha)
   if branch=$(git -C "$r" symbolic-ref --short -q HEAD 2>/dev/null); then

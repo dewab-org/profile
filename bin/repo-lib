@@ -1,0 +1,63 @@
+# repo-lib — shared plumbing for the repo-* family (repo-status, repo-actions).
+# Sourced by the scripts next to it (resolved through their ~/.local/bin
+# symlinks); never executed directly. Keep bash 3.2 compatible.
+# shellcheck shell=bash
+
+# ---------- shared glyphs/colors: Nerd Font + color on a tty, plain when piped ----------
+if [[ -t 1 ]]; then
+  G_REPO=' '   # folder
+  C_RESET=$'\e[0m'
+  C_DIM=$'\e[2m'
+  C_NAME=$'\e[1;36m'
+  C_WARN=$'\e[33m'
+else
+  G_REPO=''
+  C_RESET='' C_DIM='' C_NAME='' C_WARN=''
+fi
+
+# discover_repos <recursive> [include_self]
+# Fills the global repos=() array. Recursive mode walks for nested .git dirs
+# (skipping hidden dirs); otherwise immediate subdirectories are scanned, and
+# with include_self=1 the repo containing $PWD (if any) is listed first.
+discover_repos() {
+  local recursive=$1 include_self=${2:-0} d dir gitdir top
+  repos=()
+  if (( recursive )); then
+    while IFS= read -r gitdir; do
+      dir="$(dirname "$gitdir")"
+      git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1 && repos+=("$dir")
+    done < <(find . \( -type d -name '.?*' ! -name '.git' \) -prune -o -name '.git' -prune -print 2>/dev/null | sort)
+  else
+    if (( include_self )) && top=$(git rev-parse --show-toplevel 2>/dev/null); then
+      repos+=("$top")
+    fi
+    for d in */; do
+      [[ -e "$d/.git" ]] && git -C "$d" rev-parse --is-inside-work-tree >/dev/null 2>&1 && repos+=("${d%/}")
+    done
+  fi
+  # Callers run under set -e: a false final test above must not become this
+  # function's (fatal) return value.
+  return 0
+}
+
+# Display name: basename for absolute paths (the include_self repo), the
+# ./-stripped relative path otherwise.
+repo_name() {
+  if [[ "$1" == /* ]]; then printf '%s' "${1##*/}"; else printf '%s' "${1#./}"; fi
+}
+
+# Sets the global width to the longest display name in repos=().
+compute_width() {
+  local r name
+  width=0
+  for r in "${repos[@]}"; do
+    name=$(repo_name "$r")
+    (( ${#name} > width )) && width=${#name}
+  done
+  return 0  # same set -e guard as discover_repos
+}
+
+# report_no_repos <recursive> — dim notice, hinting at -r when not recursive.
+report_no_repos() {
+  echo "${C_DIM}no git repositories found$( (($1)) || printf ' (try -r)')${C_RESET}"
+}

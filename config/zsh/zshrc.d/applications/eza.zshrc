@@ -60,6 +60,8 @@ if is-executable eza; then
   return
 fi
 
+# exa fallback kept intentionally: legacy hosts that predate eza still carry
+# exa (upstream is unmaintained, but the installed binaries keep working).
 if is-executable exa; then
   (( ${+_comps} )) || typeset -g -A _comps
   _comps[exa]=_exa
