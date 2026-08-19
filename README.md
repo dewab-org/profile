@@ -8,8 +8,12 @@ bootstrapped from declarative JSON manifests.
 
 - **Prompt:** Starship with Catppuccin Mocha styling, Git context, runtime
   indicators, and a distinct SSH hostname segment.
-- **Terminal:** Ghostty configuration with Nerd Font support and automatic
-  remote `xterm-ghostty` terminfo installation.
+- **Terminal:** iTerm2 shell integration, gated on `TERM_PROGRAM` so other
+  terminals skip the probe. Ghostty configuration is retained, including
+  automatic remote `xterm-ghostty` terminfo installation.
+- **Repo utilities:** `repo-status` and `repo-actions` one-line multi-repo
+  dashboards, `mdopen` markdown rendering via pandoc, and `git-remote-toggle`
+  for switching origins between SSH and HTTPS.
 - **Completion:** Native Zsh completions, Carapace fallback coverage, Bash
   completion compatibility, and fzf-tab.
 - **History and navigation:** Atuin, Zoxide, fzf, fd, and ripgrep.
@@ -111,11 +115,12 @@ tools/install.py --manifest tools/manifest-tanzu.json
 │           ├── global/        Prompt and shared configuration
 │           ├── hosts/         Host-specific configuration
 │           └── platform/      OS-specific configuration
+├── bin/                       First-party scripts linked into ~/.local/bin
+│   ├── repo-status            One-line git status for repos under CWD (-r recursive)
+│   └── repo-actions           Latest GitHub Actions status per repo (--legend)
 ├── manifest.json              Dotfile and plugin bootstrap manifest
 ├── setup.py                   Profile bootstrap
-├── bin/                       First-party scripts linked into ~/.local/bin
-    │   └── repo-status            One-line git status for repos under CWD (-r recursive)
-    └── tools/
+└── tools/
     ├── install.py             Release binary installer
     ├── manifest.json          Primary tool manifest
     └── manifest-tanzu.json    Optional Tanzu/Carvel manifest
@@ -174,9 +179,9 @@ Configured formatters include Ruff, Prettier, Terraform, and jq.
 
 ## Remote Hosts
 
-Ghostty's `ssh-terminfo` shell integration installs the `xterm-ghostty`
-terminfo entry on SSH hosts when needed. This preserves Backspace, cursor keys,
-colors, and other terminal capabilities.
+When Ghostty is the terminal, its `ssh-terminfo` shell integration installs
+the `xterm-ghostty` terminfo entry on SSH hosts when needed. This preserves
+Backspace, cursor keys, colors, and other terminal capabilities.
 
 The Starship hostname segment changes color during SSH sessions to make remote
 shells visually distinct.
