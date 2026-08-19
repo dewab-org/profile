@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+# repo-fetch — fetch every repo below the current directory, in parallel.
+#
+#   repo-fetch             fetch repos in immediate subdirectories (and the
+#                          repo containing the current directory, if any)
+#   repo-fetch -r          recurse into subdirectories to find nested repos
+#   repo-fetch -j <n>      fetch up to <n> repos at once (default: 8)
+#   repo-fetch -h          help
+#
+# One line per repo: how many refs the fetch updated, up to date, or the
+# failure. Pairs with repo-status, whose ahead/behind counts read the refs
+# this fetches. Requires a Nerd Font for the glyphs.
+set -euo pipefail
+
+# Shared plumbing (glyph/color base, repo discovery, alignment) lives in
+# repo-lib next to the real script; resolve the ~/.local/bin symlink first.
+_self=$0
+if [[ -L "$_self" ]]; then
+  _target=$(readlink "$_self")
+  [[ "$_target" == /* ]] || _target="$(dirname "$_self")/$_target"
+  _self=$_target
+fi
+# shellcheck source=bin/repo-lib
+source "$(cd "$(dirname "$_self")" && pwd)/repo-lib"
+unset _self _target
+
+# ---------- glyphs: Nerd Font on a tty, plain ASCII when piped ----------
+if [[ -t 1 ]]; then
+  G_FRESH=''      # check (fetched, nothing new)
+  G_UPDATED=''     # down arrow (new refs fetched)
+  G_FAIL=''           # x (fetch failed)
+else
+  G_FRESH='ok'
+  G_UPDATED='v'
+  G_FAIL='FAIL'
+fi
+
+# ---------- colors ----------
+if [[ -t 1 ]]; then
+  C_FRESH=$'\e[1;32m'; C_UPDATED=$'\e[36m'; C_FAIL=$'\e[1;31m'
+else
+  C_FRESH='' C_UPDATED='' C_FAIL=''
+fi
+
+recursive=0
+jobs=8
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -r|--recursive) recursive=1 ;;
+    -j|--jobs)
+      shift
+      [[ "${1:-}" =~ ^[1-9][0-9]*$ ]] || { echo "repo-fetch: -j needs a positive number" >&2; exit 2; }
+      jobs=$1
+      ;;
+    -h|--help) sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) echo "unknown option: $1 (try --help)" >&2; exit 2 ;;
+  esac
+  shift
+done
+
+discover_repos "$recursive" 1
+
+if (( ${#repos[@]} == 0 )); then
+  report_no_repos "$recursive"
+  exit 0
+fi
+
+compute_width
+
+workdir=$(mktemp -d "${TMPDIR:-/tmp}/repo-fetch.XXXXXX")
+trap 'rm -rf "$workdir"' EXIT
+
+# Fetch one repo; write "<kind>\t<detail>" for the report loop. Always returns
+# 0 so a failed fetch in a background job never trips the caller's set -e.
+fetch_one() {
+  local r=$1 out=$2 lines n rc=0
+  if [[ -z "$(git -C "$r" remote 2>/dev/null)" ]]; then
+    printf 'none\t\n' > "$out"
+    return 0
+  fi
+  lines=$(git -C "$r" fetch --no-progress 2>&1) || rc=$?
+  if (( rc )); then
+    printf 'fail\t%s\n' "$(printf '%s\n' "$lines" | sed -n '1p')" > "$out"
+  else
+    # Updated-ref lines ("main -> origin/main", "[new branch]", "[new tag]")
+    # all carry "->"; an up-to-date fetch prints nothing.
+    n=$(printf '%s\n' "$lines" | grep -c -- '->') || true
+    printf 'done\t%s\n' "$n" > "$out"
+  fi
+  return 0
+}
+
+# Simple batched parallelism (bash 3.2 has no `wait -n`): launch up to $jobs
+# fetches, wait for the batch, continue. Stragglers gate their batch only.
+i=0
+for r in "${repos[@]}"; do
+  fetch_one "$r" "$workdir/$i" &
+  i=$(( i + 1 ))
+  (( i % jobs == 0 )) && wait
+done
+wait
+
+# ---------- per-repo report, in discovery order ----------
+i=0
+for r in "${repos[@]}"; do
+  name=$(repo_name "$r")
+  printf "%s%b%-*s%b " "${C_NAME}${G_REPO}" '' "$width" "$name" "$C_RESET"
+  kind='' detail=''
+  IFS=$'\t' read -r kind detail < "$workdir/$i" || true
+  i=$(( i + 1 ))
+  case "$kind" in
+    none) printf "%s\n" "${C_DIM}no remote${C_RESET}" ;;
+    fail) printf "%s %s\n" "${C_FAIL}${G_FAIL}${C_RESET}" "${C_DIM}${detail}${C_RESET}" ;;
+    done)
+      if (( detail > 0 )); then
+        refs='refs'; (( detail == 1 )) && refs='ref'
+        printf "%s %s\n" "${C_UPDATED}${G_UPDATED}${C_RESET}" "${C_DIM}${detail} ${refs} updated${C_RESET}"
+      else
+        printf "%s %s\n" "${C_FRESH}${G_FRESH}${C_RESET}" "${C_DIM}up to date${C_RESET}"
+      fi
+      ;;
+    *) printf "%s\n" "${C_WARN}no result${C_RESET}" ;;
+  esac
+done

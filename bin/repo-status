@@ -5,8 +5,8 @@
 #   repo-status -r         recurse into subdirectories to find nested repos
 #   repo-status -h         help
 #
-# Ahead/behind counts use the locally cached upstream refs; run `git fetch`
-# per repo (or `repo-status` after a fetch sweep) for fresh numbers.
+# Ahead/behind counts use the locally cached upstream refs; run `repo-fetch`
+# first for fresh numbers.
 # Requires a Nerd Font for the glyphs.
 set -euo pipefail
 

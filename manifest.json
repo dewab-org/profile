@@ -166,6 +166,11 @@
       "source": "bin/repo-actions",
       "target": ".local/bin/repo-actions",
       "type": "link"
+    },
+    {
+      "source": "bin/repo-fetch",
+      "target": ".local/bin/repo-fetch",
+      "type": "link"
     }
   ],
   "gitrepos": [

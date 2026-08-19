@@ -11,9 +11,9 @@ bootstrapped from declarative JSON manifests.
 - **Terminal:** iTerm2 shell integration, gated on `TERM_PROGRAM` so other
   terminals skip the probe. Ghostty configuration is retained, including
   automatic remote `xterm-ghostty` terminfo installation.
-- **Repo utilities:** `repo-status` and `repo-actions` one-line multi-repo
-  dashboards, `mdopen` markdown rendering via pandoc, and `git-remote-toggle`
-  for switching origins between SSH and HTTPS.
+- **Repo utilities:** `repo-status`, `repo-actions`, and `repo-fetch`
+  one-line multi-repo dashboards, `mdopen` markdown rendering via pandoc, and
+  `git-remote-toggle` for switching origins between SSH and HTTPS.
 - **Completion:** Native Zsh completions, Carapace fallback coverage, Bash
   completion compatibility, and fzf-tab.
 - **History and navigation:** Atuin, Zoxide, fzf, fd, and ripgrep.
@@ -118,6 +118,7 @@ tools/install.py --manifest tools/manifest-tanzu.json
 ├── bin/                       First-party scripts linked into ~/.local/bin
 │   ├── repo-status            One-line git status for repos under CWD (-r recursive)
 │   ├── repo-actions           Latest GitHub Actions status per repo (--legend)
+│   ├── repo-fetch             Parallel git fetch across repos (-j concurrency)
 │   └── repo-lib               Shared plumbing sourced by the repo-* scripts
 ├── manifest.json              Dotfile and plugin bootstrap manifest
 ├── setup.py                   Profile bootstrap
