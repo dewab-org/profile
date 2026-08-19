@@ -1,0 +1,162 @@
+#!/usr/bin/env bash
+# repo-pull — fast-forward every clean, behind-only repo below the current
+# directory; skip (and say why) anything that needs a human.
+#
+#   repo-pull              pull repos in immediate subdirectories (and the
+#                          repo containing the current directory, if any)
+#   repo-pull -r           recurse into subdirectories to find nested repos
+#   repo-pull -j <n>       process up to <n> repos at once (default: 8)
+#   repo-pull -h           help
+#
+# Fetches first, then fast-forwards only: never merges, never rebases, never
+# touches a repo with modified tracked files, a divergence, a detached HEAD,
+# or a merge/rebase in progress. Requires a Nerd Font for the glyphs.
+set -euo pipefail
+
+# Shared plumbing (glyph/color base, repo discovery, alignment) lives in
+# repo-lib next to the real script; resolve the ~/.local/bin symlink first.
+_self=$0
+if [[ -L "$_self" ]]; then
+  _target=$(readlink "$_self")
+  [[ "$_target" == /* ]] || _target="$(dirname "$_self")/$_target"
+  _self=$_target
+fi
+# shellcheck source=bin/repo-lib
+source "$(cd "$(dirname "$_self")" && pwd)/repo-lib"
+unset _self _target
+
+# ---------- glyphs: Nerd Font on a tty, plain ASCII when piped ----------
+if [[ -t 1 ]]; then
+  G_PULLED=''      # down arrow (commits pulled)
+  G_CURRENT=''    # check (already up to date)
+  G_FAIL=''           # x (fetch or merge failed)
+  G_UP=''            # up arrow (local commits ahead)
+  G_DOWN=''        # down arrow (commits behind, in skip notes)
+else
+  G_PULLED='v'
+  G_CURRENT='ok'
+  G_FAIL='FAIL'
+  G_UP='^'
+  G_DOWN='v'
+fi
+
+# ---------- colors ----------
+if [[ -t 1 ]]; then
+  C_PULLED=$'\e[36m'; C_CURRENT=$'\e[1;32m'; C_FAIL=$'\e[1;31m'
+else
+  C_PULLED='' C_CURRENT='' C_FAIL=''
+fi
+
+recursive=0
+jobs=8
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -r|--recursive) recursive=1 ;;
+    -j|--jobs)
+      shift
+      [[ "${1:-}" =~ ^[1-9][0-9]*$ ]] || { echo "repo-pull: -j needs a positive number" >&2; exit 2; }
+      jobs=$1
+      ;;
+    -h|--help) sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) echo "unknown option: $1 (try --help)" >&2; exit 2 ;;
+  esac
+  shift
+done
+
+discover_repos "$recursive" 1
+
+if (( ${#repos[@]} == 0 )); then
+  report_no_repos "$recursive"
+  exit 0
+fi
+
+compute_width
+
+workdir=$(mktemp -d "${TMPDIR:-/tmp}/repo-pull.XXXXXX")
+trap 'rm -rf "$workdir"' EXIT
+
+# Assess and (only when provably safe) fast-forward one repo; write
+# "<kind>\t<detail>" for the report loop. Always returns 0 so a failure in a
+# background job never trips the caller's set -e.
+pull_one() {
+  local r=$1 out=$2 lines gitdir behind ahead old new
+  if [[ -z "$(git -C "$r" remote 2>/dev/null)" ]]; then
+    printf 'none\t\n' > "$out"; return 0
+  fi
+  if ! lines=$(git -C "$r" fetch --no-progress 2>&1); then
+    printf 'fail\t%s\n' "$(printf '%s\n' "$lines" | sed -n '1p')" > "$out"; return 0
+  fi
+  if ! git -C "$r" symbolic-ref -q HEAD >/dev/null; then
+    printf 'detached\t\n' > "$out"; return 0
+  fi
+  if ! git -C "$r" rev-parse --abbrev-ref '@{upstream}' >/dev/null 2>&1; then
+    printf 'noupstream\t\n' > "$out"; return 0
+  fi
+  gitdir=$(git -C "$r" rev-parse --git-dir)
+  [[ "$gitdir" == /* ]] || gitdir="$r/$gitdir"
+  if [[ -e "$gitdir/MERGE_HEAD" || -d "$gitdir/rebase-merge" || -d "$gitdir/rebase-apply" ]]; then
+    printf 'inprogress\t\n' > "$out"; return 0
+  fi
+  read -r behind ahead < <(git -C "$r" rev-list --left-right --count '@{upstream}...HEAD' 2>/dev/null || echo "0 0")
+  if (( behind == 0 )); then
+    if (( ahead )); then printf 'aheadonly\t%s\n' "$ahead" > "$out"
+    else printf 'current\t\n' > "$out"; fi
+    return 0
+  fi
+  if (( ahead )); then
+    printf 'diverged\t%s %s\n' "$ahead" "$behind" > "$out"; return 0
+  fi
+  # Modified tracked files block the pull; untracked files alone do not
+  # (git aborts the fast-forward itself if one would be overwritten).
+  if git -C "$r" status --porcelain 2>/dev/null | grep -qv '^??'; then
+    printf 'dirty\t%s\n' "$behind" > "$out"; return 0
+  fi
+  old=$(git -C "$r" rev-parse --short HEAD)
+  if lines=$(git -C "$r" merge --ff-only --quiet '@{upstream}' 2>&1); then
+    new=$(git -C "$r" rev-parse --short HEAD)
+    printf 'pulled\t%s %s %s\n' "$behind" "$old" "$new" > "$out"
+  else
+    printf 'fail\t%s\n' "$(printf '%s\n' "$lines" | sed -n '1p')" > "$out"
+  fi
+  return 0
+}
+
+# Batched parallelism (bash 3.2 has no `wait -n`); repos are independent.
+i=0
+for r in "${repos[@]}"; do
+  pull_one "$r" "$workdir/$i" &
+  i=$(( i + 1 ))
+  (( i % jobs == 0 )) && wait
+done
+wait
+
+# ---------- per-repo report, in discovery order ----------
+i=0
+for r in "${repos[@]}"; do
+  name=$(repo_name "$r")
+  printf "%s%b%-*s%b " "${C_NAME}${G_REPO}" '' "$width" "$name" "$C_RESET"
+  kind='' detail=''
+  IFS=$'\t' read -r kind detail < "$workdir/$i" || true
+  i=$(( i + 1 ))
+  case "$kind" in
+    none)       printf "%s\n" "${C_DIM}no remote${C_RESET}" ;;
+    fail)       printf "%s %s\n" "${C_FAIL}${G_FAIL}${C_RESET}" "${C_DIM}${detail}${C_RESET}" ;;
+    detached)   printf "%s\n" "${C_DIM}detached HEAD, skipped${C_RESET}" ;;
+    noupstream) printf "%s\n" "${C_DIM}no upstream, skipped${C_RESET}" ;;
+    inprogress) printf "%s\n" "${C_WARN}merge/rebase in progress, skipped${C_RESET}" ;;
+    aheadonly)  printf "%s\n" "${C_DIM}${G_UP}${detail} ahead, nothing to pull${C_RESET}" ;;
+    diverged)
+      ahead=${detail%% *}; behind=${detail##* }
+      printf "%s\n" "${C_WARN}diverged ${G_UP}${ahead} ${G_DOWN}${behind}, skipped${C_RESET}"
+      ;;
+    dirty)      printf "%s\n" "${C_WARN}dirty (${G_DOWN}${detail} behind), skipped${C_RESET}" ;;
+    current)    printf "%s %s\n" "${C_CURRENT}${G_CURRENT}${C_RESET}" "${C_DIM}up to date${C_RESET}" ;;
+    pulled)
+      count=${detail%% *}; rest=${detail#* }; old=${rest%% *}; new=${rest##* }
+      commits='commits'; (( count == 1 )) && commits='commit'
+      printf "%s %s\n" "${C_PULLED}${G_PULLED}${C_RESET}" \
+        "${C_DIM}pulled ${count} ${commits} (${old} ${new})${C_RESET}"
+      ;;
+    *)          printf "%s\n" "${C_WARN}no result${C_RESET}" ;;
+  esac
+done

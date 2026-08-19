@@ -171,6 +171,11 @@
       "source": "bin/repo-fetch",
       "target": ".local/bin/repo-fetch",
       "type": "link"
+    },
+    {
+      "source": "bin/repo-pull",
+      "target": ".local/bin/repo-pull",
+      "type": "link"
     }
   ],
   "gitrepos": [
