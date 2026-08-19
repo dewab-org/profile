@@ -1,6 +1,6 @@
-convert_seconds () {
+convert-seconds () {
 	local seconds=${1:-0}
-	[[ $seconds == <-> ]] || { echo "Usage: convert_seconds <seconds>" >&2; return 1; }
+	[[ $seconds == <-> ]] || { echo "Usage: convert-seconds <seconds>" >&2; return 1; }
 
 	local hours mins secs
 	# Match original format: HH:MM:SS with hours mod 24

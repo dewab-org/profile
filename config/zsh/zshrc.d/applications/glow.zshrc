@@ -5,7 +5,7 @@ is-executable glow || return
 # precedence). The path is resolved at call time, keeping the tracked config portable.
 alias glow='command glow --style "${XDG_CONFIG_HOME:-$HOME/.config}/glow/catppuccin-mocha.json"'
 
-autoload -Uz _glow command_completion
+autoload -Uz _glow command-completion
 (( ${+_comps} )) || typeset -g -A _comps
 _comps[glow]=_glow
-command_completion "${ZSH_CACHE_DIR}/completions/_glow" glow completion zsh &|
+command-completion "${ZSH_CACHE_DIR}/completions/_glow" glow completion zsh &|

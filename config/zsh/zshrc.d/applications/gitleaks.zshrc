@@ -1,6 +1,6 @@
 is-executable gitleaks || return
 
-autoload -Uz _gitleaks command_completion
+autoload -Uz _gitleaks command-completion
 (( ${+_comps} )) || typeset -g -A _comps
 _comps[gitleaks]=_gitleaks
-command_completion "${ZSH_CACHE_DIR}/completions/_gitleaks" gitleaks completion zsh &|
+command-completion "${ZSH_CACHE_DIR}/completions/_gitleaks" gitleaks completion zsh &|

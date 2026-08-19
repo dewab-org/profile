@@ -1,12 +1,12 @@
 #! /bin/zsh
 #
-# command_completion <target> <generator command...>
+# command-completion <target> <generator command...>
 # - Regenerates the completion file when missing or older than COMMAND_COMPLETION_MAX_AGE_DAYS (default: 1).
 # - Compiles to <target>.zwc when present and size meets COMMAND_COMPLETION_COMPILE_THRESHOLD_BYTES (default: 10240).
 # - Replaces generated and compiled files atomically so concurrent shells never
 #   observe partially written completion data, and serializes updates per target.
 
-command_completion() {
+command-completion() {
   local target="$1"; shift
 
   # Bail quietly on an empty target; otherwise the redirection below writes to an

@@ -17,11 +17,11 @@ is-executable fzf && {
   export FZF_ALT_C_COMMAND="$_fd_bin --type=d --hidden --follow --strip-cwd-prefix --exclude .git"
 }
 
-# Shell completion (regenerated/cached by command_completion)
-autoload -Uz _fd command_completion
+# Shell completion (regenerated/cached by command-completion)
+autoload -Uz _fd command-completion
 (( ${+_comps} )) || typeset -g -A _comps
 _comps[fd]=_fd
-command_completion "${ZSH_CACHE_DIR}/completions/_fd" "$_fd_bin" --gen-completions zsh &|
+command-completion "${ZSH_CACHE_DIR}/completions/_fd" "$_fd_bin" --gen-completions zsh &|
 
 # fd colorizes paths via LS_COLORS, which is set by vivid.zshrc (Catppuccin Mocha).
 

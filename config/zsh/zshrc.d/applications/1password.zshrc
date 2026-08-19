@@ -1,10 +1,10 @@
 is-executable op || return
 
-# op's own shell completion (cached + refreshed daily by command_completion).
-autoload -Uz _op command_completion
+# op's own shell completion (cached + refreshed daily by command-completion).
+autoload -Uz _op command-completion
 (( ${+_comps} )) || typeset -g -A _comps
 _comps[op]=_op
-command_completion "${ZSH_CACHE_DIR}/completions/_op" op completion zsh &|
+command-completion "${ZSH_CACHE_DIR}/completions/_op" op completion zsh &|
 
 # 1Password CLI plugin wrappers.
 #

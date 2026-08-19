@@ -19,9 +19,9 @@ if (( $+commands[batcat] )); then
   _comps[batcat]=_batcat
 elif "$_bat_bin" --help 2>/dev/null | command grep -q -- '--completion'; then
   # Newer bat releases can generate their own completion definition.
-  autoload -Uz _bat command_completion
+  autoload -Uz _bat command-completion
   _comps[bat]=_bat
-  command_completion "${ZSH_CACHE_DIR}/completions/_bat" "$_bat_bin" --completion zsh &|
+  command-completion "${ZSH_CACHE_DIR}/completions/_bat" "$_bat_bin" --completion zsh &|
 fi
 
 # Colored, themed man pages via bat (uses bat's Catppuccin Mocha theme).

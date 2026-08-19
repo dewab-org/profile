@@ -13,9 +13,9 @@ alias ku='kubectl config use-context'
 
 # Keep kubectl completions available even when kubecolor is aliased to kubectl.
 _kubectl_completion_file="${ZSH_CACHE_DIR}/completions/_kubectl"
-autoload -Uz _kubectl command_completion
+autoload -Uz _kubectl command-completion
 (( ${+_comps} )) || typeset -g -A _comps
-command_completion "${_kubectl_completion_file}" kubectl completion zsh &|
+command-completion "${_kubectl_completion_file}" kubectl completion zsh &|
 
 autoload -Uz add-zsh-hook
 __kube__compdefs() {
@@ -48,19 +48,19 @@ if is-executable helm; then
   _helm_completion_file="${ZSH_CACHE_DIR}/completions/_helm"
   autoload -Uz _helm
   _comps[helm]=_helm
-  command_completion "${_helm_completion_file}" helm completion zsh &|
+  command-completion "${_helm_completion_file}" helm completion zsh &|
 fi
 
 if is-executable k9s; then
   _k9s_completion_file="${ZSH_CACHE_DIR}/completions/_k9s"
   autoload -Uz _k9s
   _comps[k9s]=_k9s
-  command_completion "${_k9s_completion_file}" k9s completion zsh &|
+  command-completion "${_k9s_completion_file}" k9s completion zsh &|
 fi
 
 if is-executable kompose; then
   _kompose_completion_file="${ZSH_CACHE_DIR}/completions/_kompose"
   autoload -Uz _kompose
   _comps[kompose]=_kompose
-  command_completion "${_kompose_completion_file}" kompose completion zsh &|
+  command-completion "${_kompose_completion_file}" kompose completion zsh &|
 fi

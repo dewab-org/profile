@@ -5,8 +5,8 @@ is-executable gdu-go || return
 
 alias gdu=gdu-go
 
-autoload -Uz _gdu command_completion
+autoload -Uz _gdu command-completion
 (( ${+_comps} )) || typeset -g -A _comps
 _comps[gdu]=_gdu
 _comps[gdu-go]=_gdu
-command_completion "${ZSH_CACHE_DIR}/completions/_gdu" gdu-go completion zsh &|
+command-completion "${ZSH_CACHE_DIR}/completions/_gdu" gdu-go completion zsh &|

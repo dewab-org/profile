@@ -5,7 +5,7 @@ is-executable fx || return
 export FX_THEME="🟣"
 export FX_NO_MOUSE=true
 
-autoload -Uz _fx command_completion
+autoload -Uz _fx command-completion
 (( ${+_comps} )) || typeset -g -A _comps
 _comps[fx]=_fx
-command_completion "${ZSH_CACHE_DIR}/completions/_fx" fx --comp zsh &|
+command-completion "${ZSH_CACHE_DIR}/completions/_fx" fx --comp zsh &|

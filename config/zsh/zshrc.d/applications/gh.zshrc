@@ -1,6 +1,6 @@
 is-executable gh || return
 
-autoload -Uz _gh command_completion
+autoload -Uz _gh command-completion
 (( ${+_comps} )) || typeset -g -A _comps
 _comps[gh]=_gh
-command_completion "${ZSH_CACHE_DIR}/completions/_gh" gh completion -s zsh &|
+command-completion "${ZSH_CACHE_DIR}/completions/_gh" gh completion -s zsh &|

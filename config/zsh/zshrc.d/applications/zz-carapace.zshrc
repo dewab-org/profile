@@ -15,12 +15,12 @@ _carapace_completion="${ZSH_CACHE_DIR}/completions/_carapace"
 # generated/run. Override by setting CARAPACE_BRIDGES before this file loads.
 export CARAPACE_BRIDGES="${CARAPACE_BRIDGES-bash,fish,inshellisense}"
 
-autoload -Uz command_completion
+autoload -Uz command-completion
 
 # The first shell needs a completion definition to source. Subsequent daily
-# refreshes can happen in the background through command_completion.
+# refreshes can happen in the background through command-completion.
 if [[ ! -s "${_carapace_completion}" ]]; then
-  command_completion "${_carapace_completion}" carapace _carapace zsh || return
+  command-completion "${_carapace_completion}" carapace _carapace zsh || return
 fi
 
 # Snapshot the native completers registered so far (per-app completion files plus
@@ -52,7 +52,7 @@ for _carapace_cmd in ${(k)_carapace_native_snapshot}; do
   compdef "${_carapace_native}" "${_carapace_cmd}" 2>/dev/null
 done
 
-command_completion "${_carapace_completion}" carapace _carapace zsh &|
+command-completion "${_carapace_completion}" carapace _carapace zsh &|
 
 unset _carapace_completion _carapace_cmd _carapace_native
 unset _carapace_native_snapshot

@@ -1,6 +1,6 @@
-convert_seconds_human_readable () {
+convert-seconds-human-readable () {
 	local seconds=${1:-0}
-	[[ $seconds == <-> ]] || { echo "Usage: convert_seconds_human_readable <seconds>" >&2; return 1; }
+	[[ $seconds == <-> ]] || { echo "Usage: convert-seconds-human-readable <seconds>" >&2; return 1; }
 
 	local hours mins secs
 	# Match original format: 02dh 02dm 02ds with hours mod 24

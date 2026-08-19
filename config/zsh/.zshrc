@@ -159,8 +159,8 @@ autoload -U +X bashcompinit && bashcompinit
 autoload -Uz paths && paths
 autoload -Uz nix-host
 autoload -Uz is && is
-autoload -Uz convert_seconds
-autoload -Uz convert_seconds_human_readable
+autoload -Uz convert-seconds
+autoload -Uz convert-seconds-human-readable
 autoload -Uz rules && rules
 autoload -Uz lsz
 autoload -Uz ips   # cross-platform (macOS + Linux); must load on all hosts
