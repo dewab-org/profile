@@ -21,6 +21,11 @@
       "type": "link"
     },
     {
+      "source": "_inputrc",
+      "target": ".inputrc",
+      "type": "link"
+    },
+    {
       "source": "config/zsh",
       "target": "${XDG_CONFIG_HOME}/zsh",
       "type": "link"
