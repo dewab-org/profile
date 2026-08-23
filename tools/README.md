@@ -101,10 +101,13 @@ Add an entry to the appropriate group's `tools` array in `manifest.json`:
   destination. Used for Docker CLI plugins, which must live in
   `~/.docker/cli-plugins` rather than the bin directory. Ignored in
   `--cache-dir` mode, whose slices are flat.
+- `skip_if_symlink_into` — a list of paths. The tool is skipped when its
+  install target is a symlink resolving inside one of them, i.e. when another
+  application already manages that file.
 
-**Docker Desktop and `docker-compose`:** Desktop ships its own compose plugin
-in `~/.docker/cli-plugins`. Installing the `docker` group overwrites it with
-the upstream release, and a Desktop update may overwrite it back. On a machine
-running Docker Desktop, prefer letting Desktop manage compose (`-docker`, or
-`--only` the other docker tools); the manifest entry is aimed at hosts with
-Docker Engine but no Desktop.
+**Docker Desktop and `docker-compose`:** Desktop points
+`~/.docker/cli-plugins/docker-compose` at its own copy inside `Docker.app`,
+so the manifest entry carries `skip_if_symlink_into` for Docker Desktop and
+Rancher Desktop. On those machines compose reports as managed and is left
+alone; on hosts running Docker Engine without Desktop it installs normally.
+Pass `--replace-managed` to install over a managed target anyway.

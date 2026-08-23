@@ -240,6 +240,31 @@ def tool_dest(tool, dest_dir: Path) -> Path:
     return Path(os.path.expanduser(d)).expanduser() if d else dest_dir
 
 
+def managed_by(tool, dest_dir: Path) -> str | None:
+    """Return the owning path when this tool's install target is a symlink
+    into one of its ``skip_if_symlink_into`` prefixes.
+
+    Docker Desktop, for instance, points ~/.docker/cli-plugins/docker-compose
+    at its own copy inside Docker.app; replacing that symlink with a standalone
+    binary starts a version tug-of-war with Desktop updates.
+    """
+    prefixes = tool.get("skip_if_symlink_into")
+    if not prefixes:
+        return None
+    target = tool_dest(tool, dest_dir) / tool["bin"]
+    if not target.is_symlink():
+        return None
+    try:
+        resolved = target.resolve()
+    except OSError:
+        return None
+    for prefix in prefixes:
+        p = Path(os.path.expanduser(prefix))
+        if resolved == p or p in resolved.parents:
+            return str(p)
+    return None
+
+
 def link_into(dest_dir: Path, name: str, src: Path) -> None:
     dest_dir.mkdir(parents=True, exist_ok=True)
     target = dest_dir / name
@@ -347,6 +372,10 @@ def process(tool, osname, arch, dest_dir, state, args, brew_prefix):
     only fall back to brew if no binary exists here.
     --no-brew: binary only (sets brew_prefix=None upstream).
     """
+    owner = managed_by(tool, dest_dir)
+    if owner and not args.replace_managed:
+        raise Skip(f"managed by {owner} (--replace-managed to override)")
+
     brew_ok = bool(brew_prefix and brew_formula(tool))
     if args.prefer_binary:
         try:
@@ -632,6 +661,14 @@ def main(argv=None):
         "--no-brew",
         action="store_true",
         help="ignore Homebrew entirely, always fetch binaries",
+    )
+    ap.add_argument(
+        "--replace-managed",
+        action="store_true",
+        help=(
+            "install tools whose target is a symlink into an application "
+            "bundle (e.g. Docker Desktop's compose plugin), replacing it"
+        ),
     )
     ap.add_argument(
         "--prefer-binary",

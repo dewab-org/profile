@@ -281,8 +281,12 @@
           "repo": "docker/compose",
           "bin": "docker-compose",
           "dest": "~/.docker/cli-plugins",
+          "skip_if_symlink_into": [
+            "/Applications/Docker.app",
+            "/Applications/Rancher Desktop.app"
+          ],
           "brew": false,
-          "note": "Docker CLI plugin: installs to ~/.docker/cli-plugins, not the bin dir. Docker Desktop ships its own copy there and may replace this one on update.",
+          "note": "Docker CLI plugin: installs to ~/.docker/cli-plugins, not the bin dir. Skipped when that path is a symlink into Docker Desktop (or Rancher Desktop), which manages its own copy.",
           "match": {
             "darwin": "docker-compose-darwin-{arch}",
             "linux": "docker-compose-linux-{arch}"

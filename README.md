@@ -101,7 +101,8 @@ The manifest groups are:
 - **general** (default): Starship, Carapace, Atuin, Zoxide, Direnv, ASSH, fzf,
   ripgrep, fd, eza, bat, vivid, glow, tldr, jless, fx, xh, gdu, jq, and yq
 - **git** (opt-in): gh, delta, lazygit, and Gitleaks
-- **docker** (opt-in): lazydocker and the docker-compose CLI plugin
+- **docker** (opt-in): lazydocker and the docker-compose CLI plugin (skipped
+  when Docker Desktop manages it)
 - **k8s** (opt-in): kubectl, kubecolor, k9s, Helm, Helmfile, kubectx, kubens,
   and switcher
 - **security** (opt-in): Smallstep CLI
