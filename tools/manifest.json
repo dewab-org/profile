@@ -1,10 +1,10 @@
 {
-  "$comment": "Binary tools deployed into ~/.local/bin by install.py, organized into groups. Groups with \"default\": true install when no group arguments are given; +<group> adds a group, -<group> deselects it AND removes its installed binaries and man pages. Each tool resolves the LATEST release for the current platform. Match patterns are Python regexes (re.fullmatch) applied to release asset names; {arch} expands to the alternation of arch synonyms for the running machine. Tools without a 'match' entry for the current OS are skipped with a notice.",
+  "$comment": "Binary tools deployed into ~/.local/bin by install.py, organized into groups. Only the group(s) marked \"default\": true (general) install when no group arguments are given; +<group> adds a group, -<group> deselects it AND removes its installed binaries and man pages. Each tool resolves the LATEST release for the current platform. Match patterns are Python regexes (re.fullmatch) applied to release asset names; {arch} expands to the alternation of arch synonyms for the running machine. Tools without a 'match' entry for the current OS are skipped with a notice.",
   "$comment_brew": "On macOS, if Homebrew is present the brew formula is preferred and symlinked into dest. The formula name defaults to the tool 'name'; override with a 'brew' string, or set 'brew': false to opt out (e.g. kctrl, which has no core formula). Use --no-brew to force binary downloads.",
   "dest": "~/.local/bin",
   "groups": {
     "general": {
-      "$comment": "Core shell, search, and file tools; installed by default.",
+      "$comment": "Core shell, search, and file tools; the only group installed by default.",
       "default": true,
       "tools": [
         {
@@ -216,8 +216,8 @@
       ]
     },
     "git": {
-      "$comment": "Git and container conveniences; installed by default.",
-      "default": true,
+      "$comment": "Git and container conveniences; opt in with +NAME.",
+      "default": false,
       "tools": [
         {
           "name": "gh",
@@ -250,6 +250,22 @@
           }
         },
         {
+          "name": "gitleaks",
+          "provider": "github",
+          "repo": "gitleaks/gitleaks",
+          "bin": "gitleaks",
+          "match": {
+            "darwin": "gitleaks_.*_darwin_{arch}\\.tar\\.gz",
+            "linux": "gitleaks_.*_linux_{arch}\\.tar\\.gz"
+          }
+        }
+      ]
+    },
+    "docker": {
+      "$comment": "Container tooling; opt in with +NAME.",
+      "default": false,
+      "tools": [
+        {
           "name": "lazydocker",
           "provider": "github",
           "repo": "jesseduffield/lazydocker",
@@ -262,8 +278,8 @@
       ]
     },
     "k8s": {
-      "$comment": "Kubernetes tooling; installed by default.",
-      "default": true,
+      "$comment": "Kubernetes tooling; opt in with +NAME.",
+      "default": false,
       "tools": [
         {
           "name": "k9s",
@@ -342,19 +358,9 @@
       ]
     },
     "security": {
-      "$comment": "Security and certificate tooling; installed by default.",
-      "default": true,
+      "$comment": "Security and certificate tooling; opt in with +NAME.",
+      "default": false,
       "tools": [
-        {
-          "name": "gitleaks",
-          "provider": "github",
-          "repo": "gitleaks/gitleaks",
-          "bin": "gitleaks",
-          "match": {
-            "darwin": "gitleaks_.*_darwin_{arch}\\.tar\\.gz",
-            "linux": "gitleaks_.*_linux_{arch}\\.tar\\.gz"
-          }
-        },
         {
           "name": "step",
           "provider": "github",

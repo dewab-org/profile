@@ -74,7 +74,7 @@ It supports macOS and Linux on AMD64 and ARM64.
 ```sh
 tools/install.py
 tools/install.py --groups
-tools/install.py +tanzu
+tools/install.py +k8s
 tools/install.py +k8s +tanzu
 tools/install.py -k8s
 tools/install.py --list
@@ -84,11 +84,11 @@ tools/install.py --no-brew
 tools/install.py --dest ~/bin
 ```
 
-Tools are organized into manifest groups. Groups marked `"default": true`
-install when no group arguments are given; `+NAME` adds a group (and any `+`
-makes the selection explicit, so `+k8s +tanzu` installs only those two), while
-`-NAME` deselects a group **and removes its installed binaries and man
-pages**. Removal only touches tools this installer recorded in its state file.
+Tools are organized into manifest groups. Only `general` installs by default;
+`+NAME` selects a group (and any `+` makes the selection explicit, so
+`+k8s +tanzu` installs only those two), while `-NAME` deselects a group **and
+removes its installed binaries and man pages**. Removal only touches tools
+this installer recorded in its state file. See `tools/README.md` for details.
 
 GitHub release metadata and assets are public and are fetched anonymously; the
 installer does not use `GITHUB_TOKEN` or the GitHub CLI.
@@ -97,10 +97,11 @@ The manifest groups are:
 
 - **general** (default): Starship, Carapace, Atuin, Zoxide, Direnv, ASSH, fzf,
   ripgrep, fd, eza, bat, vivid, glow, tldr, jless, fx, xh, gdu, jq, and yq
-- **git** (default): gh, delta, lazygit, and lazydocker
-- **k8s** (default): kubectl, kubecolor, k9s, Helm, Helmfile, kubectx, kubens,
+- **git** (opt-in): gh, delta, lazygit, and Gitleaks
+- **docker** (opt-in): lazydocker
+- **k8s** (opt-in): kubectl, kubecolor, k9s, Helm, Helmfile, kubectx, kubens,
   and switcher
-- **security** (default): Gitleaks and Smallstep CLI
+- **security** (opt-in): Smallstep CLI
 - **tanzu** (opt-in): Tanzu CLI, Velero, Cluster API, and the Carvel tools
   (ytt, imgpkg, kbld, kapp, kwt, kctrl, vendir)
 
@@ -132,6 +133,7 @@ The manifest groups are:
 ├── manifest.json              Dotfile and plugin bootstrap manifest
 ├── setup.py                   Profile bootstrap
 └── tools/
+    ├── README.md              Installer and manifest reference
     ├── install.py             Release binary installer
     └── manifest.json          Grouped tool manifest
 ```
