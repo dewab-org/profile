@@ -274,6 +274,19 @@
             "darwin": "lazydocker_.*_Darwin_{arch}\\.tar\\.gz",
             "linux": "lazydocker_.*_Linux_{arch}\\.tar\\.gz"
           }
+        },
+        {
+          "name": "docker-compose",
+          "provider": "github",
+          "repo": "docker/compose",
+          "bin": "docker-compose",
+          "dest": "~/.docker/cli-plugins",
+          "brew": false,
+          "note": "Docker CLI plugin: installs to ~/.docker/cli-plugins, not the bin dir. Docker Desktop ships its own copy there and may replace this one on update.",
+          "match": {
+            "darwin": "docker-compose-darwin-{arch}",
+            "linux": "docker-compose-linux-{arch}"
+          }
         }
       ]
     },

@@ -18,13 +18,16 @@ when no group arguments are given — currently just `general`.
 | --- | --- | --- |
 | `general` | yes | Shell, search, and file tools: starship, carapace, atuin, zoxide, direnv, assh, fzf, ripgrep, fd, eza, bat, vivid, glow, tldr, jless, fx, xh, gdu, jq, yq |
 | `git` | no | gh, delta, lazygit, gitleaks |
-| `docker` | no | lazydocker |
+| `docker` | no | lazydocker, docker-compose |
 | `k8s` | no | kubectl, kubecolor, k9s, helm, helmfile, kubectx, kubens, switcher |
 | `security` | no | step |
 | `tanzu` | no | tanzu-cli, velero, clusterctl, and the Carvel tools (ytt, imgpkg, kbld, kapp, kwt, kctrl, vendir) |
 
 `+NAME` selects a group. Any `+` argument makes the selection explicit, so
 `+k8s +docker` installs those two groups and nothing else.
+
+`all` is a pseudo-group meaning every group, so `+all` installs everything and
+`+all -tanzu` is everything except tanzu.
 
 `-NAME` deselects a group **and removes its installed binaries and man
 pages**. Removal only touches tools recorded in the installer's state file
@@ -35,6 +38,8 @@ left alone, and re-running is a no-op.
 ./install.py                  # the default groups (general)
 ./install.py +k8s             # k8s only
 ./install.py +k8s +docker     # k8s and docker
+./install.py +all             # every group
+./install.py +all -tanzu      # every group except tanzu
 ./install.py -k8s             # defaults minus k8s, removing its files
 ./install.py --groups         # list groups and exit
 ```
@@ -92,3 +97,14 @@ Add an entry to the appropriate group's `tools` array in `manifest.json`:
   used to locate it inside an archive when it differs.
 - `brew` — a formula name when it differs from `name`, or `false` to opt out
   of Homebrew for that tool.
+- `dest` — an install directory for that tool alone, overriding the run's
+  destination. Used for Docker CLI plugins, which must live in
+  `~/.docker/cli-plugins` rather than the bin directory. Ignored in
+  `--cache-dir` mode, whose slices are flat.
+
+**Docker Desktop and `docker-compose`:** Desktop ships its own compose plugin
+in `~/.docker/cli-plugins`. Installing the `docker` group overwrites it with
+the upstream release, and a Desktop update may overwrite it back. On a machine
+running Docker Desktop, prefer letting Desktop manage compose (`-docker`, or
+`--only` the other docker tools); the manifest entry is aimed at hosts with
+Docker Engine but no Desktop.

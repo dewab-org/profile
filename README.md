@@ -76,6 +76,8 @@ tools/install.py
 tools/install.py --groups
 tools/install.py +k8s
 tools/install.py +k8s +tanzu
+tools/install.py +all
+tools/install.py +all -tanzu
 tools/install.py -k8s
 tools/install.py --list
 tools/install.py --only fzf bat atuin
@@ -86,8 +88,9 @@ tools/install.py --dest ~/bin
 
 Tools are organized into manifest groups. Only `general` installs by default;
 `+NAME` selects a group (and any `+` makes the selection explicit, so
-`+k8s +tanzu` installs only those two), while `-NAME` deselects a group **and
-removes its installed binaries and man pages**. Removal only touches tools
+`+k8s +tanzu` installs only those two), `+all` selects every group, while
+`-NAME` deselects a group **and removes its installed binaries and man
+pages**. Removal only touches tools
 this installer recorded in its state file. See `tools/README.md` for details.
 
 GitHub release metadata and assets are public and are fetched anonymously; the
@@ -98,7 +101,7 @@ The manifest groups are:
 - **general** (default): Starship, Carapace, Atuin, Zoxide, Direnv, ASSH, fzf,
   ripgrep, fd, eza, bat, vivid, glow, tldr, jless, fx, xh, gdu, jq, and yq
 - **git** (opt-in): gh, delta, lazygit, and Gitleaks
-- **docker** (opt-in): lazydocker
+- **docker** (opt-in): lazydocker and the docker-compose CLI plugin
 - **k8s** (opt-in): kubectl, kubecolor, k9s, Helm, Helmfile, kubectx, kubens,
   and switcher
 - **security** (opt-in): Smallstep CLI

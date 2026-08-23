@@ -207,6 +207,7 @@ def brew_installed_version(formula: str) -> str | None:
 
 
 def process_brew(tool, dest_dir, prefix, state, args):
+    dest_dir = tool_dest(tool, dest_dir)
     formula = brew_formula(tool)
     binname = tool["bin"]
     before = brew_installed_version(formula)
@@ -230,6 +231,13 @@ def process_brew(tool, dest_dir, prefix, state, args):
     if before and before == after and not args.force:
         return "skip", f"brew up to date ({after})"
     return "ok", f"brew {formula} -> {after} (symlinked)"
+
+
+def tool_dest(tool, dest_dir: Path) -> Path:
+    """Install directory for one tool: its own ``dest`` when set (e.g. Docker
+    CLI plugins), otherwise the run's destination."""
+    d = tool.get("dest")
+    return Path(os.path.expanduser(d)).expanduser() if d else dest_dir
 
 
 def link_into(dest_dir: Path, name: str, src: Path) -> None:
@@ -352,8 +360,12 @@ def process(tool, osname, arch, dest_dir, state, args, brew_prefix):
     return process_binary(tool, osname, arch, dest_dir, state, args)
 
 
-def process_binary(tool, osname, arch, dest_dir, state, args, install_man=True):
+def process_binary(
+    tool, osname, arch, dest_dir, state, args, install_man=True, honor_tool_dest=True
+):
     name = tool["name"]
+    if honor_tool_dest:
+        dest_dir = tool_dest(tool, dest_dir)
     resolver = RESOLVERS.get(tool["provider"])
     if not resolver:
         return "fail", f"unknown provider {tool['provider']!r}"
@@ -363,7 +375,8 @@ def process_binary(tool, osname, arch, dest_dir, state, args, install_man=True):
     present = (dest_dir / tool["bin"]).exists()
     if args.list or args.dry_run:
         flag = "up-to-date" if (installed == version and present) else "would install"
-        return "plan", f"{version:<14} {flag}  ({asset_name})"
+        where = f" -> {dest_dir}" if tool.get("dest") else ""
+        return "plan", f"{version:<14} {flag}{where}  ({asset_name})"
     if installed == version and present and not args.force:
         return "skip", f"up to date ({version})"
 
@@ -408,18 +421,30 @@ def all_tools(manifest: dict) -> list:
 
 
 def parse_group_args(tokens, groups) -> tuple[set, set]:
-    """Split ``+g``/``-g`` tokens into (added, removed) group-name sets."""
+    """Split ``+g``/``-g`` tokens into (added, removed) group-name sets.
+
+    ``all`` is a pseudo-group meaning every group in the manifest, so ``+all``
+    installs everything and ``+all -tanzu`` is everything but tanzu. Only
+    explicitly named groups can conflict; ``all`` expanding over a group named
+    on the other side is the normal way to write "everything except".
+    """
     added, removed = set(), set()
+    named_add, named_remove = set(), set()
     for tok in tokens:
         sign, name = tok[0], tok[1:]
         if sign not in "+-" or not name:
             sys.exit(f"invalid group argument {tok!r}: use +NAME or -NAME")
+        if name == "all":
+            (added if sign == "+" else removed).update(groups)
+            continue
         if name not in groups:
             sys.exit(
-                f"unknown group {name!r}; known groups: {', '.join(sorted(groups))}"
+                f"unknown group {name!r}; known groups: "
+                f"{', '.join(sorted(groups))}, all"
             )
         (added if sign == "+" else removed).add(name)
-    overlap = added & removed
+        (named_add if sign == "+" else named_remove).add(name)
+    overlap = named_add & named_remove
     if overlap:
         sys.exit(f"group(s) both added and removed: {', '.join(sorted(overlap))}")
     return added, removed
@@ -455,7 +480,7 @@ def remove_group_tools(manifest, groups_to_remove, dest_dir, state, args) -> int
     for gname in groups_to_remove:
         for tool in group_tools(groups[gname]):
             name, binname = tool["name"], tool["bin"]
-            target = dest_dir / binname
+            target = tool_dest(tool, dest_dir) / binname
             known = name in state
             if not known and not (target.is_symlink() or target.exists()):
                 continue
@@ -554,8 +579,18 @@ def cache_main(args) -> int:
             tools,
             # Cache slices map directly onto the target's bin dir, so they carry
             # no share/man sibling; man pages are installed by the on-host run.
+            # Cache slices are flat directories copied onto a target host, so
+            # a tool's own dest (e.g. a Docker CLI plugin path) is ignored here
+            # and applied by the on-host run.
             lambda tool: process_binary(
-                tool, osname, arch, dest_dir, state, args, install_man=False
+                tool,
+                osname,
+                arch,
+                dest_dir,
+                state,
+                args,
+                install_man=False,
+                honor_tool_dest=False,
             ),
         )
         if not (args.list or args.dry_run):
