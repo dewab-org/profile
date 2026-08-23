@@ -8,8 +8,17 @@ from what was last installed (tracked in ``<dest>/.tools-installed.json``).
 
 Supports macOS and Linux on x86_64 and arm64. Pure stdlib (Python 3.8+).
 
+Tools are organized into groups in the manifest. Groups marked "default":
+true install when no group arguments are given. ``+group`` adds a group,
+``-group`` deselects it and removes its already-installed binaries and man
+pages.
+
 Usage:
-    ./install.py                     # install/update everything
+    ./install.py                     # install/update the default groups
+    ./install.py +tanzu              # defaults plus the tanzu group
+    ./install.py +k8s +tanzu         # only these two groups
+    ./install.py -k8s                # defaults minus k8s (removes its files)
+    ./install.py --groups            # list groups and exit
     ./install.py --only fzf bat      # just these tools
     ./install.py --list              # show resolved plan, install nothing
     ./install.py --force             # re-download even if up to date
@@ -382,14 +391,107 @@ def process_binary(tool, osname, arch, dest_dir, state, args, install_man=True):
     return "ok", msg
 
 
-def _select_tools(manifest: dict, only: list[str] | None) -> list:
-    tools = manifest["tools"]
+# ── groups ───────────────────────────────────────────────────────────────────
+def manifest_groups(manifest: dict) -> dict:
+    """Ordered {group: spec} mapping, ignoring $comment keys."""
+    return {
+        k: v for k, v in manifest.get("groups", {}).items() if not k.startswith("$")
+    }
+
+
+def group_tools(spec: dict) -> list:
+    return spec.get("tools", [])
+
+
+def all_tools(manifest: dict) -> list:
+    return [t for spec in manifest_groups(manifest).values() for t in group_tools(spec)]
+
+
+def parse_group_args(tokens, groups) -> tuple[set, set]:
+    """Split ``+g``/``-g`` tokens into (added, removed) group-name sets."""
+    added, removed = set(), set()
+    for tok in tokens:
+        sign, name = tok[0], tok[1:]
+        if sign not in "+-" or not name:
+            sys.exit(f"invalid group argument {tok!r}: use +NAME or -NAME")
+        if name not in groups:
+            sys.exit(
+                f"unknown group {name!r}; known groups: {', '.join(sorted(groups))}"
+            )
+        (added if sign == "+" else removed).add(name)
+    overlap = added & removed
+    if overlap:
+        sys.exit(f"group(s) both added and removed: {', '.join(sorted(overlap))}")
+    return added, removed
+
+
+def select_groups(manifest: dict, added: set, removed: set) -> tuple[list, list]:
+    """Return (selected_group_names, deselected_group_names).
+
+    With no ``+`` arguments the manifest defaults are the baseline; any ``+``
+    argument makes the selection explicit (only those groups). ``-`` always
+    subtracts, and every unselected group counts as deselected so its files
+    can be removed.
+    """
+    groups = manifest_groups(manifest)
+    if added:
+        selected = [g for g in groups if g in added]
+    else:
+        selected = [g for g in groups if groups[g].get("default", False)]
+    selected = [g for g in selected if g not in removed]
+    deselected = [g for g in groups if g not in selected]
+    return selected, deselected
+
+
+def remove_group_tools(manifest, groups_to_remove, dest_dir, state, args) -> int:
+    """Delete installed binaries (and their man pages) for deselected groups.
+
+    Only files this installer recorded in its state file are touched, so a
+    tool that was never installed here is left alone.
+    """
+    groups = manifest_groups(manifest)
+    man_root = dest_dir.parent / "share" / "man"
+    removed_count = 0
+    for gname in groups_to_remove:
+        for tool in group_tools(groups[gname]):
+            name, binname = tool["name"], tool["bin"]
+            target = dest_dir / binname
+            known = name in state
+            if not known and not (target.is_symlink() or target.exists()):
+                continue
+            if args.list or args.dry_run:
+                print(f"  · {name:<12} would remove {target}")
+                removed_count += 1
+                continue
+            if target.is_symlink() or target.exists():
+                target.unlink()
+            for man in sorted(man_root.glob(f"man[1-8]/{binname}.[1-8]*")):
+                man.unlink()
+            state.pop(name, None)
+            print(f"  ✗ {name:<12} removed {binname}")
+            removed_count += 1
+    return removed_count
+
+
+def _select_tools(manifest: dict, only: list[str] | None, selected=None) -> list:
+    if selected is None:
+        tools = all_tools(manifest)
+    else:
+        groups = manifest_groups(manifest)
+        tools = [t for g in selected for t in group_tools(groups[g])]
     if only:
         wanted = set(only)
         tools = [t for t in tools if t["name"] in wanted]
         missing = wanted - {t["name"] for t in tools}
         if missing:
-            sys.exit(f"unknown tool(s): {', '.join(sorted(missing))}")
+            known = {t["name"] for t in all_tools(manifest)}
+            unknown = missing - known
+            if unknown:
+                sys.exit(f"unknown tool(s): {', '.join(sorted(unknown))}")
+            sys.exit(
+                "tool(s) not in the selected groups: "
+                f"{', '.join(sorted(missing))} (add the group with +NAME)"
+            )
     return tools
 
 
@@ -436,7 +538,10 @@ def cache_main(args) -> int:
     <cache-dir>/<os>-<arch>/ to each target host's install dir.
     """
     manifest = json.loads(args.manifest.read_text())
-    tools = _select_tools(manifest, args.only)
+    groups = manifest_groups(manifest)
+    added, removed = parse_group_args(args.groups, groups)
+    selected, _ = select_groups(manifest, added, removed)
+    tools = _select_tools(manifest, args.only, selected)
     targets = [parse_platform(p) for p in args.targets]
 
     total_fail = 0
@@ -469,6 +574,12 @@ def main(argv=None):
         description="Install latest tool binaries into ~/.local/bin"
     )
     ap.add_argument("--manifest", type=Path, default=here / "manifest.json")
+    ap.add_argument(
+        "--groups",
+        dest="list_groups",
+        action="store_true",
+        help="list manifest groups with their tools and exit",
+    )
     ap.add_argument(
         "--dest", type=Path, default=None, help="install dir (default from manifest)"
     )
@@ -509,7 +620,23 @@ def main(argv=None):
         metavar="OS/ARCH",
         help="with --cache-dir: platform(s) to cache, e.g. linux/amd64 darwin/arm64",
     )
+    ap.epilog = (
+        "group selection: +NAME installs that group (any + makes the selection "
+        "explicit), -NAME deselects it and removes its installed binaries and "
+        "man pages. With no group arguments the manifest's default groups are "
+        "installed. Example: install.py +k8s +tanzu"
+    )
+    ap.formatter_class = argparse.RawDescriptionHelpFormatter
+
+    # argparse would treat "-k8s" as an option cluster, so group tokens are
+    # split out of argv before parsing. A bare "-" or "+" is left for argparse
+    # to reject.
+    argv = list(sys.argv[1:] if argv is None else argv)
+    group_args = [a for a in argv if len(a) > 1 and a[0] in "+-" and a[1].isalnum()]
+    argv = [a for a in argv if a not in group_args]
+
     args = ap.parse_args(argv)
+    args.groups = group_args
 
     if args.cache_dir:
         if not args.targets:
@@ -517,6 +644,20 @@ def main(argv=None):
         return cache_main(args)
 
     manifest = json.loads(args.manifest.read_text())
+    groups = manifest_groups(manifest)
+
+    if args.list_groups:
+        for gname, spec in groups.items():
+            flag = "default" if spec.get("default") else "opt-in"
+            names = " ".join(t["name"] for t in group_tools(spec))
+            print(f"{gname:<10} ({flag}, {len(group_tools(spec))})  {names}")
+        return 0
+
+    added, removed = parse_group_args(args.groups, groups)
+    selected, deselected = select_groups(manifest, added, removed)
+    if not selected:
+        sys.exit("no groups selected; nothing to do")
+
     dest_dir = (
         args.dest or Path(os.path.expanduser(manifest.get("dest", "~/.local/bin")))
     ).expanduser()
@@ -531,11 +672,23 @@ def main(argv=None):
         method = f"binary downloads (brew @ {brew_prefix} fallback)"
     else:
         method = f"brew @ {brew_prefix} (binary fallback)"
-    print(f"platform: {osname}/{arch}   dest: {dest_dir}   method: {method}\n")
+    print(
+        f"platform: {osname}/{arch}   dest: {dest_dir}   method: {method}\n"
+        f"groups: {', '.join(selected)}\n"
+    )
 
-    tools = _select_tools(manifest, args.only)
     state_path = dest_dir / STATE_FILE
     state = load_state(state_path)
+
+    # Explicit -GROUP removes that group's files; groups merely left unselected
+    # are ignored, so a partial run never deletes anything unexpectedly.
+    n_removed = 0
+    if removed:
+        n_removed = remove_group_tools(
+            manifest, [g for g in deselected if g in removed], dest_dir, state, args
+        )
+
+    tools = _select_tools(manifest, args.only, selected)
     counts = _run_tools(
         tools,
         lambda tool: process(tool, osname, arch, dest_dir, state, args, brew_prefix),
@@ -544,10 +697,13 @@ def main(argv=None):
     if not (args.list or args.dry_run):
         save_state(state_path, state)
 
-    print(
+    summary = (
         f"\n{counts['ok']} installed, {counts['skip']} up-to-date, "
         f"{counts['skip-platform']} n/a here, {counts['fail']} failed"
     )
+    if n_removed:
+        summary += f", {n_removed} removed"
+    print(summary)
     if dest_dir.is_dir() and str(dest_dir) not in os.environ.get("PATH", "").split(
         os.pathsep
     ):
