@@ -3,6 +3,17 @@
 # - Compiles to <target>.zwc when present and size meets COMMAND_COMPLETION_COMPILE_THRESHOLD_BYTES (default: 10240).
 # - Replaces generated and compiled files atomically so concurrent shells never
 #   observe partially written completion data, and serializes updates per target.
+#
+# Known behavior (observed 2026-09-07, left as-is): callers invoke this with &|,
+# so on the day the cache expires all ~25 generators spawn at once — roughly
+# 2.5s of CPU in one burst (trivy 0.34s, k9s 0.29s, grype 0.17s, gh/helm 0.15s,
+# kubectl 0.14s, the rest under 0.1s). For a second or two that makes
+# interactive work feel sluggish, most visibly Atuin's TUI, and any warning a
+# generator prints lands on the prompt. It self-clears and recurs at most once
+# a day. If it ever becomes annoying, two fixes: run the generator under `nice`
+# so it yields to the interactive shell, and/or raise
+# COMMAND_COMPLETION_MAX_AGE_DAYS and offset each target by a hash of its name
+# so refreshes spread over the window instead of stampeding on one day.
 
 command-completion() {
   local target="$1"; shift
