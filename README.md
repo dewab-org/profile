@@ -4,6 +4,9 @@ Personal shell, terminal, editor, and command-line tooling for macOS and Linux.
 The configuration follows XDG paths, uses Zsh as the interactive shell, and is
 bootstrapped from declarative JSON manifests.
 
+The story behind it, on my blog:
+[My zsh profile is ridiculously overbuilt](https://danielwhicker.com/2026/09/zsh-profile-overbuilt/).
+
 ## Highlights
 
 - **Prompt:** Starship with Catppuccin Mocha styling, Git context, runtime
